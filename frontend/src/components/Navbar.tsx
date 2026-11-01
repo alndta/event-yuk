@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   AlertCircle,
@@ -6,7 +6,6 @@ import {
   Globe,
   Layers,
   LogOut,
-  Menu,
   PlusCircle,
   User,
   X,
@@ -14,6 +13,8 @@ import {
 import { UserRole } from './RoleOnboardingModal';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { gsap, NO_REDUCED_MOTION } from '../lib/motion';
+import useMagnetic from '../hooks/useMagnetic';
 
 interface Props {
   currentRole: UserRole;
@@ -30,14 +31,19 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
   const { language, toggleLanguage, t } = useLanguage();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [menu, setMenu] = useState<'closed' | 'open' | 'closing'>('closed');
+  const mounted = menu !== 'closed';
+  const menuRef = useRef(menu);
+  menuRef.current = menu;
+  const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const btnRef = useMagnetic<HTMLButtonElement>(0.22);
   const [scrolled, setScrolled] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
-  const closeRef = useRef<HTMLButtonElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
 
   const overlay = LIME_HERO_ROUTES.includes(location.pathname) || NAVY_HERO_ROUTES.includes(location.pathname);
   const onNavy = NAVY_HERO_ROUTES.includes(location.pathname);
-  const solid = scrolled || menuOpen;
+  const solid = scrolled || menu === 'open';
   const light = onNavy && !solid;
   const isHome = LIME_HERO_ROUTES.includes(location.pathname);
   // Line the logo up with the content below it on each kind of page.
@@ -48,8 +54,32 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
       : 'px-5 sm:px-8 lg:px-12 2xl:px-16';
   const shellStyle = onNavy ? { paddingInline: 'clamp(1.25rem, 4.5vw, 5rem)' } : undefined;
 
+  // Open and close. The panel stays mounted while it plays backwards.
+  const openMenu = () => {
+    if (menuRef.current === 'closing') tlRef.current?.timeScale(1).play();
+    setMenu('open');
+  };
+  const closeMenu = () => {
+    if (menuRef.current === 'closed') return;
+    const tl = tlRef.current;
+    if (!tl) {
+      setMenu('closed');
+      return;
+    }
+    setMenu('closing');
+    tl.timeScale(1.7).reverse();
+  };
+  const closeRef = useRef(closeMenu);
+  closeRef.current = closeMenu;
+  // For actions that open something else right away (a modal), skip the exit.
+  const forceClose = () => {
+    tlRef.current?.kill();
+    tlRef.current = null;
+    setMenu('closed');
+  };
+
   useEffect(() => {
-    setMenuOpen(false);
+    closeRef.current();
   }, [location.pathname]);
 
   useEffect(() => {
@@ -61,15 +91,16 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
 
   // Modal behaviour: lock page scroll, close on Escape, keep Tab inside, return focus on close.
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!mounted) return;
     const previous = document.activeElement as HTMLElement | null;
     const overflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    closeRef.current?.focus();
+    window.dispatchEvent(new CustomEvent('ey:scroll-lock', { detail: true }));
+    closeBtnRef.current?.focus();
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setMenuOpen(false);
+        closeRef.current();
         return;
       }
       if (e.key !== 'Tab' || !dialogRef.current) return;
@@ -90,10 +121,49 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
     document.addEventListener('keydown', onKey);
     return () => {
       document.body.style.overflow = overflow;
+      window.dispatchEvent(new CustomEvent('ey:scroll-lock', { detail: false }));
       document.removeEventListener('keydown', onKey);
       previous?.focus?.();
     };
-  }, [menuOpen]);
+  }, [mounted]);
+
+  // Entrance: a circle grows out of the Menu button, then the blocks rise in
+  // turn, labels slide up out of their masks, arrows spin in, and the photo
+  // opens from the right. Built before paint so nothing flashes.
+  useLayoutEffect(() => {
+    if (!mounted) return;
+    const root = dialogRef.current;
+    if (!root) return;
+    const mm = gsap.matchMedia();
+    mm.add(NO_REDUCED_MOTION, () => {
+      const q = gsap.utils.selector(root);
+      const b = btnRef.current?.getBoundingClientRect();
+      const cx = b ? b.left + b.width / 2 : window.innerWidth - 60;
+      const cy = b ? b.top + b.height / 2 : 36;
+      const radius = Math.hypot(Math.max(cx, window.innerWidth - cx), Math.max(cy, window.innerHeight - cy));
+
+      const tl = gsap.timeline({ defaults: { ease: 'ey' }, onReverseComplete: () => setMenu('closed') });
+      tl.fromTo(
+        root,
+        { clipPath: `circle(0px at ${cx}px ${cy}px)` },
+        { clipPath: `circle(${radius}px at ${cx}px ${cy}px)`, duration: 1.05, ease: 'power3.inOut' },
+        0
+      )
+        .from(q('[data-menu-top]'), { autoAlpha: 0, y: -18, duration: 0.7 }, 0.45)
+        .from(q('[data-menu-block]'), { yPercent: 110, duration: 1.05, stagger: 0.08 }, 0.28)
+        .from(q('[data-menu-label]'), { yPercent: 105, duration: 0.95, stagger: 0.08 }, 0.42)
+        .from(q('[data-menu-arrow]'), { scale: 0, rotate: -90, duration: 0.8, ease: 'back.out(2)', stagger: 0.08 }, 0.66)
+        .from(q('[data-menu-chip]'), { y: 28, autoAlpha: 0, duration: 0.8, stagger: 0.06 }, 0.72)
+        .from(q('[data-menu-photo]'), { clipPath: 'inset(0% 0% 0% 100%)', duration: 1.2 }, 0.35)
+        .from(q('[data-menu-photo] img'), { scale: 1.4, duration: 1.6 }, 0.35)
+        .from(q('[data-menu-account]'), { y: 36, autoAlpha: 0, duration: 0.9 }, 0.82);
+      tlRef.current = tl;
+      return () => {
+        tlRef.current = null;
+      };
+    });
+    return () => mm.revert();
+  }, [mounted]);
 
   const textTone = light ? 'text-white' : 'text-brand-navy';
   const pill =
@@ -179,42 +249,49 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
             )}
 
             <button
+              ref={btnRef}
               type="button"
-              onClick={() => setMenuOpen(true)}
+              onClick={openMenu}
               aria-haspopup="dialog"
-              aria-expanded={menuOpen}
+              aria-expanded={menu === 'open'}
               className={
                 pill +
-                'border-2 ' +
+                'ey-menu-btn border-2 ' +
                 (light
                   ? 'border-white text-white hover:bg-white hover:text-brand-navy focus-visible:outline-white'
                   : 'border-brand-navy text-brand-navy hover:bg-brand-navy hover:text-brand-lime focus-visible:outline-brand-navy')
               }
             >
-              <Menu aria-hidden="true" className="h-5 w-5" />
-              Menu
+              <span aria-hidden="true" className="relative block h-3 w-5">
+                <span className="ey-bar ey-bar-a absolute left-0 top-0 h-0.5 w-full rounded-full bg-current" />
+                <span className="ey-bar ey-bar-b absolute bottom-0 left-0 h-0.5 w-full rounded-full bg-current" />
+              </span>
+              <span className="ey-roll">
+                <span>Menu</span>
+                <span aria-hidden="true">Menu</span>
+              </span>
             </button>
           </div>
         </div>
       </header>
 
-      {menuOpen && (
+      {mounted && (
         <div
           ref={dialogRef}
           role="dialog"
           aria-modal="true"
           aria-label="Menu utama"
-          className="fixed inset-0 z-50 flex animate-fadeIn flex-col overflow-y-auto bg-brand-navy font-sans text-white"
+          className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-brand-navy font-sans text-white"
         >
-          <div className="mx-auto flex w-full max-w-[96rem] items-center justify-between px-5 py-3 sm:px-8 lg:px-12">
+          <div data-menu-top className="mx-auto flex w-full max-w-[96rem] items-center justify-between px-5 py-3 sm:px-8 lg:px-12">
             <Link to="/" className="flex items-center gap-2.5 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-lime">
               <img src="/logo-event-yuk.png" alt="" className="h-9 w-auto rounded-md bg-white p-1 object-contain" />
               <span className="font-display text-xl font-extrabold leading-none tracking-[-0.03em]">Event Yuk</span>
             </Link>
             <button
-              ref={closeRef}
+              ref={closeBtnRef}
               type="button"
-              onClick={() => setMenuOpen(false)}
+              onClick={closeMenu}
               className={pill + 'bg-brand-lime text-brand-navy hover:bg-brand-lime-hover focus-visible:outline-white'}
             >
               <X aria-hidden="true" className="h-5 w-5" />
@@ -228,24 +305,29 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
                 <Link
                   key={to}
                   to={to}
+                  data-menu-block
                   aria-current={isHere(to) ? 'page' : undefined}
                   className={
                     'group flex min-h-[4.5rem] items-center justify-between rounded-lg px-6 lg:flex-1 font-display text-[clamp(2rem,4.4vw,3.75rem)] font-extrabold leading-none tracking-[-0.04em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:min-h-[5.5rem] ' +
                     tone
                   }
                 >
-                  <span className="flex items-center gap-4">
-                    {label}
+                  <span className="flex items-center gap-4 overflow-hidden py-[0.12em]">
+                    <span data-menu-label className="block">
+                      {label}
+                    </span>
                     {isHere(to) && <span aria-hidden="true" className="h-3 w-3 rounded-full bg-brand-navy" />}
                   </span>
-                  <ArrowUpRight aria-hidden="true" className="h-8 w-8 shrink-0 transition-transform group-hover:-translate-y-1 group-hover:translate-x-1 sm:h-10 sm:w-10" />
+                  <span data-menu-arrow className="shrink-0">
+                    <ArrowUpRight aria-hidden="true" className="h-8 w-8 transition-transform duration-500 group-hover:-translate-y-1 group-hover:translate-x-1 sm:h-10 sm:w-10" />
+                  </span>
                 </Link>
               ))}
 
               <p className="mt-4 text-base font-semibold text-slate-300">{t('nav.partners')}</p>
               <ul className="grid grid-cols-2 gap-2">
                 {partners.map(({ to, label }) => (
-                  <li key={to}>
+                  <li key={to} data-menu-chip>
                     <Link
                       to={to}
                       aria-current={isHere(to) ? 'page' : undefined}
@@ -262,7 +344,7 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
               </ul>
             </nav>
 
-            <div className="relative hidden min-h-[14rem] overflow-hidden rounded-lg bg-brand-navy-light lg:block">
+            <div data-menu-photo className="relative hidden min-h-[14rem] overflow-hidden rounded-lg bg-brand-navy-light lg:block">
               <img
                 src="/assets/hero-concert.jpg"
                 alt=""
@@ -273,7 +355,7 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
               />
             </div>
 
-            <div className="space-y-3 rounded-lg bg-brand-navy-dark p-5">
+            <div data-menu-account className="space-y-3 rounded-lg bg-brand-navy-dark p-5">
               {!isAuthenticated ? (
                 <div className="grid grid-cols-2 gap-3">
                   <Link
@@ -314,7 +396,7 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
                       <button
                         type="button"
                         onClick={() => {
-                          setMenuOpen(false);
+                          forceClose();
                           onOpenCreateEvent();
                         }}
                         className={pill + 'w-full justify-center border-2 border-white/40 text-white hover:border-white focus-visible:outline-white'}
@@ -326,7 +408,7 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
                         <button
                           type="button"
                           onClick={() => {
-                            setMenuOpen(false);
+                            forceClose();
                             onOpenUploadPortfolio();
                           }}
                           className={pill + 'w-full justify-center text-slate-200 hover:text-white focus-visible:outline-white'}
@@ -347,7 +429,7 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
                     <button
                       type="button"
                       onClick={() => {
-                        setMenuOpen(false);
+                        forceClose();
                         logout();
                       }}
                       className={pill + 'justify-center border-2 border-white/40 text-white hover:border-white focus-visible:outline-white'}
