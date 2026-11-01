@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import useEnter from '../hooks/useEnter';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Mail,
@@ -20,6 +21,8 @@ export default function LoginPage() {
   const { login, signInWithGoogle } = useAuth();
 
   const [email, setEmail] = useState('');
+  const pageRef = useRef<HTMLDivElement>(null);
+  useEnter(pageRef);
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
@@ -58,7 +61,7 @@ export default function LoginPage() {
   ];
 
   return (
-    <div className="flex min-h-screen w-full flex-col bg-white font-sans lg:flex-row">
+    <div ref={pageRef} className="flex min-h-screen w-full flex-col bg-white font-sans lg:flex-row">
       <SEOHead
         title="Masuk ke Akun Mitra | Event Yuk"
         description="Masuk ke ruang kerja kolaborasi acara Event Yuk untuk mengelola pagu anggaran, kontrak PKS sah, dan rekening bersama Escrow."
@@ -74,14 +77,14 @@ export default function LoginPage() {
         </Link>
 
         <div className="max-w-lg">
-          <h1 className="font-display text-5xl font-extrabold leading-[1.05] tracking-[-0.03em]">
+          <h1 data-enter className="font-display text-5xl font-extrabold leading-[1.05] tracking-[-0.03em]">
             Satu akun,
             <span className="mt-2 block text-brand-lime">semua peran di acaramu.</span>
           </h1>
-          <p className="mt-6 text-lg leading-8 text-slate-200">
+          <p data-enter className="mt-6 text-lg leading-8 text-slate-200">
             Masuk untuk mengelola proyek, kontrak, dan pembayaran, baik sebagai penyelenggara, vendor, musisi, tenant, sponsor, maupun kru.
           </p>
-          <ul className="mt-8 space-y-4">
+          <ul data-enter className="mt-8 space-y-4">
             {guarantees.map((item) => (
               <li key={item} className="flex items-start gap-3 text-base leading-7 text-slate-100">
                 <Check aria-hidden="true" className="mt-1 h-5 w-5 shrink-0 text-brand-lime" />
@@ -119,7 +122,7 @@ export default function LoginPage() {
             <img src="/logo-event-yuk.png" alt="Event Yuk" className="mx-auto h-10 w-auto object-contain" />
           </Link>
 
-          <h2 className="font-display text-3xl font-extrabold tracking-[-0.03em] text-slate-950 sm:text-4xl">
+          <h2 data-enter className="font-display text-3xl font-extrabold tracking-[-0.03em] text-slate-950 sm:text-4xl">
             Masuk ke akunmu
           </h2>
           <p className="mt-3 text-base leading-7 text-slate-600">
@@ -136,7 +139,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="mt-8 space-y-5">
+          <form data-enter onSubmit={handleLogin} className="mt-8 space-y-5">
             <div>
               <label htmlFor="login-email" className="mb-2 block text-sm font-semibold text-slate-800">
                 Email

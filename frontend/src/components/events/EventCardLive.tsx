@@ -44,7 +44,7 @@ export default function EventCardLive({ event, onSelectAction }: Props) {
   ];
 
   return (
-    <article data-gsap-reveal className="group flex h-full flex-col overflow-hidden rounded-2xl bg-white">
+    <article data-gsap-reveal className="ey-lift group flex h-full flex-col overflow-hidden rounded-2xl bg-white">
       <Link
         to={'/events/' + event.id}
         aria-label={t('eventCard.details') + ': ' + event.title}

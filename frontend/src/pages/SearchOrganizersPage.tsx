@@ -160,7 +160,7 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
           <div
             key={eo.id}
             data-gsap-reveal
-            className="flex flex-col overflow-hidden rounded-lg bg-white"
+            className="ey-lift flex flex-col overflow-hidden rounded-lg bg-white"
           >
             {/* Banner Top */}
             <div className="relative h-36 overflow-hidden bg-brand-navy-light">

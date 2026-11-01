@@ -1,3 +1,4 @@
+import Dialog from '../components/Dialog';
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import {
@@ -588,7 +589,7 @@ export default function DashboardPage({ onShowToast }: Props) {
 
       {/* Modal: Tambah Dagangan / Paket Katalog Baru */}
       {showAddModal && (
-        <div className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 animate-fadeIn">
+        <Dialog onClose={() => setShowAddModal(false)} label="Tambah ke katalog">
           <div role="dialog" aria-modal="true" aria-labelledby="add-item-title" className="bg-white rounded-lg max-w-lg w-full p-6 sm:p-8 space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
@@ -684,7 +685,7 @@ export default function DashboardPage({ onShowToast }: Props) {
               </div>
             </form>
           </div>
-        </div>
+        </Dialog>
       )}
     </div>
   );

@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import useEnter from '../hooks/useEnter';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Mail,
@@ -30,6 +31,8 @@ export default function RegisterPage() {
   const { login, signInWithGoogle } = useAuth();
 
   const [step, setStep] = useState<'SELECT_ROLE' | 'FORM' | 'OTP'>('SELECT_ROLE');
+  const stepRef = useRef<HTMLElement>(null);
+  useEnter(stepRef, step);
   const [formData, setFormData] = useState({
     fullName: '',
     businessName: '',
@@ -305,7 +308,7 @@ export default function RegisterPage() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12">
+      <main ref={stepRef} className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12">
         {/* Error / Success Notifications */}
         {errorMessage && (
           <div className="max-w-2xl mx-auto mb-6 p-4 rounded-lg bg-rose-50 border border-rose-300 text-sm text-rose-800 font-medium flex items-center gap-2.5" role="alert">
@@ -459,7 +462,7 @@ export default function RegisterPage() {
 
         {/* STEP 2: ACCOUNT DETAILS & CREDENTIALS */}
         {step === 'FORM' && (
-          <div className="max-w-2xl mx-auto space-y-6 animate-fadeIn">
+          <div className="max-w-2xl mx-auto space-y-6">
             {/* Header */}
             <div>
               <button
@@ -662,7 +665,7 @@ export default function RegisterPage() {
 
         {/* STEP 3: OTP VERIFICATION */}
         {step === 'OTP' && (
-          <div className="max-w-md mx-auto space-y-6 animate-fadeIn">
+          <div className="max-w-md mx-auto space-y-6">
             <div className="text-center">
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-brand-lime text-brand-navy">
                 <KeyRound aria-hidden="true" className="h-7 w-7" />

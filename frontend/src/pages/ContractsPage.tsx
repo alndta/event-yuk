@@ -1,3 +1,4 @@
+import Dialog from '../components/Dialog';
 import { useState, useEffect } from 'react';
 import {
   FileCheck,
@@ -600,7 +601,7 @@ export default function ContractsPage({ onShowToast }: Props) {
 
       {/* Counter-Offer Negotiation Modal */}
       {counterTarget && (
-        <div className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn">
+        <Dialog onClose={() => setCounterTarget(null)} label="Ajukan perubahan kontrak">
           <div className="bg-white rounded-lg max-w-lg w-full border border-slate-200 overflow-hidden flex flex-col">
             <div className="p-6 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
               <div>
@@ -691,7 +692,7 @@ export default function ContractsPage({ onShowToast }: Props) {
               </div>
             </form>
           </div>
-        </div>
+        </Dialog>
       )}
 
       {/* Official PKS Digital Document Modal */}

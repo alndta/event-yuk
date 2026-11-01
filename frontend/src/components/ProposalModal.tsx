@@ -1,3 +1,4 @@
+import useDialog from '../hooks/useDialog';
 import React, { useState, useRef } from 'react';
 import {
   X,
@@ -25,7 +26,7 @@ interface Props {
   onSuccess: (proposalData: any) => void;
 }
 
-export default function ProposalModal({
+function ProposalModalInner({
   isOpen,
   event,
   partner,
@@ -33,6 +34,7 @@ export default function ProposalModal({
   onClose,
   onSuccess,
 }: Props) {
+  const dialogRef = useDialog(onClose);
   const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
@@ -141,7 +143,7 @@ export default function ProposalModal({
   };
 
   return (
-    <div className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-sm animate-fadeIn">
+    <div ref={dialogRef} className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-sm animate-fadeIn">
       <div className="bg-white rounded-lg max-w-xl w-full border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header */}
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -423,4 +425,9 @@ export default function ProposalModal({
       </div>
     </div>
   );
+}
+
+export default function ProposalModal(props: Props) {
+  if (!props.isOpen) return null;
+  return <ProposalModalInner {...props} />;
 }

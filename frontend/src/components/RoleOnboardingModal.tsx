@@ -1,3 +1,4 @@
+import useDialog from '../hooks/useDialog';
 import { useState } from 'react';
 import {
   X,
@@ -88,7 +89,8 @@ interface Props {
   onSelectRole: (role: UserRole) => void;
 }
 
-export default function RoleOnboardingModal({ isOpen, currentRole, onClose, onSelectRole }: Props) {
+function RoleOnboardingModalInner({ isOpen, currentRole, onClose, onSelectRole }: Props) {
+  const dialogRef = useDialog(onClose);
   const [selected, setSelected] = useState<UserRole>(currentRole);
 
   if (!isOpen) return null;
@@ -99,7 +101,7 @@ export default function RoleOnboardingModal({ isOpen, currentRole, onClose, onSe
   };
 
   return (
-    <div className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fadeIn">
+    <div ref={dialogRef} className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fadeIn">
       <div className="bg-white rounded-lg max-w-2xl w-full border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -182,4 +184,9 @@ export default function RoleOnboardingModal({ isOpen, currentRole, onClose, onSe
       </div>
     </div>
   );
+}
+
+export default function RoleOnboardingModal(props: Props) {
+  if (!props.isOpen) return null;
+  return <RoleOnboardingModalInner {...props} />;
 }

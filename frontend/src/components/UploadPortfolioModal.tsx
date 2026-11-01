@@ -1,3 +1,4 @@
+import useDialog from '../hooks/useDialog';
 import React, { useState } from 'react';
 import { X, UploadCloud, Film, Users, DollarSign, Calendar, MapPin, FileCheck } from 'lucide-react';
 import { EventItem } from '../data/mockEvents';
@@ -9,7 +10,8 @@ interface Props {
   onSuccess: (newEvent: EventItem) => void;
 }
 
-export default function UploadPortfolioModal({ isOpen, onClose, onSuccess }: Props) {
+function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
+  const dialogRef = useDialog(onClose);
   const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
@@ -95,7 +97,7 @@ export default function UploadPortfolioModal({ isOpen, onClose, onSuccess }: Pro
   };
 
   return (
-    <div className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+    <div ref={dialogRef} className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
       <div className="bg-white rounded-lg max-w-xl w-full border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-brand-lime-soft">
@@ -272,4 +274,9 @@ export default function UploadPortfolioModal({ isOpen, onClose, onSuccess }: Pro
       </div>
     </div>
   );
+}
+
+export default function UploadPortfolioModal(props: Props) {
+  if (!props.isOpen) return null;
+  return <UploadPortfolioModalInner {...props} />;
 }

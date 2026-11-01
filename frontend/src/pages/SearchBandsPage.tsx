@@ -149,7 +149,7 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
           <div
             key={band.id}
             data-gsap-reveal
-            className="flex flex-col justify-between overflow-hidden rounded-lg bg-white"
+            className="ey-lift flex flex-col justify-between overflow-hidden rounded-lg bg-white"
           >
             <div className="p-6">
               {/* Header: Avatar, Name, Genre */}

@@ -150,7 +150,7 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
           <div
             key={vendor.id}
             data-gsap-reveal
-            className="flex flex-col justify-between overflow-hidden rounded-lg bg-white"
+            className="ey-lift flex flex-col justify-between overflow-hidden rounded-lg bg-white"
           >
             <div className="p-6">
               {/* Header */}

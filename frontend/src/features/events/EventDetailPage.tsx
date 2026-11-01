@@ -1,3 +1,4 @@
+import Dialog from '../../components/Dialog';
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
@@ -22,6 +23,7 @@ import { SEOHead } from '../../components/SEOHead';
 import { DetailSkeleton } from '../../components/skeletons/DetailSkeleton';
 import { cachedFetch } from '../../utils/apiCache';
 import useGsapReveal from '../../hooks/useGsapReveal';
+import useEnter from '../../hooks/useEnter';
 import Avatar from '../../components/Avatar';
 import { categoryLabels } from '../../components/events/EventCardLive';
 
@@ -41,6 +43,8 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
   const [booths, setBooths] = useState<any[]>([]);
   const [crewShifts, setCrewShifts] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'overview' | 'booths' | 'crew' | 'sponsorship'>('overview');
+  const tabsRef = useRef<HTMLDivElement>(null);
+  useEnter(tabsRef, activeTab);
 
   // Interactive Booth registration modal
   const [selectedBooth, setSelectedBooth] = useState<any | null>(null);
@@ -286,7 +290,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
       {/* Main Grid: Detail + Action Sidebar */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
         {/* Left Column (2 Cols) */}
-        <div className="space-y-6 lg:col-span-2">
+        <div ref={tabsRef} className="space-y-6 lg:col-span-2">
           {/* Organizer Box */}
           <div data-gsap-reveal className="flex flex-wrap items-center justify-between gap-4 rounded-lg bg-white p-5">
             <div className="flex items-center gap-3">
@@ -357,7 +361,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
           {/* Tab 1: Overview */}
           {activeTab === 'overview' && (
-            <div data-gsap-reveal className="space-y-5 rounded-lg bg-white p-6 sm:p-8">
+            <div data-enter className="space-y-5 rounded-lg bg-white p-6 sm:p-8">
               <div>
                 <p className="text-sm font-semibold text-brand-lime-strong">Tentang acara</p>
                 <h2 className="mt-2 font-display text-2xl font-bold tracking-[-0.025em] text-slate-950">Ikhtisar acara</h2>
@@ -397,7 +401,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
           {/* Tab 2: Booths */}
           {activeTab === 'booths' && (
-            <div className="space-y-4">
+            <div data-enter className="space-y-4">
               <div className="rounded-lg bg-brand-lime-soft p-5 text-sm">
                 <div className="mb-1 flex items-center gap-2 font-bold text-slate-900">
                   <Store aria-hidden="true" className="h-4 w-4 text-brand-navy" />
@@ -443,7 +447,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
           {/* Tab 3: Crew Shifts */}
           {activeTab === 'crew' && (
-            <div className="space-y-4">
+            <div data-enter className="space-y-4">
               <div className="rounded-lg bg-brand-lime-soft p-5 text-sm">
                 <div className="mb-1 flex items-center gap-2 font-bold text-slate-900">
                   <Briefcase aria-hidden="true" className="h-4 w-4 text-amber-800" />
@@ -487,7 +491,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
           {/* Tab 4: Sponsorship Packages */}
           {activeTab === 'sponsorship' && (
-            <div className="space-y-4">
+            <div data-enter className="space-y-4">
               <div data-gsap-reveal className="rounded-lg bg-white p-6 sm:p-8">
                 <span className="inline-flex items-center gap-2 rounded-full bg-brand-navy/10 px-3 py-1.5 text-sm font-semibold text-brand-navy">
                   <Building2 aria-hidden="true" className="h-4 w-4" /> Kemitraan brand
@@ -567,7 +571,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
       {/* Modal Booth Registration */}
       {selectedBooth && (
-        <div className="fixed inset-0 !mt-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
+        <Dialog onClose={() => setSelectedBooth(null)} label="Daftar booth">
           <div role="dialog" aria-modal="true" aria-labelledby="booth-dialog-title" className="w-full max-w-md rounded-lg bg-white p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-4">
               <h2 id="booth-dialog-title" className="font-display text-lg font-bold tracking-[-0.02em] text-slate-950">
@@ -633,7 +637,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
               </div>
             </form>
           </div>
-        </div>
+        </Dialog>
       )}
     </div>
   );

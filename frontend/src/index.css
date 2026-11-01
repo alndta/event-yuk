@@ -126,3 +126,13 @@
 .ey-menu-btn:focus-visible .ey-roll > span {
   transform: translateY(-100%);
 }
+
+/* Cards lift a little under the pointer; touch devices never see this. */
+@media (hover: hover) and (pointer: fine) {
+  .ey-lift {
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .ey-lift:hover {
+    transform: translateY(-6px);
+  }
+}

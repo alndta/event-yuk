@@ -1,3 +1,4 @@
+import useDialog from '../hooks/useDialog';
 import { Link } from 'react-router-dom';
 import { ShieldCheck, X, LogIn, UserPlus, CheckCircle2 } from 'lucide-react';
 
@@ -7,11 +8,12 @@ interface Props {
   onClose: () => void;
 }
 
-export default function AuthPromptModal({ isOpen, message, onClose }: Props) {
+function AuthPromptModalInner({ isOpen, message, onClose }: Props) {
+  const dialogRef = useDialog(onClose);
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fadeIn font-sans">
+    <div ref={dialogRef} className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fadeIn font-sans">
       <div className="bg-white rounded-lg max-w-md w-full border border-slate-200 overflow-hidden flex flex-col relative">
         {/* Top Accent Gradient */}
         <div className="h-2 bg-brand-lime" />
@@ -86,4 +88,9 @@ export default function AuthPromptModal({ isOpen, message, onClose }: Props) {
       </div>
     </div>
   );
+}
+
+export default function AuthPromptModal(props: Props) {
+  if (!props.isOpen) return null;
+  return <AuthPromptModalInner {...props} />;
 }

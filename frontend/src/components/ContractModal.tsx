@@ -1,3 +1,4 @@
+import useDialog from '../hooks/useDialog';
 import { useState } from 'react';
 import {
   X,
@@ -30,7 +31,8 @@ interface Props {
   onSignAndFund: () => void;
 }
 
-export default function ContractModal({ isOpen, contractData, onClose, onSignAndFund }: Props) {
+function ContractModalInner({ isOpen, contractData, onClose, onSignAndFund }: Props) {
+  const dialogRef = useDialog(onClose);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
   if (!isOpen) return null;
@@ -58,7 +60,7 @@ export default function ContractModal({ isOpen, contractData, onClose, onSignAnd
   };
 
   return (
-    <div className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn">
+    <div ref={dialogRef} className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn">
       <div className="bg-white rounded-lg max-w-2xl w-full border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
@@ -255,4 +257,9 @@ export default function ContractModal({ isOpen, contractData, onClose, onSignAnd
       </div>
     </div>
   );
+}
+
+export default function ContractModal(props: Props) {
+  if (!props.isOpen) return null;
+  return <ContractModalInner {...props} />;
 }

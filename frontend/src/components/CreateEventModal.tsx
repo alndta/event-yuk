@@ -1,3 +1,4 @@
+import useDialog from '../hooks/useDialog';
 import React, { useState } from 'react';
 import {
   X,
@@ -22,7 +23,8 @@ interface Props {
   onSuccess: (newEvent: EventItem) => void;
 }
 
-export default function CreateEventModal({ isOpen, onClose, onSuccess }: Props) {
+function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
+  const dialogRef = useDialog(onClose);
   const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
@@ -114,7 +116,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: Props) 
   };
 
   return (
-    <div className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fadeIn">
+    <div ref={dialogRef} className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fadeIn">
       <div className="bg-white rounded-lg max-w-2xl w-full border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
@@ -346,4 +348,9 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: Props) 
       </div>
     </div>
   );
+}
+
+export default function CreateEventModal(props: Props) {
+  if (!props.isOpen) return null;
+  return <CreateEventModalInner {...props} />;
 }

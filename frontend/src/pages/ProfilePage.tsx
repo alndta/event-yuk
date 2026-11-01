@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import useEnter from '../hooks/useEnter';
 import {
   User,
   ShieldCheck,
@@ -16,6 +17,8 @@ import { SEOHead } from '../components/SEOHead';
 export default function ProfilePage() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'profile' | 'kyc' | 'wallet'>('profile');
+  const pageRef = useRef<HTMLDivElement>(null);
+  useEnter(pageRef, activeTab);
   const [loading, setLoading] = useState(false);
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
@@ -153,7 +156,7 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 sm:space-y-8 font-sans">
+    <div ref={pageRef} className="max-w-5xl mx-auto space-y-6 sm:space-y-8 font-sans">
       <SEOHead
         title="Pengaturan Profil Akun & e-KYC | Event Yuk"
         description="Kelola profil akun, verifikasi e-KYC identitas hukum, dan rekening bank penarikan saldo."
@@ -237,7 +240,7 @@ export default function ProfilePage() {
 
       {/* TAB 1: INFORMASI PROFIL */}
       {activeTab === 'profile' && (
-        <div className="bg-white rounded-lg p-6 sm:p-8 max-w-3xl">
+        <div data-enter className="bg-white rounded-lg p-6 sm:p-8 max-w-3xl">
           <h3 className="font-display text-2xl font-extrabold tracking-[-0.03em] text-brand-ink mb-1">Data identitas akun</h3>
           <p className="text-base text-slate-600 mb-6">Informasi kontak yang tampil pada kontrak PKS digital dan profil resmi.</p>
 
@@ -308,7 +311,7 @@ export default function ProfilePage() {
 
       {/* TAB 2: VERIFIKASI E-KYC & BANK */}
       {activeTab === 'kyc' && (
-        <div className="bg-white rounded-lg p-6 sm:p-8 max-w-3xl">
+        <div data-enter className="bg-white rounded-lg p-6 sm:p-8 max-w-3xl">
           <div className="flex items-center gap-2 mb-1">
             <ShieldCheck aria-hidden="true" className="w-5 h-5 text-brand-forest" />
             <h3 className="font-extrabold text-slate-900 text-lg">Verifikasi e-KYC & Rekening Penarikan</h3>
@@ -399,7 +402,7 @@ export default function ProfilePage() {
 
       {/* TAB 3: DOMPET ESCROW & SALDO */}
       {activeTab === 'wallet' && (
-        <div className="space-y-6">
+        <div data-enter className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Escrow Locked Card */}
             <div className="bg-brand-navy text-white p-6 sm:p-8 rounded-lg">
