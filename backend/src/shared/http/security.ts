@@ -3,6 +3,7 @@ import type { RequestHandler } from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import type { Env } from '../config/env';
+import { langOf, translate } from '../i18n/messages';
 
 /** Security headers for the API. The docs page loosens only what Swagger UI needs. */
 export const securityHeaders = (): RequestHandler => helmet();
@@ -24,7 +25,7 @@ export const corsPolicy = (env: Env): RequestHandler =>
     origin: (origin, callback) => callback(null, !origin || env.corsOrigins.includes(origin)),
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept-Language'],
     maxAge: 600,
   });
 
@@ -34,7 +35,9 @@ const limiter = (windowMs: number, max: number, message: string, key?: RequestHa
     limit: max,
     standardHeaders: true,
     legacyHeaders: false,
-    message: { success: false, code: 'RATE_LIMITED', error: message },
+    handler: (req, res) => {
+      res.status(429).json({ success: false, code: 'RATE_LIMITED', error: translate(message, langOf(req)) });
+    },
     ...(key ? { keyGenerator: key as never } : {}),
   });
 

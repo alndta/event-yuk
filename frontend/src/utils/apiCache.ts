@@ -25,7 +25,8 @@ export async function cachedFetch<T = any>(
   ttlMs = 45000
 ): Promise<T> {
   // Signed-in visitors send their token, so the same URL is cached separately for them.
-  const options: RequestInit = { ...baseOptions, headers: { ...authHeaders(), ...(baseOptions?.headers as Record<string, string>) } };
+  const lang = (() => { try { return localStorage.getItem('eventyuk_lang_pref') === 'en' ? 'en' : 'id'; } catch { return 'id'; } })();
+  const options: RequestInit = { ...baseOptions, headers: { 'Accept-Language': lang, ...authHeaders(), ...(baseOptions?.headers as Record<string, string>) } };
   // Only cache GET requests
   const method = (options?.method || 'GET').toUpperCase();
   if (method !== 'GET') {

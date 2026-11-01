@@ -114,4 +114,36 @@ describe('e-KYC', () => {
     expect((await request(app).get(`${API}/users/me`).set(auth(admin))).body.user.is_admin).toBe(true);
     expect((await request(app).get(`${API}/users/me`).set(auth(user))).body.user.is_admin).toBe(false);
   });
+
+  it('deletes photos right away when a submission is rejected', async () => {
+    const { deps, documents } = memoryDeps();
+    const app = createApp(deps);
+    const user = await signUp(app, 'r1@x.id');
+    const admin = await signUp(app, 'admin@eventyuk.id');
+    await uploadBoth(app, user);
+    expect(documents.files.size).toBe(2);
+    await request(app).post(`${API}/users/kyc`).set(auth(user)).send({ nik: '3171234567890010', bank_account: bank });
+    const id = JSON.stringify((await request(app).get(`${API}/users/me`).set(auth(user))).body).match(/"id":"([^"]+)"/)![1];
+    await request(app).post(`${API}/admin/users/${id}/kyc`).set(auth(admin)).send({ decision: 'UNVERIFIED', reason: 'Foto buram' });
+    expect(documents.files.size).toBe(0);
+    expect((await request(app).get(`${API}/users/kyc`).set(auth(user))).body.kyc.documents).toEqual({ ktp: false, selfie: false });
+  });
+
+  it('keeps approved photos for the retention period, then deletes them', async () => {
+    const { deps, documents } = memoryDeps();
+    const app = createApp(deps);
+    const user = await signUp(app, 'r2@x.id');
+    const admin = await signUp(app, 'admin@eventyuk.id');
+    await uploadBoth(app, user);
+    await request(app).post(`${API}/users/kyc`).set(auth(user)).send({ nik: '3171234567890011', bank_account: bank });
+    const id = JSON.stringify((await request(app).get(`${API}/users/me`).set(auth(user))).body).match(/"id":"([^"]+)"/)![1];
+    await request(app).post(`${API}/admin/users/${id}/kyc`).set(auth(admin)).send({ decision: 'VERIFIED' });
+    expect(documents.files.size).toBe(2); // still within the window
+    const jobs = app.locals.jobs as { purgeKycPhotos: (now?: Date) => Promise<number> };
+    expect(await jobs.purgeKycPhotos()).toBe(0); // not due yet
+    expect(documents.files.size).toBe(2);
+    const later = new Date(Date.now() + 31 * 24 * 60 * 60 * 1000);
+    expect(await jobs.purgeKycPhotos(later)).toBe(2);
+    expect(documents.files.size).toBe(0);
+  });
 });

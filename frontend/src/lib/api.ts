@@ -28,6 +28,15 @@ interface Options {
   signal?: AbortSignal;
 }
 
+/** The language the visitor picked, so the server answers errors in it. */
+function langHeader(): Record<string, string> {
+  try {
+    return { 'Accept-Language': localStorage.getItem('eventyuk_lang_pref') === 'en' ? 'en' : 'id' };
+  } catch {
+    return {};
+  }
+}
+
 export function authHeaders(): Record<string, string> {
   const token = getToken();
   return token ? { Authorization: `Bearer ${token}` } : {};
@@ -39,12 +48,12 @@ export async function api<T = any>(path: string, { method = 'GET', body, anonymo
     res = await fetch(BASE + path, {
       method,
       signal,
-      headers: { ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}), ...(anonymous ? {} : authHeaders()) },
+      headers: { ...langHeader(), ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}), ...(anonymous ? {} : authHeaders()) },
       body: body !== undefined ? JSON.stringify(body) : undefined,
     });
   } catch (err) {
     if ((err as Error).name === 'AbortError') throw err;
-    throw new ApiError(0, 'Tidak bisa terhubung ke server. Periksa koneksimu lalu coba lagi.');
+    throw new ApiError(0, langHeader()['Accept-Language'] === 'en' ? 'Cannot reach the server. Check your connection and try again.' : 'Tidak bisa terhubung ke server. Periksa koneksimu lalu coba lagi.');
   }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
@@ -67,9 +76,9 @@ export const query = (params: Record<string, string | undefined | null>) => {
 export async function uploadImage(path: string, file: File): Promise<void> {
   let res: Response;
   try {
-    res = await fetch(BASE + path, { method: 'POST', headers: { 'Content-Type': file.type, ...authHeaders() }, body: file });
+    res = await fetch(BASE + path, { method: 'POST', headers: { 'Content-Type': file.type, ...langHeader(), ...authHeaders() }, body: file });
   } catch {
-    throw new ApiError(0, 'Tidak bisa terhubung ke server. Periksa koneksimu lalu coba lagi.');
+    throw new ApiError(0, langHeader()['Accept-Language'] === 'en' ? 'Cannot reach the server. Check your connection and try again.' : 'Tidak bisa terhubung ke server. Periksa koneksimu lalu coba lagi.');
   }
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {

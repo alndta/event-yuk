@@ -66,6 +66,7 @@ export function createApp(deps: AppDeps): Express {
 
   const app = express();
   app.disable('x-powered-by');
+  app.locals.jobs = identity.jobs;
   app.set('trust proxy', parseTrustProxy(env.trustProxy));
 
   app.use(requestLog);

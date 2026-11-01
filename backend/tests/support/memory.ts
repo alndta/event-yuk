@@ -57,6 +57,7 @@ export class MemoryDocuments implements DocumentStore {
   files = new Map<string, Buffer>();
   async put(path: string, body: Buffer) { this.files.set(path, body); }
   async signedUrl(path: string, seconds: number) { return `https://files.test/${path}?exp=${seconds}`; }
+  async remove(paths: string[]) { for (const p of paths) this.files.delete(p); }
 }
 
 export class MemoryKyc implements KycRepository {
@@ -64,6 +65,17 @@ export class MemoryKyc implements KycRepository {
   docs: KycDocument[] = [];
   async addDocument(i: { userId: string; kind: KycDocumentKind; path: string; contentType: string; size: number }) {
     this.docs.unshift({ id: randomUUID(), createdAt: new Date().toISOString(), ...i });
+  }
+  async takeDocuments(userId: string) {
+    const mine = this.docs.filter((d) => d.userId === userId);
+    this.docs = this.docs.filter((d) => d.userId !== userId);
+    return mine;
+  }
+  async takeApprovedDocumentsBefore(cutoff: Date) {
+    const approved = new Set(this.rows.filter((r) => r.status === 'APPROVED' && r.reviewedAt && new Date(r.reviewedAt) < cutoff).map((r) => r.userId));
+    const due = this.docs.filter((d) => approved.has(d.userId));
+    this.docs = this.docs.filter((d) => !approved.has(d.userId));
+    return due;
   }
   async listDocuments(userId: string) {
     const seen = new Set<string>();
@@ -90,13 +102,14 @@ export class MemoryKyc implements KycRepository {
 export function memoryDeps(over: Partial<AppDeps> = {}) {
   const sent: MailMessage[] = [];
   const users = new MemoryUsers();
+  const documents = new MemoryDocuments();
   const google: GoogleIdentityVerifier = { verify: async () => null };
   const deps: AppDeps = {
     env: loadEnv({ NODE_ENV: 'test', JWT_SECRET: 'x'.repeat(40), EXPOSE_OTP_PREVIEW: 'true', ADMIN_EMAILS: 'admin@eventyuk.id' } as never),
     users,
     otps: new MemoryOtps(),
     kyc: new MemoryKyc(users),
-    documents: new MemoryDocuments(),
+    documents,
     events: {} as never, catalog: {} as never, proposals: {} as never, payments: {} as never,
     google,
     mailer: { send: async (m) => { sent.push(m); } },
@@ -104,5 +117,5 @@ export function memoryDeps(over: Partial<AppDeps> = {}) {
     disableRateLimits: true,
     ...over,
   };
-  return { deps, sent };
+  return { deps, sent, documents };
 }

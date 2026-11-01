@@ -73,6 +73,24 @@ export class SupabaseKycRepository implements KycRepository {
     }
     return [...latest.values()];
   }
+
+  private toDoc = (r: any): KycDocument => ({ id: r.id, userId: r.user_id, kind: r.kind, path: r.path, contentType: r.content_type, size: r.size_bytes, createdAt: r.created_at });
+
+  async takeDocuments(userId: string): Promise<KycDocument[]> {
+    const { data, error } = await (this.db as any).from('kyc_documents').delete().eq('user_id', userId).select();
+    if (error) return fail();
+    return (data ?? []).map(this.toDoc);
+  }
+
+  async takeApprovedDocumentsBefore(cutoff: Date): Promise<KycDocument[]> {
+    const { data: subs, error } = await this.table.select('user_id').eq('status', 'APPROVED').lt('reviewed_at', cutoff.toISOString());
+    if (error) return fail();
+    const ids = [...new Set((subs ?? []).map((r: any) => r.user_id))];
+    if (ids.length === 0) return [];
+    const { data, error: delError } = await (this.db as any).from('kyc_documents').delete().in('user_id', ids).select();
+    if (delError) return fail();
+    return (data ?? []).map(this.toDoc);
+  }
 }
 
 const BUCKET = 'kyc-documents';
@@ -90,5 +108,10 @@ export class SupabaseDocumentStore implements DocumentStore {
     const { data, error } = await this.db.storage.from(BUCKET).createSignedUrl(path, expiresInSeconds);
     if (error || !data) return fail();
     return data.signedUrl;
+  }
+
+  async remove(paths: string[]) {
+    const { error } = await this.db.storage.from(BUCKET).remove(paths);
+    if (error) fail();
   }
 }

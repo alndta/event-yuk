@@ -320,6 +320,27 @@ export class IdentityService {
     if (decision === 'UNVERIFIED' && !reason) throw badRequest('Alasan penolakan wajib diisi.');
     await this.d.kyc.decide({ userId, reviewerId, status: decision === 'VERIFIED' ? 'APPROVED' : 'REJECTED', reason: reason ?? null });
     await this.d.users.update(userId, { kycStatus: decision });
+    // A rejected submission has no further use for its photos, so they go right away.
+    if (decision === 'UNVERIFIED') await this.deletePhotos(await this.d.kyc.takeDocuments(userId));
+  }
+
+  /** Deletes the files and records of the given photos. A failure is logged, not thrown, so a decision is never undone by it. */
+  private async deletePhotos(docs: { path: string }[]): Promise<void> {
+    if (docs.length === 0) return;
+    try {
+      await this.d.documents.remove(docs.map((d) => d.path));
+    } catch (err) {
+      logger.error('kyc photo deletion failed', { count: docs.length, error: err instanceof Error ? err.message : String(err) });
+    }
+  }
+
+  /** Run on a schedule: approved photos are kept for KYC_APPROVED_PHOTO_DAYS and then deleted. */
+  async purgeApprovedPhotos(now = new Date()): Promise<number> {
+    const cutoff = new Date(now.getTime() - this.d.env.kycApprovedPhotoDays * 24 * 60 * 60 * 1000);
+    const due = await this.d.kyc.takeApprovedDocumentsBefore(cutoff);
+    await this.deletePhotos(due);
+    if (due.length > 0) logger.info('kyc approved photos deleted', { count: due.length });
+    return due.length;
   }
 
   async setRole(userId: string, input: SetRoleInput): Promise<UserView> {

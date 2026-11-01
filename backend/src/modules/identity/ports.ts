@@ -88,6 +88,10 @@ export interface KycRepository {
   addDocument(input: { userId: string; kind: KycDocumentKind; path: string; contentType: string; size: number }): Promise<void>;
   /** The newest document of each kind. */
   listDocuments(userId: string): Promise<KycDocument[]>;
+  /** Removes every photo record of the account and returns what was removed, so the files can be deleted too. */
+  takeDocuments(userId: string): Promise<KycDocument[]>;
+  /** Photos of submissions approved before the cutoff; they are due for deletion. */
+  takeApprovedDocumentsBefore(cutoff: Date): Promise<KycDocument[]>;
 }
 
 export type KycDocumentKind = 'KTP' | 'SELFIE';
@@ -106,4 +110,5 @@ export interface KycDocument {
 export interface DocumentStore {
   put(path: string, body: Buffer, contentType: string): Promise<void>;
   signedUrl(path: string, expiresInSeconds: number): Promise<string>;
+  remove(paths: string[]): Promise<void>;
 }

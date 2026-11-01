@@ -24,6 +24,8 @@ const schema = z.object({
   MIDTRANS_CLIENT_KEY: z.string().optional(),
   MIDTRANS_IS_PRODUCTION: flag,
   PLATFORM_FEE_PCT: z.coerce.number().min(0).max(30).default(2.5),
+  /** Days an approved e-KYC photo is kept before it is deleted. Rejected photos are deleted at once. */
+  KYC_APPROVED_PHOTO_DAYS: z.coerce.number().int().min(0).max(365).default(30),
 
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().int().positive().default(465),
@@ -52,6 +54,7 @@ export interface Env {
   platformFeePct: number;
   smtp: { host?: string; port: number; secure: boolean; user?: string; pass?: string; from?: string };
   exposeOtpPreview: boolean;
+  kycApprovedPhotoDays: number;
 }
 
 const list = (v: string) =>
@@ -110,5 +113,6 @@ export function loadEnv(source: NodeJS.ProcessEnv = process.env): Env {
       from: e.EMAIL_FROM,
     },
     exposeOtpPreview: !isProduction && e.EXPOSE_OTP_PREVIEW,
+    kycApprovedPhotoDays: e.KYC_APPROVED_PHOTO_DAYS,
   };
 }

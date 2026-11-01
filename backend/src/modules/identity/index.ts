@@ -43,6 +43,8 @@ export function createIdentityModule(deps: IdentityDeps) {
   };
   return {
     api,
+    /** Scheduled maintenance, run by main.ts. */
+    jobs: { purgeKycPhotos: (now?: Date) => service.purgeApprovedPhotos(now) },
     router: (guards: AuthGuards, limits: IdentityLimiters) => createIdentityRouter(service, guards, limits, deps.env.exposeOtpPreview),
   };
 }

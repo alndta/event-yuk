@@ -20,6 +20,11 @@ const server = app.listen(env.port, () => {
   logger.info('Event Yuk API ready', { url: `http://localhost:${env.port}`, docs: env.isProduction ? undefined : `http://localhost:${env.port}/api-docs`, env: env.nodeEnv });
 });
 
+// Approved e-KYC photos are deleted after their retention period; check at start-up and every six hours.
+const purge = () => app.locals.jobs.purgeKycPhotos().catch((err: unknown) => logger.error('kyc purge failed', { error: err instanceof Error ? err.message : String(err) }));
+void purge();
+setInterval(purge, 6 * 60 * 60 * 1000).unref();
+
 const shutdown = (signal: string) => {
   logger.info('shutting down', { signal });
   server.close(() => process.exit(0));
