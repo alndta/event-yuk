@@ -176,7 +176,7 @@ function RoleOnboardingModalInner({ isOpen, currentRole, onClose, onSelectRole }
               onClick={handleConfirm}
               className="px-5 py-2.5 rounded-lg text-sm font-bold text-white bg-slate-900 hover:bg-black transition flex items-center gap-1.5"
             >
-              <span>Konfirmasi & Masuk</span>
+              <span>Konfirmasi dan masuk</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>

@@ -1,4 +1,5 @@
 import { Plus } from 'lucide-react';
+import { useLanguage } from '../../../context/LanguageContext';
 import Band from './Band';
 import SectionHeading from './SectionHeading';
 
@@ -31,18 +32,49 @@ const faqs = [
   },
 ];
 
+// English text says the same thing as the Indonesian answers above; nothing is added.
+const faqsEn = [
+  {
+    role: 'Organizer',
+    q: 'Can an organizer limit proposals from outside parties?',
+    a: 'Yes. An organizer can switch on "Allow open vendor offers" or "Allow open band proposals", or use invite-only mode.',
+  },
+  {
+    role: 'Organizer',
+    q: 'How does a refund work if the event is cancelled?',
+    a: 'If one side cancels before equipment is installed, the Escrow system automatically processes a refund according to the agreed PKS clauses.',
+  },
+  {
+    role: 'Band',
+    q: 'What if the organizer does not provide the sound system listed in the technical rider?',
+    a: 'The band management can ask for an adjustment or file an arbitration claim under the rider clauses of the digital PKS.',
+  },
+  {
+    role: 'Tenant',
+    q: 'Are electricity and a tent included in the booth rent?',
+    a: 'Power (watts), table, and tent details are listed openly in each booth specification.',
+  },
+  {
+    role: 'Crew',
+    q: 'Can I apply for two crew positions on the same day?',
+    a: 'Only if the two shifts do not overlap and the locations allow you to travel between them.',
+  },
+];
+
 export default function HomeFaqSection() {
+  const { language } = useLanguage();
+  const items = language === 'en' ? faqsEn : faqs;
   return (
     <Band tone="bg-brand-cream">
       <section aria-labelledby="home-faq-title" data-gsap-reveal className="space-y-12">
         <SectionHeading
           id="home-faq-title"
           align="center"
-          title="Pertanyaan umum"
-          description="Jawaban untuk penyelenggara, band, tenant, dan kru."
+          title={language === 'en' ? 'Common questions' : 'Pertanyaan umum'}
+          description={language === 'en' ? 'Answers for organizers, bands, tenants, and crew.' : 'Jawaban untuk penyelenggara, band, tenant, dan kru.'}
         />
         <div className="mx-auto max-w-3xl divide-y divide-brand-navy/15 border-y border-brand-navy/15">
-          {faqs.map(({ role, q, a }, index) => (
+          {items.map(({ role, q, a }, index) => (
             <details key={q} data-gsap-reveal open={index === 0} className="group py-1">
               <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-6 py-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy [&::-webkit-details-marker]:hidden">
                 <span>

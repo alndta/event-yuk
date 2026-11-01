@@ -9,13 +9,14 @@ interface Props {
 }
 
 export default function HomeCallToAction({ onOpenCreateEvent }: Props) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const ctaRef = useMagnetic<HTMLButtonElement>();
 
   return (
     <Band tone="bg-brand-lime text-brand-navy" className="sm:!py-32">
       <section aria-labelledby="home-cta-title" data-gsap-reveal className="mx-auto flex max-w-4xl flex-col items-center text-center">
         <h2
+          key={language}
           id="home-cta-title"
           data-split-title
           className="font-display text-5xl font-extrabold leading-[0.98] tracking-[-0.045em] sm:text-7xl lg:text-8xl"

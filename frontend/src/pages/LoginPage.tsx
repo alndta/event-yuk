@@ -250,7 +250,7 @@ export default function LoginPage() {
         <div className="flex flex-col items-center justify-between gap-3 border-t border-slate-200 pt-6 text-sm text-slate-600 sm:flex-row">
           <p className="flex items-center gap-2">
             <ShieldCheck aria-hidden="true" className="h-4 w-4 text-brand-forest" />
-            Koneksi terenkripsi TLS 1.3 &amp; SHA-256
+            Koneksi terenkripsi TLS 1.3 dan SHA-256
           </p>
           <p>© {new Date().getFullYear()} Event Yuk. Seluruh hak cipta dilindungi.</p>
         </div>

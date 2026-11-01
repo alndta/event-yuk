@@ -198,7 +198,7 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (data.success) {
-        setSuccessMessage('Pendaftaran akun berhasil! Mengalihkan ke Dashboard...');
+        setSuccessMessage('Pendaftaran berhasil. Membuka dashboard...');
         await login(formData.email, formData.password);
         setTimeout(() => {
           navigate('/dashboard');
@@ -208,7 +208,7 @@ export default function RegisterPage() {
       }
     } catch {
       // Offline fallback
-      setSuccessMessage('Pendaftaran akun berhasil! Mengalihkan ke Dashboard...');
+      setSuccessMessage('Pendaftaran berhasil. Membuka dashboard...');
       await login(formData.email, formData.password);
       setTimeout(() => {
         navigate('/dashboard');
@@ -627,7 +627,7 @@ export default function RegisterPage() {
                   className="mt-1 h-5 w-5 rounded border-slate-400 text-brand-navy focus:ring-brand-navy"
                 />
                 <label htmlFor="agreeTerms" className="cursor-pointer text-base leading-7 text-slate-700">
-                  Saya menyetujui <span className="font-semibold text-brand-navy underline underline-offset-4">Syarat & Ketentuan Layanan</span> serta klausul otomatisasi <span className="font-semibold text-brand-navy underline underline-offset-4">Rekening Bersama Escrow & PKS Digital</span> Event Yuk.
+                  Saya menyetujui <span className="font-semibold text-brand-navy underline underline-offset-4">Syarat dan Ketentuan Layanan</span> serta klausul otomatisasi <span className="font-semibold text-brand-navy underline underline-offset-4">Rekening Bersama Escrow dan PKS Digital</span> Event Yuk.
                 </label>
               </div>
 
@@ -760,7 +760,7 @@ export default function RegisterPage() {
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Sistem Pendaftaran Resmi Ekosistem Kolaborasi Acara Event Yuk</span>
+            <span>Pendaftaran resmi Event Yuk</span>
           </div>
           <div>© {new Date().getFullYear()} Event Yuk. Seluruh data terenkripsi dan terlindungi.</div>
         </div>

@@ -21,7 +21,7 @@ export const categoryLabels: Record<string, { label: string; color: string }> = 
   CONCERT: { label: 'Konser Musik', color: 'text-brand-navy' },
   PENSI: { label: 'Pensi Sekolah', color: 'text-brand-navy' },
   BAZAAR: { label: 'Bazaar & Kuliner', color: 'text-brand-navy' },
-  EXPO: { label: 'Pameran & Expo', color: 'text-brand-navy' },
+  EXPO: { label: 'Pameran dan expo', color: 'text-brand-navy' },
 };
 
 const categoryKeyById = {

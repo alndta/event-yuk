@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { useLanguage } from '../../../context/LanguageContext';
 
 interface Props {
   id: string;
@@ -17,6 +18,7 @@ export default function SectionHeading({
   inverse = false,
   align = 'left',
 }: Props) {
+  const { language } = useLanguage();
   const titleClass = inverse ? 'text-white' : 'text-brand-ink';
   const descriptionClass = inverse ? 'text-slate-300' : 'text-slate-700';
 
@@ -24,6 +26,7 @@ export default function SectionHeading({
     return (
       <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
         <h2
+          key={language}
           id={id}
           data-split-title
           className={'font-display text-4xl font-extrabold leading-[1.05] tracking-[-0.04em] sm:text-6xl ' + titleClass}

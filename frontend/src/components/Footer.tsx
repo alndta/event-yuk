@@ -99,9 +99,9 @@ export default function Footer() {
         <div className="mt-10 flex flex-col gap-3 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
           <p>&copy; {new Date().getFullYear()} Event Yuk. Seluruh hak cipta dilindungi undang-undang.</p>
           <div className="flex flex-wrap gap-x-4 gap-y-2">
-            <span>Syarat &amp; Ketentuan PKS</span>
-            <span>Kebijakan Privasi e-KYC</span>
-            <span>Protokol Arbitrase Escrow</span>
+            <span>Syarat dan ketentuan PKS</span>
+            <span>Kebijakan privasi e-KYC</span>
+            <span>Protokol arbitrase Escrow</span>
           </div>
         </div>
 

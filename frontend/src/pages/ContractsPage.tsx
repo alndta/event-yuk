@@ -321,7 +321,7 @@ export default function ContractsPage({ onShowToast }: Props) {
 
     setIsPksModalOpen(false);
     if (onShowToast) {
-      onShowToast('Pembayaran DP Escrow via Midtrans berhasil diverifikasi! Dana terkunci aman.');
+      onShowToast('Pembayaran DP Escrow lewat Midtrans terverifikasi. Dana terkunci di escrow.');
     }
   };
 
@@ -606,7 +606,7 @@ export default function ContractsPage({ onShowToast }: Props) {
             <div className="p-6 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
               <div>
                 <span className="text-sm tabular-nums text-slate-500 font-semibold">{counterTarget.contractNumber}</span>
-                <h3 className="font-extrabold text-slate-900 text-base">Ajukan Perubahan (Counter-Offer)</h3>
+                <h3 className="font-extrabold text-slate-900 text-base">Ajukan perubahan (counter-offer)</h3>
               </div>
               <button
                 onClick={() => setCounterTarget(null)}
@@ -619,7 +619,7 @@ export default function ContractsPage({ onShowToast }: Props) {
             <form onSubmit={handleSubmitCounter} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-1">
-                  Nominal Penawaran Baru (Rp)
+                  Nominal penawaran baru (Rp)
                 </label>
                 <input
                   type="number"
@@ -662,7 +662,7 @@ export default function ContractsPage({ onShowToast }: Props) {
 
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-1">
-                  Alasan Penyesuaian & Catatan Teknis
+                  Alasan penyesuaian dan catatan teknis
                 </label>
                 <textarea
                   rows={3}

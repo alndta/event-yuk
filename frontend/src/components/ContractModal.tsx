@@ -96,7 +96,7 @@ function ContractModalInner({ isOpen, contractData, onClose, onSignAndFund }: Pr
                 </div>
                 <div className="min-w-0">
                   <div className="inline-flex items-center gap-1 text-sm font-bold text-[#5E7628]">
-                    <span>Dokumen Kontrak Mandiri Terlampir</span>
+                    <span>Dokumen kontrak mandiri terlampir</span>
                   </div>
                   <p className="font-bold text-slate-900 text-sm truncate">
                     {contractData.attachedFileName}
@@ -233,7 +233,7 @@ function ContractModalInner({ isOpen, contractData, onClose, onSignAndFund }: Pr
                 className="px-3 py-2 text-sm font-semibold text-[#172D46] hover:bg-[#172D46]/10 rounded-lg transition flex items-center gap-1.5"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Unduh Berkas Lampiran</span>
+                <span>Unduh berkas lampiran</span>
               </button>
             )}
           </div>
@@ -250,7 +250,7 @@ function ContractModalInner({ isOpen, contractData, onClose, onSignAndFund }: Pr
               className="px-5 min-h-12 text-white rounded-full font-bold text-sm transition flex items-center gap-2 bg-brand-navy hover:bg-brand-navy-dark transition-colors"
             >
               <ShieldCheck className="w-4 h-4" />
-              <span>Tandatangani & Lanjutkan Escrow Midtrans</span>
+              <span>Tanda tangani dan lanjut ke Escrow Midtrans</span>
             </button>
           </div>
         </div>

@@ -122,10 +122,10 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
           <div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800 text-sm font-bold mb-1">
-              <Layers className="w-3.5 h-3.5 text-sky-600" /> Event Project Workspace
+              <Layers className="w-3.5 h-3.5 text-sky-600" /> Ruang kerja proyek acara
             </div>
             <h3 className="font-extrabold text-slate-900 text-xl tracking-tight">
-              Bentuk Proyek Acara Baru
+              Buat proyek acara baru
             </h3>
             <p className="text-sm text-slate-500 mt-0.5">
               Tentukan parameter acara dan atur izin pengajuan penawaran untuk vendor, band, tenant, serta kru.
@@ -142,7 +142,7 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 text-sm">
           <div>
-            <label className="block font-semibold text-slate-700 mb-1">Judul / Nama Acara</label>
+            <label className="block font-semibold text-slate-700 mb-1">Judul acara</label>
             <input
               type="text"
               required
@@ -163,13 +163,13 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
               >
                 <option value="CONCERT">Konser Musik</option>
                 <option value="PENSI">Pentas Seni (Pensi)</option>
-                <option value="BAZAAR">Bazaar & Festival Kuliner</option>
-                <option value="EXPO">Pameran & Expo</option>
+                <option value="BAZAAR">Bazaar dan festival kuliner</option>
+                <option value="EXPO">Pameran dan expo</option>
               </select>
             </div>
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1">
-                <DollarSign className="w-3.5 h-3.5 text-slate-400" /> Pagu Anggaran (Rp)
+                <DollarSign className="w-3.5 h-3.5 text-slate-400" /> Pagu anggaran (Rp)
               </label>
               <input
                 type="text"
@@ -184,7 +184,7 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-slate-400" /> Lokasi / Venue Acara
+                <MapPin className="w-3.5 h-3.5 text-slate-400" /> Lokasi atau venue
               </label>
               <input
                 type="text"
@@ -211,7 +211,7 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
           </div>
 
           <div>
-            <label className="block font-semibold text-slate-700 mb-1">Deskripsi & Kebutuhan Acara</label>
+            <label className="block font-semibold text-slate-700 mb-1">Deskripsi dan kebutuhan acara</label>
             <textarea
               rows={2}
               placeholder="Jelaskan konsep acara, target pengunjung, dan kebutuhan pengadaan panggung/talent..."
@@ -225,9 +225,9 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
           <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3">
             <div className="flex items-center justify-between">
               <span className="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-                <Sliders className="w-3.5 h-3.5 text-sky-600" /> Kontrol Izin Pengajuan Mitra
+                <Sliders className="w-3.5 h-3.5 text-sky-600" /> Izin pengajuan mitra
               </span>
-              <span className="text-sm text-slate-500 font-medium">Aturan Penerimaan Pengajuan</span>
+              <span className="text-sm text-slate-500 font-medium">Aturan penerimaan</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -241,7 +241,7 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
                 />
                 <div>
                   <div className="font-bold text-slate-800 flex items-center gap-1">
-                    <Sliders className="w-3.5 h-3.5 text-indigo-600" /> Terima Pengajuan Vendor
+                    <Sliders className="w-3.5 h-3.5 text-indigo-600" /> Terima pengajuan vendor
                   </div>
                   <div className="text-sm text-slate-500">Vendor luar boleh mengajukan penawaran harga alat</div>
                 </div>
@@ -257,7 +257,7 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
                 />
                 <div>
                   <div className="font-bold text-slate-800 flex items-center gap-1">
-                    <Music className="w-3.5 h-3.5 text-purple-600" /> Terima Pengajuan Band
+                    <Music className="w-3.5 h-3.5 text-purple-600" /> Terima pengajuan band
                   </div>
                   <div className="text-sm text-slate-500">Manajer band/musisi boleh mengajukan proposal manggung</div>
                 </div>
@@ -273,9 +273,9 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
                 />
                 <div>
                   <div className="font-bold text-slate-800 flex items-center gap-1">
-                    <Store className="w-3.5 h-3.5 text-emerald-600" /> Buka Kaveling Tenant
+                    <Store className="w-3.5 h-3.5 text-emerald-600" /> Buka kaveling tenant
                   </div>
-                  <div className="text-sm text-slate-500">Buka pendaftaran booth bazaar & pameran</div>
+                  <div className="text-sm text-slate-500">Buka pendaftaran booth bazaar dan pameran</div>
                 </div>
               </label>
 
@@ -289,7 +289,7 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
                 />
                 <div>
                   <div className="font-bold text-slate-800 flex items-center gap-1">
-                    <Users className="w-3.5 h-3.5 text-rose-600" /> Buka Rekrutmen Kru
+                    <Users className="w-3.5 h-3.5 text-rose-600" /> Buka rekrutmen kru
                   </div>
                   <div className="text-sm text-slate-500">Membuka lowongan kru shift lapangan</div>
                 </div>

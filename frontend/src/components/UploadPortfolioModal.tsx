@@ -106,7 +106,7 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
               <FileCheck className="w-5 h-5 text-amber-600" />
             </span>
             <div>
-              <h3 className="font-extrabold text-slate-900 text-lg">Upload Portofolio Acara Sukses</h3>
+              <h3 className="font-extrabold text-slate-900 text-lg">Unggah portofolio acara</h3>
               <p className="text-sm text-slate-500">Tampilkan rekam jejak event yang pernah kamu laksanakan ke dalam katalog publik</p>
             </div>
           </div>
@@ -121,7 +121,7 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 text-sm">
           <div>
-            <label className="block font-semibold text-slate-700 mb-1">Nama Acara / Event</label>
+            <label className="block font-semibold text-slate-700 mb-1">Nama acara</label>
             <input
               type="text"
               required
@@ -142,12 +142,12 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
               >
                 <option value="CONCERT">Konser Musik</option>
                 <option value="PENSI">Pentas Seni (Pensi)</option>
-                <option value="BAZAAR">Festival Kuliner & Bazaar</option>
+                <option value="BAZAAR">Festival kuliner dan bazaar</option>
                 <option value="EXPO">Pameran / Expo</option>
               </select>
             </div>
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Nama Tim / EO kamu</label>
+              <label className="block font-semibold text-slate-700 mb-1">Nama tim atau EO</label>
               <input
                 type="text"
                 placeholder="Nama Organisasi / EO"
@@ -191,7 +191,7 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
           <div className="grid grid-cols-2 gap-3 bg-amber-50/50 p-3 rounded-lg border border-amber-200/60">
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1 text-sm">
-                <Users className="w-3.5 h-3.5 text-amber-600" /> Total Penonton / Pengunjung
+                <Users className="w-3.5 h-3.5 text-amber-600" /> Total penonton atau pengunjung
               </label>
               <input
                 type="text"
@@ -203,7 +203,7 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
             </div>
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1 text-sm">
-                <DollarSign className="w-3.5 h-3.5 text-amber-600" /> Estimasi Total Produksi
+                <DollarSign className="w-3.5 h-3.5 text-amber-600" /> Estimasi biaya produksi
               </label>
               <input
                 type="text"
@@ -216,7 +216,7 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
           </div>
 
           <div>
-            <label className="block font-semibold text-slate-700 mb-1">Cerita Singkat & Keberhasilan Acara</label>
+            <label className="block font-semibold text-slate-700 mb-1">Cerita singkat dan hasil acara</label>
             <textarea
               rows={3}
               placeholder="Ceritakan keseruan artis pengisi, kepuasan tenant, dan kelancaran produksi..."
@@ -229,7 +229,7 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1">
-                <UploadCloud className="w-3.5 h-3.5 text-slate-400" /> URL Foto Dokumentasi
+                <UploadCloud className="w-3.5 h-3.5 text-slate-400" /> URL foto dokumentasi
               </label>
               <input
                 type="url"
@@ -241,7 +241,7 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
             </div>
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1">
-                <Film className="w-3.5 h-3.5 text-slate-400" /> Link Video Aftermovie
+                <Film className="w-3.5 h-3.5 text-slate-400" /> Tautan video aftermovie
               </label>
               <input
                 type="url"

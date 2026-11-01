@@ -1,5 +1,6 @@
 import { useLayoutEffect } from 'react';
 import { gsap, ScrollTrigger, SplitText, NO_REDUCED_MOTION } from '../lib/motion';
+import { useLanguage } from '../context/LanguageContext';
 
 interface ElementRef {
   current: HTMLElement | null;
@@ -19,6 +20,9 @@ export default function useGsapReveal(
   selector = '[data-gsap-reveal]',
   deps: unknown[] = []
 ) {
+  // SplitText rewrites a heading's DOM, so a language switch has to rebuild it.
+  const { language } = useLanguage();
+
   useLayoutEffect(() => {
     const root = rootRef.current;
     if (!root) return;
@@ -92,5 +96,5 @@ export default function useGsapReveal(
 
     return () => mm.revert();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rootRef, selector, ...deps]);
+  }, [rootRef, selector, language, ...deps]);
 }

@@ -146,7 +146,7 @@ export default function ProfilePage() {
         }),
       });
       setFormData({ ...profileData, kycStatus: 'VERIFIED' });
-      setSuccessToast('Dokumen e-KYC dan rekening bank resmi berhasil diverifikasi dan disimpan!');
+      setSuccessToast('Dokumen e-KYC dan rekening bank sudah diverifikasi dan disimpan.');
     } catch (err) {
       setSuccessToast('e-KYC tersimpan.');
     } finally {
@@ -314,7 +314,7 @@ export default function ProfilePage() {
         <div data-enter className="bg-white rounded-lg p-6 sm:p-8 max-w-3xl">
           <div className="flex items-center gap-2 mb-1">
             <ShieldCheck aria-hidden="true" className="w-5 h-5 text-brand-forest" />
-            <h3 className="font-extrabold text-slate-900 text-lg">Verifikasi e-KYC & Rekening Penarikan</h3>
+            <h3 className="font-extrabold text-slate-900 text-lg">Verifikasi e-KYC dan rekening penarikan</h3>
           </div>
           <p className="text-sm text-slate-500 mb-6">
             Sesuai regulasi FR-AUTH-03, identitas KTP/NPWP dan rekening bank wajib terverifikasi sebelum dapat mencairkan dana dari Escrow.
@@ -334,8 +334,8 @@ export default function ProfilePage() {
 
             <div className="border border-dashed border-slate-300 rounded-lg p-5 text-center bg-slate-50">
               <UploadCloud className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-              <div className="font-bold text-slate-800 text-sm">Unggah Foto KTP / NPWP Asli</div>
-              <div className="text-sm text-slate-400 mt-0.5">Format JPG/PNG maksimal 5 MB (Dokumen tersimpan aman & terenkripsi)</div>
+              <div className="font-bold text-slate-800 text-sm">Unggah foto KTP atau NPWP asli</div>
+              <div className="text-sm text-slate-400 mt-0.5">Format JPG atau PNG, maksimal 5 MB. Dokumen disimpan terenkripsi.</div>
               <div className="mt-3 inline-block px-3 py-1 bg-white border border-slate-200 rounded-lg tabular-nums text-sm text-slate-600">
                 ktp_nusantara_live_kreasi.jpg (Terverifikasi)
               </div>
@@ -344,7 +344,7 @@ export default function ProfilePage() {
             <div className="pt-2 border-t border-slate-100">
               <h4 className="font-bold text-slate-900 text-sm mb-3 flex items-center gap-1.5">
                 <CreditCard className="w-4 h-4 text-[#172D46]" />
-                <span>Rekening Bank Penarikan Saldo</span>
+                <span>Rekening bank untuk penarikan saldo</span>
               </h4>
 
               <div className="grid grid-cols-2 gap-3 mb-3">
@@ -393,7 +393,7 @@ export default function ProfilePage() {
                 className="min-h-12 px-7 rounded-full bg-brand-navy hover:bg-brand-navy-dark text-white font-semibold transition-colors flex items-center gap-2"
               >
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Simpan & Verifikasi e-KYC</span>
+                <span>Simpan dan verifikasi e-KYC</span>
               </button>
             </div>
           </form>

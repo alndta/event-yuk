@@ -172,7 +172,7 @@ function ProposalModalInner({
           {/* Judul */}
           <div>
             <label className="block font-semibold text-slate-700 mb-1">
-              Judul Penawaran / Pekerjaan
+              Judul penawaran atau pekerjaan
             </label>
             <input
               type="text"
@@ -189,7 +189,7 @@ function ProposalModalInner({
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1">
                 <DollarSign className="w-3.5 h-3.5 text-slate-400" />
-                <span>Nominal Kesepakatan (Rp)</span>
+                <span>Nominal kesepakatan (Rp)</span>
               </label>
               <input
                 type="text"
@@ -222,7 +222,7 @@ function ProposalModalInner({
           {/* Scope of Work */}
           <div>
             <label className="block font-semibold text-slate-700 mb-1">
-              Lingkup Kerja (Scope of Work)
+              Lingkup kerja
             </label>
             <textarea
               rows={2}
@@ -236,7 +236,7 @@ function ProposalModalInner({
           {/* Riders or Specs */}
           <div>
             <label className="block font-semibold text-slate-700 mb-1">
-              Rincian Spesifikasi Teknis / Riders
+              Spesifikasi teknis dan rider
             </label>
             <textarea
               rows={2}
@@ -307,7 +307,7 @@ function ProposalModalInner({
                 <div>
                   <div className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
                     <UploadCloud className="w-3.5 h-3.5 text-[#5E7628]" />
-                    <span>Unggah Berkas Mandiri (.pdf / .doc)</span>
+                    <span>Unggah berkas sendiri (.pdf atau .doc)</span>
                   </div>
                   <p className="text-sm text-slate-500 mt-0.5 leading-snug">
                     Gunakan draf kontrak khusus dari legal internal perusahaan kamu.
@@ -340,7 +340,7 @@ function ProposalModalInner({
                       Klik untuk memilih berkas atau seret berkas ke sini
                     </span>
                     <span className="text-sm text-slate-500 mt-0.5">
-                      Mendukung format: .PDF, .DOC, .DOCX (Maksimal 15 MB)
+                      Format .PDF, .DOC, atau .DOCX, maksimal 15 MB
                     </span>
                   </label>
                 ) : (
@@ -394,7 +394,7 @@ function ProposalModalInner({
           <div className="p-3.5 bg-slate-50 rounded-lg border border-slate-200 text-sm space-y-1.5">
             <div className="font-bold text-slate-800 flex items-center gap-1.5">
               <FileCheck className="w-4 h-4 text-[#172D46]" />
-              <span>Jaminan Kepastian Hukum & Escrow</span>
+              <span>Kepastian hukum dan Escrow</span>
             </div>
             <p className="text-slate-600 leading-relaxed text-sm">
               {contractDocMode === 'UPLOAD_CUSTOM' && uploadedFile

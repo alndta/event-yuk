@@ -97,14 +97,14 @@ export default function ContractListTab({ contracts, onViewContract, onFundEscro
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-bold bg-amber-100 text-amber-800 border border-amber-200">
             <Clock className="w-3.5 h-3.5 text-amber-600" />
-            <span>Tahap Kesepakatan Nilai</span>
+            <span>Tahap kesepakatan nilai</span>
           </span>
         );
       case 'SUBMITTED':
         return (
           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-sm font-bold bg-slate-100 text-slate-700 border border-slate-200">
             <Handshake className="w-3.5 h-3.5 text-slate-500" />
-            <span>Draf Penawaran Baru</span>
+            <span>Draf penawaran baru</span>
           </span>
         );
     }
@@ -116,7 +116,7 @@ export default function ContractListTab({ contracts, onViewContract, onFundEscro
         <div>
           <h3 className="font-extrabold text-slate-900 text-lg flex items-center gap-2">
             <FileCheck className="w-5 h-5 text-indigo-600" />
-            <span>Buku Besar Kontrak & Perjanjian Kerjasama (PKS)</span>
+            <span>Daftar kontrak dan perjanjian kerja sama (PKS)</span>
           </h3>
           <p className="text-sm text-slate-500 mt-0.5">
             Daftar pengajuan dua arah antara Event Organizer, Vendor Peralatan, dan Manajemen Band dengan jaminan hukum serta rekening bersama.
@@ -170,7 +170,7 @@ export default function ContractListTab({ contracts, onViewContract, onFundEscro
             {/* Financial pill & actions */}
             <div className="flex flex-col sm:flex-row md:flex-col lg:flex-row items-start sm:items-center md:items-end lg:items-center gap-3 pt-3 md:pt-0 border-t md:border-t-0 border-slate-100">
               <div className="text-left md:text-right">
-                <div className="text-sm text-slate-400 font-medium">Nilai Kontrak Net:</div>
+                <div className="text-sm text-slate-400 font-medium">Nilai kontrak bersih</div>
                 <div className="font-extrabold text-slate-900 text-base tabular-nums">
                   Rp {c.totalAmount.toLocaleString('id-ID')}
                 </div>

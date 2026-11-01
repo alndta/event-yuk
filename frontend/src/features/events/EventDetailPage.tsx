@@ -405,7 +405,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
               <div className="rounded-lg bg-brand-lime-soft p-5 text-sm">
                 <div className="mb-1 flex items-center gap-2 font-bold text-slate-900">
                   <Store aria-hidden="true" className="h-4 w-4 text-brand-navy" />
-                  <span>Kaveling Booth Pameran & Bazaar Kuliner</span>
+                  <span>Kaveling booth pameran dan bazaar kuliner</span>
                 </div>
                 <p className="text-sm leading-6 text-slate-600">
                   Lihat detail ukuran dan biaya setiap kaveling. Pendaftaran akan diteruskan ke penyelenggara untuk ditinjau.
@@ -436,7 +436,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                         onClick={() => setSelectedBooth(booth)}
                           className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-brand-navy px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-navy/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
                       >
-                        Daftar Sewa Kaveling Ini
+                        Daftar sewa kaveling ini
                       </button>
                     )}
                   </div>
@@ -451,7 +451,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
               <div className="rounded-lg bg-brand-lime-soft p-5 text-sm">
                 <div className="mb-1 flex items-center gap-2 font-bold text-slate-900">
                   <Briefcase aria-hidden="true" className="h-4 w-4 text-amber-800" />
-                  <span>Papan Rekrutmen Kru Shift Acara</span>
+                  <span>Lowongan kru shift acara</span>
                 </div>
                 <p className="text-sm leading-6 text-slate-600">
                   Tinjau peran, jadwal, dan honor sebelum mengirim lamaran. Detail berikut mengikuti informasi yang dicantumkan penyelenggara.
@@ -481,7 +481,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                       onClick={() => handleApplyShift(shift)}
                       className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-brand-ink px-5 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
                     >
-                      Lamar Shift Ini
+                      Lamar shift ini
                     </button>
                   </div>
                 ))}
@@ -589,7 +589,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
             <form onSubmit={handleRegisterBooth} className="space-y-4">
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-1">
-                  Nama Brand / Usaha Tenant
+                  Nama brand atau usaha tenant
                 </label>
                 <input
                   type="text"
