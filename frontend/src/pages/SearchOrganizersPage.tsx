@@ -14,6 +14,7 @@ import {
 import { mockOrganizers, OrganizerItem } from '../data/mockOrganizers';
 import { PartnerCardsSkeletonList } from '../components/skeletons/PartnerCardSkeleton';
 import { SEOHead } from '../components/SEOHead';
+import { useLanguage } from '../context/LanguageContext';
 import { api, query } from '../lib/api';
 import useDebounced from '../hooks/useDebounced';
 import Avatar from '../components/Avatar';
@@ -23,6 +24,7 @@ interface Props {
 }
 
 export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrganizer }: Props) {
+  const { t, language } = useLanguage();
   const [organizers, setOrganizers] = useState<OrganizerItem[]>(import.meta.env.DEV ? mockOrganizers : []);
   const [loading, setLoading] = useState<boolean>(false);
   const pageRef = useRef<HTMLDivElement>(null);
@@ -85,8 +87,8 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
           <Calendar aria-hidden="true" className="h-4 w-4" />
           Direktori promotor dan event organizer
         </p>
-        <h1 data-split-title className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
-          Cari event organizer yang cocok
+        <h1 key={language} data-split-title className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
+          {t('orgs.title')}
         </h1>
         <p className="mt-4 text-lg leading-8 text-slate-700">
           Penyelenggara festival musik, pensi sekolah, dan pameran dengan rekam jejak, pagu anggaran, dan ulasan yang bisa kamu lihat sebelum menghubungi.
@@ -97,8 +99,8 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
           <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
           <input
             type="search"
-            aria-label="Cari event organizer"
-            placeholder="Cari nama EO, kota, atau jenis acara"
+            aria-label={t('orgs.searchLabel')}
+            placeholder={t('orgs.searchPh')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="min-h-14 w-full rounded-full border border-slate-300 bg-white pl-12 pr-5 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
@@ -136,12 +138,12 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
         <div className="flex items-center gap-2">
           <MapPin aria-hidden="true" className="h-4 w-4 text-slate-600" />
           <select
-            aria-label="Filter kota"
+            aria-label={t('common.cityFilter')}
             value={selectedCity}
             onChange={(e) => setSelectedCity(e.target.value)}
             className="min-h-11 rounded-full border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
           >
-            <option value="ALL">Semua kota</option>
+            <option value="ALL">{t('common.allCities')}</option>
             <option value="Jakarta">Jakarta</option>
             <option value="Bandung">Bandung</option>
             <option value="Surabaya">Surabaya</option>

@@ -15,6 +15,7 @@ import {
 import { mockPartners, PartnerItem } from '../data/mockPartners';
 import { PartnerCardsSkeletonList } from '../components/skeletons/PartnerCardSkeleton';
 import { SEOHead } from '../components/SEOHead';
+import { useLanguage } from '../context/LanguageContext';
 import { api, query } from '../lib/api';
 import useDebounced from '../hooks/useDebounced';
 import Avatar from '../components/Avatar';
@@ -24,6 +25,7 @@ interface Props {
 }
 
 export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: Props) {
+  const { t, language } = useLanguage();
   const [bands, setBands] = useState<PartnerItem[]>(() =>
     import.meta.env.DEV ? mockPartners.filter((p) => p.type === 'TALENT') : []
   );
@@ -74,8 +76,8 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
           <Music aria-hidden="true" className="h-4 w-4" />
           Direktori band, artis, dan musisi festival
         </p>
-        <h1 data-split-title className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
-          Cari band dan musisi tamu
+        <h1 key={language} data-split-title className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
+          {t('bands.title')}
         </h1>
         <p className="mt-4 text-lg leading-8 text-slate-700">
           Lihat portofolio band indie, pop, jazz, dan musisi tamu lengkap dengan rate card honor, ringkasan technical rider, dan kontrak digital PKS.
@@ -86,8 +88,8 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
           <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
           <input
             type="search"
-            aria-label="Cari band atau musisi"
-            placeholder="Cari nama band, genre, atau kota asal"
+            aria-label={t('bands.searchLabel')}
+            placeholder={t('bands.searchPh')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="min-h-14 w-full rounded-full border border-slate-300 bg-white pl-12 pr-5 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
@@ -126,12 +128,12 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
         <div className="flex items-center gap-2">
           <MapPin aria-hidden="true" className="h-4 w-4 text-slate-600" />
           <select
-            aria-label="Filter kota"
+            aria-label={t('common.cityFilter')}
             value={selectedCity}
             onChange={(e) => setSelectedCity(e.target.value)}
             className="min-h-11 rounded-full border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
           >
-            <option value="ALL">Semua kota</option>
+            <option value="ALL">{t('common.allCities')}</option>
             <option value="Jakarta">Jakarta</option>
             <option value="Bandung">Bandung</option>
             <option value="Yogyakarta">Yogyakarta</option>
