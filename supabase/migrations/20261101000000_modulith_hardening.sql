@@ -17,17 +17,49 @@ returns boolean language plpgsql security definer set search_path = public as $$
 declare v_payer uuid; v_gross numeric;
 begin
   update public.escrow_transactions
-     set status = 'ESCROW_HELD'
-   where id = p_tx_id and status = 'INITIATED'
+     set escrow_state = 'ESCROW_HELD', updated_at = now()
+   where id = p_tx_id and escrow_state = 'INITIATED'
    returning payer_id, gross_amount into v_payer, v_gross;
   if not found then return false; end if;
-  update public.wallets set escrow_locked = coalesce(escrow_locked, 0) + v_gross where user_id = v_payer;
+  insert into public.wallets (user_id, escrow_locked) values (v_payer, v_gross)
+  on conflict (user_id) do update set escrow_locked = coalesce(public.wallets.escrow_locked, 0) + excluded.escrow_locked, updated_at = now();
+  return true;
+end $$;
+
+-- 3b. Handover (BAST): the payee reports the work done, the payer approves, and only then is the money released.
+alter table public.escrow_transactions add column if not exists bast_submitted_at timestamptz;
+alter table public.escrow_transactions add column if not exists bast_note text;
+alter table public.escrow_transactions add column if not exists bast_approved_at timestamptz;
+
+create or replace function public.submit_bast(p_tx_id uuid, p_note text)
+returns boolean language plpgsql security definer set search_path = public as $$
+begin
+  update public.escrow_transactions
+     set bast_submitted_at = now(), bast_note = p_note, updated_at = now()
+   where id = p_tx_id and escrow_state = 'ESCROW_HELD' and bast_submitted_at is null;
+  return found;
+end $$;
+
+create or replace function public.release_escrow(p_tx_id uuid)
+returns boolean language plpgsql security definer set search_path = public as $$
+declare v_payer uuid; v_payee uuid; v_gross numeric; v_fee numeric;
+begin
+  update public.escrow_transactions
+     set escrow_state = 'SETTLED', bast_approved_at = now(), updated_at = now()
+   where id = p_tx_id and escrow_state = 'ESCROW_HELD' and bast_submitted_at is not null
+   returning payer_id, payee_id, gross_amount, coalesce(platform_fee, 0) into v_payer, v_payee, v_gross, v_fee;
+  if not found then return false; end if;
+  update public.wallets set escrow_locked = greatest(coalesce(escrow_locked, 0) - v_gross, 0), updated_at = now() where user_id = v_payer;
+  insert into public.wallets (user_id, available_bal) values (v_payee, v_gross - v_fee)
+  on conflict (user_id) do update set available_bal = coalesce(public.wallets.available_bal, 0) + excluded.available_bal, updated_at = now();
   return true;
 end $$;
 
 -- 4. Only the backend (service role) may call the functions above.
 revoke all on function public.otp_increment_attempts(uuid) from public, anon, authenticated;
 revoke all on function public.hold_escrow(uuid) from public, anon, authenticated;
+revoke all on function public.submit_bast(uuid, text) from public, anon, authenticated;
+revoke all on function public.release_escrow(uuid) from public, anon, authenticated;
 
 -- 5. Row level security: the backend uses the service role, so browsers get no direct table access.
 do $$

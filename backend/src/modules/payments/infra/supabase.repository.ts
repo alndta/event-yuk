@@ -16,12 +16,14 @@ const toTx = (r: any): EscrowTransaction => ({
   platformFee: Number(r.platform_fee),
   state: r.escrow_state,
   orderId: r.idempotency_key,
+  bastSubmittedAt: r.bast_submitted_at ?? null,
+  bastApprovedAt: r.bast_approved_at ?? null,
 });
 
 export class SupabasePaymentsRepository implements PaymentsRepository {
   constructor(private readonly db: Db) {}
 
-  async createTransaction(input: Omit<EscrowTransaction, 'id' | 'state'>) {
+  async createTransaction(input: Omit<EscrowTransaction, 'id' | 'state' | 'bastSubmittedAt' | 'bastApprovedAt'>) {
     const { data, error } = await this.db
       .from('escrow_transactions')
       .insert({
@@ -49,6 +51,36 @@ export class SupabasePaymentsRepository implements PaymentsRepository {
 
   async holdEscrow(transactionId: string) {
     const { data, error } = await this.db.rpc('hold_escrow' as never, { p_tx_id: transactionId } as never);
+    if (error) fail(error);
+    return data === true;
+  }
+
+  async findByRef(refId: string) {
+    const { data, error } = await this.db.from('escrow_transactions').select('*').eq('ref_id', refId).order('created_at', { ascending: false }).limit(1).maybeSingle();
+    if (error) fail(error);
+    return data ? toTx(data) : null;
+  }
+
+  async listForUser(userId: string) {
+    const { data, error } = await this.db
+      .from('escrow_transactions')
+      .select('*')
+      .or(`payer_id.eq.${userId},payee_id.eq.${userId}`)
+      .in('escrow_state', ['ESCROW_HELD', 'SETTLED'])
+      .order('created_at', { ascending: false })
+      .limit(200);
+    if (error) fail(error);
+    return (data ?? []).map(toTx);
+  }
+
+  async submitBast(transactionId: string, note: string | null) {
+    const { data, error } = await this.db.rpc('submit_bast' as never, { p_tx_id: transactionId, p_note: note } as never);
+    if (error) fail(error);
+    return data === true;
+  }
+
+  async releaseEscrow(transactionId: string) {
+    const { data, error } = await this.db.rpc('release_escrow' as never, { p_tx_id: transactionId } as never);
     if (error) fail(error);
     return data === true;
   }

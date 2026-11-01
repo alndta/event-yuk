@@ -2,6 +2,7 @@ import { randomBytes } from 'node:crypto';
 import type { Env } from '../../shared/config/env';
 import { badRequest, conflict, forbidden, notFound, serviceUnavailable } from '../../shared/errors';
 import { logger } from '../../shared/logger';
+import type { EventBus } from '../../shared/events/bus';
 import type { AuthContext } from '../../shared/types';
 import type { EventsApi } from '../events';
 import type { IdentityApi } from '../identity';
@@ -17,8 +18,49 @@ export class PaymentsService {
     private readonly proposals: ProposalsApi,
     private readonly events: EventsApi,
     private readonly identity: IdentityApi,
-    private readonly env: Env
+    private readonly env: Env,
+    private readonly bus: EventBus
   ) {}
+
+  /** What each of the user's held or settled escrows looks like, so the contract list can show the right action. */
+  async escrows(userId: string) {
+    const list = await this.repo.listForUser(userId);
+    return list.map((t) => ({
+      proposal_id: t.refId,
+      state: t.state,
+      amount: t.grossAmount,
+      role: t.payerId === userId ? 'payer' : 'payee',
+      bast_submitted_at: t.bastSubmittedAt,
+      bast_approved_at: t.bastApprovedAt,
+    }));
+  }
+
+  /** The recipient reports the work done. Nothing moves yet; the payer must approve. */
+  async submitBast(auth: AuthContext, proposalId: string, note?: string) {
+    const tx = await this.partyEscrow(auth, proposalId);
+    if (auth.userId !== tx.payeeId) throw forbidden('Hanya pihak penerima dana yang bisa mengajukan BAST.');
+    if (tx.state !== 'ESCROW_HELD') throw conflict('Dana pada kontrak ini sudah dilepas atau belum ditahan.');
+    if (tx.bastSubmittedAt) throw conflict('BAST sudah diajukan.');
+    if (!(await this.repo.submitBast(tx.id, note ?? null))) throw conflict('BAST sudah diajukan.');
+    await this.bus.emit('payments.bast_submitted', { proposalId, payerId: tx.payerId, payeeId: tx.payeeId });
+  }
+
+  /** The payer accepts the handover; the money is released to the recipient's balance. */
+  async approveBast(auth: AuthContext, proposalId: string) {
+    const tx = await this.partyEscrow(auth, proposalId);
+    if (auth.userId !== tx.payerId) throw forbidden('Hanya pihak pembayar yang bisa menyetujui BAST.');
+    if (!tx.bastSubmittedAt) throw conflict('Penerima belum mengajukan BAST.');
+    if (!(await this.repo.releaseEscrow(tx.id))) throw conflict('Dana pada kontrak ini sudah dilepas atau belum ditahan.');
+    logger.info('escrow released', { proposal: proposalId, amount: tx.grossAmount });
+    await this.bus.emit('payments.escrow_released', { proposalId, payerId: tx.payerId, payeeId: tx.payeeId, amount: tx.grossAmount - tx.platformFee });
+  }
+
+  /** Looks the escrow up and hides it from anyone who is not one of its two parties. */
+  private async partyEscrow(auth: AuthContext, proposalId: string) {
+    const tx = await this.repo.findByRef(proposalId);
+    if (!tx || (tx.payerId !== auth.userId && tx.payeeId !== auth.userId)) throw notFound('Dana escrow untuk kontrak ini belum ada.');
+    return tx;
+  }
 
   async wallet(userId: string) {
     const w = await this.repo.getWallet(userId);
@@ -94,7 +136,8 @@ export class PaymentsService {
     const paid = PAID_STATUSES.has(status.transactionStatus) && (status.fraudStatus === null || status.fraudStatus === 'accept');
     if (!paid) return { paid: false };
 
-    await this.repo.holdEscrow(tx.id);
+    const held = await this.repo.holdEscrow(tx.id);
+    if (held) await this.bus.emit('payments.escrow_held', { proposalId: tx.refId, payerId: tx.payerId, payeeId: tx.payeeId, amount: tx.grossAmount });
     try {
       await this.proposals.markEscrowFunded(tx.refId);
     } catch (err) {

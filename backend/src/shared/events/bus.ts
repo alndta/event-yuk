@@ -6,6 +6,9 @@ import { logger } from '../logger';
  */
 export interface DomainEvents {
   'identity.user_registered': { userId: string };
+  'payments.escrow_held': { proposalId: string; payerId: string; payeeId: string; amount: number };
+  'payments.bast_submitted': { proposalId: string; payerId: string; payeeId: string };
+  'payments.escrow_released': { proposalId: string; payerId: string; payeeId: string; amount: number };
 }
 
 type Handler<T> = (payload: T) => void | Promise<void>;

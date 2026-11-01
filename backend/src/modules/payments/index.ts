@@ -22,7 +22,7 @@ export function createPaymentsModule(deps: {
   bus: EventBus;
   env: Env;
 }) {
-  const service = new PaymentsService(deps.repo, deps.gateway, deps.proposals, deps.events, deps.identity, deps.env);
+  const service = new PaymentsService(deps.repo, deps.gateway, deps.proposals, deps.events, deps.identity, deps.env, deps.bus);
   // Every new account gets a wallet, whichever module created it.
   deps.bus.on('identity.user_registered', ({ userId }) => service.ensureWallet(userId));
   return { router: (guards: AuthGuards, limits: RequestHandler[]) => createPaymentsRouter(service, guards, limits) };

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const checkoutParams = z.object({ id: z.uuid() });
+export const bastSchema = z.object({ note: z.string().trim().max(1000).optional() });
 
 // Midtrans sends more fields than these; only what we verify against is declared.
 export const notificationSchema = z.object({

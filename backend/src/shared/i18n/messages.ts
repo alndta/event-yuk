@@ -90,6 +90,12 @@ export const EN: Record<string, string> = {
   'Nominal tidak sesuai dengan transaksi.': 'The amount does not match the transaction.',
   'Midtrans belum bisa membuat pembayaran. Coba lagi sebentar lagi.': 'Midtrans could not create the payment. Please try again shortly.',
   'Status pembayaran belum bisa diperiksa.': 'The payment status could not be checked.',
+  'Dana escrow untuk kontrak ini belum ada.': 'There is no escrow for this contract yet.',
+  'Hanya pihak penerima dana yang bisa mengajukan BAST.': 'Only the recipient can submit the handover (BAST).',
+  'Hanya pihak pembayar yang bisa menyetujui BAST.': 'Only the paying party can approve the handover (BAST).',
+  'BAST sudah diajukan.': 'The BAST was already submitted.',
+  'Dana pada kontrak ini sudah dilepas atau belum ditahan.': 'The funds on this contract are already released or not held yet.',
+  'Penerima belum mengajukan BAST.': 'The recipient has not submitted the BAST yet.',
   // validation (zod)
   'Tanggal memakai format YYYY-MM-DD.': 'Dates use the YYYY-MM-DD format.',
   'Gunakan alamat https:// atau path yang dimulai dengan /.': 'Use an https:// address or a path starting with /.',

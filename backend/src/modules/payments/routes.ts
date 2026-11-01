@@ -3,7 +3,7 @@ import { asyncHandler } from '../../shared/http/asyncHandler';
 import { currentAuth, type AuthGuards } from '../../shared/http/auth';
 import { noStore } from '../../shared/http/security';
 import { validate } from '../../shared/http/validate';
-import { checkoutParams, notificationSchema } from './schemas';
+import { bastSchema, checkoutParams, notificationSchema } from './schemas';
 import type { PaymentsService } from './service';
 
 export function createPaymentsRouter(service: PaymentsService, guards: AuthGuards, limits: RequestHandler[]) {
@@ -15,6 +15,39 @@ export function createPaymentsRouter(service: PaymentsService, guards: AuthGuard
     guards.requireAuth,
     asyncHandler(async (req, res) => {
       res.json({ success: true, wallet: await service.wallet(currentAuth(req).userId) });
+    })
+  );
+
+  router.get(
+    '/escrows',
+    noStore,
+    guards.requireAuth,
+    asyncHandler(async (req, res) => {
+      res.json({ success: true, data: await service.escrows(currentAuth(req).userId) });
+    })
+  );
+
+  router.post(
+    '/proposals/:id/bast',
+    noStore,
+    guards.requireAuth,
+    ...limits,
+    validate({ params: checkoutParams, body: bastSchema }),
+    asyncHandler(async (req, res) => {
+      await service.submitBast(currentAuth(req), req.params.id as string, req.body.note);
+      res.json({ success: true, message: 'BAST diajukan. Menunggu persetujuan pembayar.' });
+    })
+  );
+
+  router.post(
+    '/proposals/:id/bast/approve',
+    noStore,
+    guards.requireAuth,
+    ...limits,
+    validate({ params: checkoutParams }),
+    asyncHandler(async (req, res) => {
+      await service.approveBast(currentAuth(req), req.params.id as string);
+      res.json({ success: true, message: 'BAST disetujui. Dana dilepas ke penerima.' });
     })
   );
 

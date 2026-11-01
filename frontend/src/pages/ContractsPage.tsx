@@ -37,6 +37,8 @@ export interface ContractProposalItem {
   counterDpPercentage?: number;
   counterNotes?: string;
   lastUpdatedBy?: string;
+  /** Escrow state for funded contracts: what this user may do next. */
+  escrow?: { state: string; role: 'payer' | 'payee'; bastSubmitted: boolean };
   /** True when the other party acted last, so this user may counter or accept. */
   myTurn?: boolean;
   attachedFileName?: string | null;
@@ -67,10 +69,13 @@ export default function ContractsPage({ onShowToast }: Props) {
 
   const [loadError, setLoadError] = useState<string | null>(null);
   const [loadingList, setLoadingList] = useState(true);
+  const [bastTarget, setBastTarget] = useState<ContractProposalItem | null>(null);
+  const [bastNote, setBastNote] = useState('');
 
   const fetchLiveProposals = () => {
-    api('/proposals')
-      .then((resData) => {
+    Promise.all([api('/proposals'), api('/payments/escrows').catch(() => ({ data: [] }))])
+      .then(([resData, escrowData]) => {
+        const escrows: Record<string, any> = Object.fromEntries((escrowData.data || []).map((e: any) => [e.proposal_id, e]));
         const myId = user?.id;
         const mapped: ContractProposalItem[] = (resData.data || []).map((p: any) => ({
           id: p.id,
@@ -90,6 +95,7 @@ export default function ContractsPage({ onShowToast }: Props) {
           lastUpdatedBy: p.last_action_by === myId ? t('con.you') : t('con.other'),
           // Only the party who did not act last can counter or accept.
           myTurn: p.last_action_by !== myId,
+          escrow: escrows[p.id] ? { state: escrows[p.id].state, role: escrows[p.id].role, bastSubmitted: Boolean(escrows[p.id].bast_submitted_at) } : undefined,
           attachedFileName: p.attached_file_name || null,
           attachedFileSize: p.attached_file_size || null,
           contractDocumentUrl: p.contract_document_url || null,
@@ -153,6 +159,21 @@ export default function ContractsPage({ onShowToast }: Props) {
 
   const handleRejectProposal = (item: ContractProposalItem) =>
     run(() => api(`/proposals/${item.id}/respond`, { method: 'POST', body: { action: 'REJECT' } }), `Penawaran untuk ${item.partyTwo} ditolak.`);
+
+  const handleSubmitBast = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bastTarget) return;
+    const ok = await run(() => api(`/payments/proposals/${bastTarget.id}/bast`, { method: 'POST', body: { note: bastNote.trim() || undefined } }), t('bast.sent'));
+    if (ok) {
+      setBastTarget(null);
+      setBastNote('');
+    }
+  };
+
+  const handleApproveBast = (item: ContractProposalItem) => {
+    if (!confirm(t('bast.confirmApprove'))) return;
+    void run(() => api(`/payments/proposals/${item.id}/bast/approve`, { method: 'POST' }), t('bast.approved'));
+  };
 
   const handleOpenPks = (item: ContractProposalItem) => {
     setSelectedForPks(item);
@@ -434,6 +455,35 @@ export default function ContractsPage({ onShowToast }: Props) {
                     </button>
                   )}
 
+                  {/* Handover: the recipient reports, the payer approves, then the money moves. */}
+                  {item.status === 'ESCROW_FUNDED' && item.escrow?.state === 'ESCROW_HELD' && item.escrow.role === 'payee' && !item.escrow.bastSubmitted && (
+                    <button
+                      onClick={() => setBastTarget(item)}
+                      className="w-full min-h-12 px-5 rounded-full text-sm font-semibold bg-brand-lime hover:bg-brand-lime-hover text-brand-navy flex items-center justify-center gap-2 transition-colors"
+                    >
+                      <CheckCircle2 aria-hidden="true" className="w-5 h-5" />
+                      <span>{t('bast.submit')}</span>
+                    </button>
+                  )}
+                  {item.status === 'ESCROW_FUNDED' && item.escrow?.state === 'ESCROW_HELD' && item.escrow.role === 'payee' && item.escrow.bastSubmitted && (
+                    <p className="w-full rounded-2xl bg-brand-sand px-4 py-3 text-center text-sm font-semibold text-brand-ink">{t('bast.waitPayer')}</p>
+                  )}
+                  {item.status === 'ESCROW_FUNDED' && item.escrow?.state === 'ESCROW_HELD' && item.escrow.role === 'payer' && !item.escrow.bastSubmitted && (
+                    <p className="w-full rounded-2xl bg-brand-sand px-4 py-3 text-center text-sm font-semibold text-brand-ink">{t('bast.waitPayee')}</p>
+                  )}
+                  {item.status === 'ESCROW_FUNDED' && item.escrow?.state === 'ESCROW_HELD' && item.escrow.role === 'payer' && item.escrow.bastSubmitted && (
+                    <button
+                      onClick={() => handleApproveBast(item)}
+                      className="w-full min-h-12 px-5 rounded-full text-sm font-semibold bg-brand-lime hover:bg-brand-lime-hover text-brand-navy flex items-center justify-center gap-2 transition-colors"
+                    >
+                      <ShieldCheck aria-hidden="true" className="w-5 h-5" />
+                      <span>{t('bast.approve')}</span>
+                    </button>
+                  )}
+                  {item.status === 'ESCROW_FUNDED' && item.escrow?.state === 'SETTLED' && (
+                    <p className="w-full rounded-2xl bg-brand-forest-light px-4 py-3 text-center text-sm font-semibold text-brand-forest-dark">{t('bast.settled')}</p>
+                  )}
+
                   {/* If ESCROW_FUNDED: can view active contract */}
                   {item.status === 'ESCROW_FUNDED' && (
                     <button
@@ -458,6 +508,29 @@ export default function ContractsPage({ onShowToast }: Props) {
       </div>
 
       {/* Counter-Offer Negotiation Modal */}
+      {bastTarget && (
+        <Dialog onClose={() => setBastTarget(null)} label={t('bast.submit')}>
+          <form onSubmit={handleSubmitBast} className="w-full max-w-md space-y-4 rounded-lg bg-white p-6 sm:p-8">
+            <h3 className="font-display text-2xl font-extrabold tracking-[-0.03em] text-brand-ink">{t('bast.submit')}</h3>
+            <p className="text-sm text-slate-600">{bastTarget.eventTitle}</p>
+            <label htmlFor="bast-note" className="block text-sm font-semibold text-slate-800">{t('bast.noteLabel')}</label>
+            <textarea
+              id="bast-note"
+              rows={4}
+              maxLength={1000}
+              value={bastNote}
+              onChange={(e) => setBastNote(e.target.value)}
+              placeholder={t('bast.notePh')}
+              className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
+            />
+            <div className="flex justify-end gap-2">
+              <button type="button" onClick={() => setBastTarget(null)} className="min-h-11 rounded-full px-5 text-sm font-semibold text-slate-700 hover:bg-slate-100">{t('prm.cancel')}</button>
+              <button type="submit" className="min-h-11 rounded-full bg-brand-navy px-6 text-sm font-semibold text-white hover:bg-brand-navy-dark">{t('bast.send')}</button>
+            </div>
+          </form>
+        </Dialog>
+      )}
+
       {counterTarget && (
         <Dialog onClose={() => setCounterTarget(null)} label={t('con.28')}>
           <div className="bg-white rounded-lg max-w-lg w-full border border-slate-200 overflow-hidden flex flex-col">
