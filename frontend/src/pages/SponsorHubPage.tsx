@@ -1,10 +1,6 @@
 import { useState, useEffect } from 'react';
 import {
   Building2,
-  TrendingUp,
-  Users,
-  Target,
-  BarChart3,
   CheckCircle2,
   Send,
   Calendar,
@@ -25,7 +21,7 @@ export default function SponsorHubPage({ events, onApplySponsorship }: Props) {
   const [selectedEvent, setSelectedEvent] = useState<EventItem>(availableEvents[0] || initialEvents[0]);
   const [selectedTier, setSelectedTier] = useState<string>('PLATINUM');
   const [customBrandName, setCustomBrandName] = useState('');
-  const [customBudget, setCustomBudget] = useState('150000000');
+  const [customBudget, setCustomBudget] = useState('');
   const [proposalSubmitted, setProposalSubmitted] = useState(false);
 
   useEffect(() => {
@@ -106,8 +102,43 @@ export default function SponsorHubPage({ events, onApplySponsorship }: Props) {
     setTimeout(() => setProposalSubmitted(false), 5000);
   };
 
+  const ageBars = [
+    { label: '18-24 tahun (mahasiswa dan pelajar)', pct: 54 },
+    { label: '25-34 tahun (first jobber dan profesional)', pct: 33 },
+    { label: '35+ tahun (keluarga muda)', pct: 13 },
+  ];
+  const interestBars = [
+    { label: 'Musik, konser, dan festival', pct: 94 },
+    { label: 'Kuliner dan specialty beverages', pct: 88 },
+    { label: 'Fashion lokal dan sneakers', pct: 76 },
+    { label: 'Teknologi, fintech, dan gadget', pct: 68 },
+    { label: 'Travel dan lifestyle experiences', pct: 55 },
+  ];
+
+  const Bar = ({ label, pct }: { label: string; pct: number }) => (
+    <div>
+      <div className="mb-1.5 flex justify-between gap-3 text-sm font-medium text-slate-800">
+        <span>{label}</span>
+        <span className="font-display font-bold text-brand-ink">{pct}%</span>
+      </div>
+      <div
+        role="progressbar"
+        aria-valuenow={pct}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-label={label}
+        className="h-2.5 w-full overflow-hidden rounded-full bg-brand-sand"
+      >
+        <div className="h-full rounded-full bg-brand-navy" style={{ width: pct + '%' }} />
+      </div>
+    </div>
+  );
+
+  const inputClass =
+    'min-h-12 w-full rounded-lg border border-slate-300 bg-white px-4 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30';
+
   return (
-    <div className="space-y-6 sm:space-y-8 font-sans">
+    <div className="space-y-16 font-sans sm:space-y-20">
       <SEOHead
         title="Sponsor Hub — Peluang Aktivasi Brand & Kemitraan Festival | Event Yuk"
         description="Hubungkan brand FMCG, fintech, dan korporasi dengan ratusan festival musik, pensi sekolah, dan bazaar di Indonesia. Akses demografi audiens riil, paket Title/Platinum/Gold/Silver, dan laporan ROI aktivasi transparan."
@@ -115,361 +146,305 @@ export default function SponsorHubPage({ events, onApplySponsorship }: Props) {
         canonicalPath="/sponsors"
       />
 
-      {/* Header */}
-      <div className="max-w-3xl">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 text-amber-800 text-xs font-bold mb-3 border border-amber-200">
-          <Building2 className="w-3.5 h-3.5 text-amber-600" />
-          <span>Portal Intelijen & Kemitraan Sponsor Brand</span>
-        </div>
-        <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-          Sponsor Intelligence Hub
-        </h1>
-        <p className="text-xs sm:text-sm text-slate-500 mt-1">
-          Akses data demografi riil pengunjung, profil audiens, kalkulasi ROI impresi, dan pilih paket sponsorship resmi dengan kepastian kontrak PKS dan termin aman.
+      <header className="max-w-3xl">
+        <p className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-brand-lime-strong">
+          <Building2 aria-hidden="true" className="h-4 w-4" />
+          Portal kemitraan sponsor brand
         </p>
-      </div>
+        <h1 className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
+          Sponsor Hub
+        </h1>
+        <p className="mt-4 text-lg leading-8 text-slate-700">
+          Lihat profil audiens, pilih paket sponsorship, dan ajukan penawaran langsung ke penyelenggara dengan kontrak PKS dan termin pembayaran yang aman.
+        </p>
+      </header>
 
-      {/* 3 Metric Highlights */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-5">
-        <div className="p-5 bg-white rounded-3xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Ekosistem Audiens</span>
-            <div className="p-2.5 rounded-2xl bg-sky-50 text-[#172D46]">
-              <Users className="w-5 h-5" />
-            </div>
+      <section aria-label="Ringkasan audiens" className="grid grid-cols-1 gap-4 sm:grid-cols-3 lg:gap-5">
+        {[
+          { label: 'Total ekosistem audiens', value: '450.000+', note: '+28% YoY peningkatan pengunjung aktif' },
+          { label: 'Target usia dominan', value: '18-32 tahun', note: 'Gen-Z dan milenial produktif (SES A dan B 72%)' },
+          { label: 'Total estimasi media impressions', value: '12,8 juta', note: 'Jangkauan media sosial dan aktivasi on-ground' },
+        ].map((m) => (
+          <div key={m.label} className="rounded-lg bg-white p-6">
+            <p className="text-sm font-medium text-slate-700">{m.label}</p>
+            <p className="mt-3 font-display text-4xl font-extrabold tracking-[-0.04em] text-brand-ink">{m.value}</p>
+            <p className="mt-2 text-sm leading-6 text-slate-600">{m.note}</p>
           </div>
-          <div className="text-3xl font-black text-slate-900 mt-3">450.000+</div>
-          <div className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-            <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
-            <span className="text-emerald-700 font-bold">+28% YoY</span>
-            <span>peningkatan pengunjung aktif</span>
-          </div>
-        </div>
+        ))}
+      </section>
 
-        <div className="p-5 bg-white rounded-3xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Target Usia Dominan</span>
-            <div className="p-2.5 rounded-2xl bg-orange-50 text-[#5E7628]">
-              <Target className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="text-3xl font-black text-slate-900 mt-3">18 - 32 Thn</div>
-          <div className="text-xs text-slate-500 mt-1">
-            Gen-Z & Milenial Produktif (SES A & B 72%)
-          </div>
-        </div>
-
-        <div className="p-5 bg-white rounded-3xl border border-slate-200 shadow-sm">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Total Est. Media Impressions</span>
-            <div className="p-2.5 rounded-2xl bg-emerald-50 text-emerald-700">
-              <BarChart3 className="w-5 h-5" />
-            </div>
-          </div>
-          <div className="text-3xl font-black text-slate-900 mt-3">12.8 Juta</div>
-          <div className="text-xs text-slate-500 mt-1">
-            Jangkauan media sosial & aktivasi on-ground
-          </div>
-        </div>
-      </div>
-
-      {/* Demographic Breakdown & Event Selector */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-        {/* Left: Demographics Chart & Audience Insights */}
-        <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
-          <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+      <section className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+        <div className="rounded-lg bg-white p-6 sm:p-8 lg:col-span-2">
+          <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <h2 className="text-lg font-black text-slate-900">Demografi & Profil Minat Pengunjung Acara</h2>
-              <p className="text-xs text-slate-500">Data agregat dari pengunjung yang membeli tiket dan registrasi tenant</p>
+              <h2 className="font-display text-2xl font-extrabold tracking-[-0.03em] text-brand-ink">
+                Demografi dan minat pengunjung
+              </h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Data agregat dari pengunjung yang membeli tiket dan registrasi tenant
+              </p>
             </div>
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#172D46] text-white flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#5E7628]" />
-              <span>Data Terverifikasi e-KYC</span>
+            <span className="inline-flex w-fit shrink-0 items-center gap-1.5 rounded-full bg-brand-forest-light px-3 py-1.5 text-sm font-semibold text-brand-forest-dark">
+              <ShieldCheck aria-hidden="true" className="h-4 w-4" />
+              Terverifikasi e-KYC
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-6">
-            {/* Usia & Gender */}
-            <div className="space-y-4">
-              <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">Sebaran Kelompok Usia</h3>
-              <div className="space-y-2">
-                <div>
-                  <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
-                    <span>18 - 24 Tahun (Mahasiswa & Pelajar)</span>
-                    <span className="text-[#172D46]">54%</span>
-                  </div>
-                  <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                    <div className="bg-[#172D46] h-full rounded-full" style={{ width: '54%' }} />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
-                    <span>25 - 34 Tahun (First Jobber & Profesional)</span>
-                    <span className="text-[#456B39]">33%</span>
-                  </div>
-                  <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                    <div className="bg-[#456B39] h-full rounded-full" style={{ width: '33%' }} />
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
-                    <span>35+ Tahun (Keluarga Muda)</span>
-                    <span className="text-[#5E7628]">13%</span>
-                  </div>
-                  <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden">
-                    <div className="bg-[#5E7628] h-full rounded-full" style={{ width: '13%' }} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Gender Split */}
-              <div className="pt-2">
-                <div className="text-xs font-black uppercase text-slate-400 tracking-wider mb-2">Rasio Gender</div>
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 p-3 bg-slate-50 rounded-xl border border-slate-200 text-center">
-                    <div className="text-xs text-slate-500 font-semibold">Wanita</div>
-                    <div className="text-lg font-black text-[#456B39]">58%</div>
-                  </div>
-                  <div className="flex-1 p-3 bg-slate-50 rounded-xl border border-slate-200 text-center">
-                    <div className="text-xs text-slate-500 font-semibold">Pria</div>
-                    <div className="text-lg font-black text-[#172D46]">42%</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Top Consumer Interests */}
-            <div className="space-y-4">
-              <h3 className="text-xs font-black uppercase text-slate-400 tracking-wider">Kategori Minat Teratas (Affinity)</h3>
-              <div className="space-y-2">
-                {[
-                  { name: 'Musik Konser & Festival', pct: 94, color: 'bg-purple-600' },
-                  { name: 'Kuliner & Specialty Beverages', pct: 88, color: 'bg-[#5E7628]' },
-                  { name: 'Fashion Lokal & Sneakers', pct: 76, color: 'bg-emerald-600' },
-                  { name: 'Teknologi, Fintech & Gadgets', pct: 68, color: 'bg-[#172D46]' },
-                  { name: 'Travel & Lifestyle Experiences', pct: 55, color: 'bg-indigo-600' },
-                ].map((item, idx) => (
-                  <div key={idx}>
-                    <div className="flex justify-between text-xs font-bold text-slate-700 mb-1">
-                      <span>{item.name}</span>
-                      <span className="font-mono text-slate-900">{item.pct}%</span>
-                    </div>
-                    <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                      <div className={`${item.color} h-full rounded-full`} style={{ width: `${item.pct}%` }} />
-                    </div>
-                  </div>
+          <div className="mt-6 grid grid-cols-1 gap-8 sm:grid-cols-2">
+            <div className="space-y-5">
+              <h3 className="font-display text-lg font-bold text-brand-ink">Sebaran usia</h3>
+              <div className="space-y-4">
+                {ageBars.map((b) => (
+                  <Bar key={b.label} {...b} />
                 ))}
               </div>
-
-              {/* Buying Power */}
-              <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200 text-xs text-emerald-900 mt-3">
-                <div className="font-bold flex items-center gap-1.5 mb-1">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  <span>Daya Beli Rata-Rata di Venue (Basket Size)</span>
+              <dl className="grid grid-cols-2 gap-3 pt-2">
+                <div className="rounded-lg bg-brand-cream p-4 text-center">
+                  <dt className="text-sm text-slate-700">Wanita</dt>
+                  <dd className="font-display text-2xl font-extrabold text-brand-ink">58%</dd>
                 </div>
-                <p className="text-[11px] text-emerald-800">
-                  Rata-rata pengeluaran pengunjung berkisar antara Rp 120.000 - Rp 350.000 per hari untuk F&B dan merchandise.
+                <div className="rounded-lg bg-brand-cream p-4 text-center">
+                  <dt className="text-sm text-slate-700">Pria</dt>
+                  <dd className="font-display text-2xl font-extrabold text-brand-ink">42%</dd>
+                </div>
+              </dl>
+            </div>
+
+            <div className="space-y-5">
+              <h3 className="font-display text-lg font-bold text-brand-ink">Minat teratas</h3>
+              <div className="space-y-4">
+                {interestBars.map((b) => (
+                  <Bar key={b.label} {...b} />
+                ))}
+              </div>
+              <div className="rounded-lg bg-brand-lime-soft p-4">
+                <p className="flex items-center gap-2 text-sm font-semibold text-brand-ink">
+                  <CheckCircle2 aria-hidden="true" className="h-4 w-4 text-brand-forest" />
+                  Daya beli rata-rata di venue
+                </p>
+                <p className="mt-1 text-sm leading-6 text-slate-700">
+                  Pengeluaran pengunjung berkisar antara Rp 120.000 dan Rp 350.000 per hari untuk F&amp;B dan merchandise.
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right: Select Event to Sponsor */}
-        <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm flex flex-col justify-between">
+        <div className="flex flex-col justify-between rounded-lg bg-white p-6 sm:p-8">
           <div>
-            <h2 className="text-lg font-black text-slate-900">Pilih Acara untuk Disponsori</h2>
-            <p className="text-xs text-slate-500 mt-1">Acara yang saat ini membuka slot sponsorship terbuka</p>
-
-            <div className="mt-4 space-y-3">
-              {availableEvents.map((ev) => (
-                <div
-                  key={ev.id}
-                  onClick={() => setSelectedEvent(ev)}
-                  className={`p-3.5 rounded-2xl border transition cursor-pointer flex items-center gap-3 ${
-                    selectedEvent.id === ev.id
-                      ? 'border-[#172D46] bg-[#172D46]/5 shadow-xs'
-                      : 'border-slate-200 hover:border-slate-300'
-                  }`}
-                >
-                  <img
-                    src={ev.bannerImage}
-                    alt={ev.title}
-                    className="w-14 h-14 rounded-xl object-cover"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="text-xs font-bold text-slate-900 truncate">{ev.title}</div>
-                    <div className="text-[11px] text-slate-500 flex items-center gap-1 mt-0.5">
-                      <Calendar className="w-3 h-3 text-[#5E7628]" />
-                      <span>{ev.date}</span>
-                    </div>
-                    <div className="text-[11px] text-slate-500 flex items-center gap-1">
-                      <MapPin className="w-3 h-3 text-[#456B39]" />
-                      <span className="truncate">{ev.venue}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-5 p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-xs">
-            <div className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">Penyelenggara Terpilih:</div>
-            <div className="font-extrabold text-slate-900 mt-0.5 flex items-center gap-1.5">
-              <span>{selectedEvent.organizer.name}</span>
-              <CheckCircle2 className="w-3.5 h-3.5 text-sky-500" />
-            </div>
-            <div className="text-[11px] text-slate-500 mt-1">
-              Target Pengunjung: 15.000+ Orang • Skema Pembayaran PKS Resmi
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Sponsorship Tier Cards */}
-      <div className="mb-12">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-              Pilihan Paket Sponsorship & Hak Istimewa
+            <h2 className="font-display text-2xl font-extrabold tracking-[-0.03em] text-brand-ink">
+              Pilih acara untuk disponsori
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-              Semua paket dilindungi kontrak PKS digital & termin escrow aman (50:50 atau 70:30)
+            <p className="mt-1 text-sm text-slate-600">Acara yang sedang membuka slot sponsorship</p>
+
+            <ul className="mt-5 space-y-3">
+              {availableEvents.map((ev) => (
+                <li key={ev.id}>
+                  <button
+                    type="button"
+                    aria-pressed={selectedEvent.id === ev.id}
+                    onClick={() => setSelectedEvent(ev)}
+                    className={`flex w-full items-center gap-3 rounded-lg border-2 p-3 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy ${
+                      selectedEvent.id === ev.id
+                        ? 'border-brand-navy bg-brand-lime-soft'
+                        : 'border-slate-200 hover:border-brand-navy/50'
+                    }`}
+                  >
+                    <img
+                      src={ev.bannerImage}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                      className="h-14 w-14 shrink-0 rounded-md bg-brand-navy-light object-cover"
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-base font-semibold text-brand-ink">{ev.title}</span>
+                      <span className="mt-0.5 flex items-center gap-1.5 text-sm text-slate-600">
+                        <Calendar aria-hidden="true" className="h-4 w-4 shrink-0" />
+                        {ev.date}
+                      </span>
+                      <span className="flex items-center gap-1.5 text-sm text-slate-600">
+                        <MapPin aria-hidden="true" className="h-4 w-4 shrink-0" />
+                        <span className="truncate">{ev.venue}</span>
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="mt-6 rounded-lg bg-brand-cream p-4">
+            <p className="text-sm text-slate-700">Penyelenggara terpilih</p>
+            <p className="mt-0.5 flex items-center gap-1.5 font-display text-lg font-extrabold text-brand-ink">
+              {selectedEvent.organizer.name}
+              <CheckCircle2 aria-label="Terverifikasi" className="h-5 w-5 text-brand-forest" />
             </p>
+            <p className="mt-1 text-sm text-slate-600">Target pengunjung 15.000+ orang, skema pembayaran PKS resmi</p>
           </div>
         </div>
+      </section>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {sponsorshipTiers.map((tier) => (
-            <div
-              key={tier.id}
-              onClick={() => setSelectedTier(tier.id)}
-              className={`rounded-3xl border-2 p-6 flex flex-col justify-between transition cursor-pointer relative shadow-sm hover:shadow-md ${
-                selectedTier === tier.id
-                  ? `${tier.color} ring-2 ring-[#172D46] shadow-md`
-                  : 'border-slate-200 bg-white hover:border-slate-300'
-              }`}
-            >
-              <div>
-                <span className="inline-block px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#172D46] text-white mb-3">
-                  {tier.badge}
-                </span>
-                <h3 className="text-base font-black text-slate-900 leading-tight">
-                  {tier.name}
-                </h3>
-                <div className="text-lg font-black text-[#172D46] mt-2 font-mono">
-                  {tier.price}
-                </div>
+      <section aria-labelledby="sponsor-tiers-title">
+        <div className="mx-auto max-w-3xl text-center">
+          <h2
+            id="sponsor-tiers-title"
+            className="font-display text-4xl font-extrabold leading-[1.05] tracking-[-0.04em] text-brand-ink sm:text-5xl"
+          >
+            Pilih paket sponsorship
+          </h2>
+          <p className="mt-4 text-lg leading-8 text-slate-700">
+            Semua paket dilindungi kontrak PKS digital dan termin escrow (50:50 atau 70:30).
+          </p>
+        </div>
 
-                <div className="mt-4 pt-4 border-t border-slate-100 space-y-2.5">
-                  <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Benefit & Deliverables:</div>
-                  {tier.deliverables.map((deliv, idx) => (
-                    <div key={idx} className="text-xs text-slate-700 flex items-start gap-2 leading-snug">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>{deliv}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <button
-                type="button"
-                className={`mt-6 w-full py-2.5 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 ${
-                  selectedTier === tier.id
-                    ? 'bg-[#172D46] text-white shadow-sm'
-                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+        <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+          {sponsorshipTiers.map((tier) => {
+            const selected = selectedTier === tier.id;
+            return (
+              <div
+                key={tier.id}
+                role="button"
+                tabIndex={0}
+                aria-pressed={selected}
+                onClick={() => setSelectedTier(tier.id)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setSelectedTier(tier.id);
+                  }
+                }}
+                className={`flex cursor-pointer flex-col justify-between rounded-lg border-2 p-6 transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy ${
+                  selected ? 'border-brand-navy bg-brand-lime' : 'border-transparent bg-white hover:border-brand-navy/40'
                 }`}
               >
-                <span>{selectedTier === tier.id ? 'Paket Terpilih' : 'Pilih Paket Ini'}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          ))}
-        </div>
-      </div>
+                <div>
+                  <span className="inline-block rounded-full bg-brand-navy px-3 py-1 text-xs font-semibold text-white">
+                    {tier.badge}
+                  </span>
+                  <h3 className="mt-4 font-display text-xl font-extrabold leading-tight tracking-[-0.03em] text-brand-ink">
+                    {tier.name}
+                  </h3>
+                  <p className="mt-2 font-display text-2xl font-extrabold tracking-[-0.03em] text-brand-ink">
+                    {tier.price}
+                  </p>
 
-      {/* Interactive Proposal Submission Form */}
-      <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm">
-        <div className="max-w-2xl mb-6">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold mb-2 border border-emerald-200">
-            <Send className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Formulir Pengajuan Kemitraan Langsung ke EO</span>
-          </div>
-          <h2 className="text-2xl font-black text-slate-900">
-            Kirim Pengajuan Sponsorship ke Penyelenggara
+                  <div className="mt-5 border-t border-brand-navy/15 pt-5">
+                    <p className="text-sm font-semibold text-brand-ink">Benefit dan deliverables</p>
+                    <ul className="mt-3 space-y-2.5">
+                      {tier.deliverables.map((deliv, idx) => (
+                        <li key={idx} className="flex items-start gap-2 text-sm leading-6 text-slate-800">
+                          <CheckCircle2 aria-hidden="true" className="mt-1 h-4 w-4 shrink-0 text-brand-forest" />
+                          <span>{deliv}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                <span
+                  aria-hidden="true"
+                  className={`mt-6 flex min-h-11 w-full items-center justify-center gap-2 rounded-full text-sm font-semibold ${
+                    selected ? 'bg-brand-navy text-white' : 'bg-brand-cream text-brand-ink'
+                  }`}
+                >
+                  {selected ? 'Paket terpilih' : 'Pilih paket ini'}
+                  <ArrowRight className="h-4 w-4" />
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section aria-labelledby="sponsor-form-title" className="rounded-lg bg-white p-6 sm:p-10">
+        <div className="max-w-2xl">
+          <p className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-brand-lime-strong">
+            <Send aria-hidden="true" className="h-4 w-4" />
+            Pengajuan langsung ke penyelenggara
+          </p>
+          <h2
+            id="sponsor-form-title"
+            className="font-display text-3xl font-extrabold tracking-[-0.04em] text-brand-ink sm:text-4xl"
+          >
+            Kirim pengajuan sponsorship
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Ajukan nominal sponsorship untuk acara <strong className="text-slate-900">{selectedEvent.title}</strong> dengan paket pilihan <strong className="text-slate-900">{selectedTier}</strong>. Anda dapat menegosiasikan termin pembayaran (50:50 atau 70:30) bersama EO.
+          <p className="mt-3 text-base leading-7 text-slate-700">
+            Kamu mengajukan sponsorship untuk <strong className="text-brand-ink">{selectedEvent.title}</strong> dengan paket{' '}
+            <strong className="text-brand-ink">{selectedTier}</strong>. Termin pembayaran (50:50 atau 70:30) bisa kamu negosiasikan bersama EO.
           </p>
         </div>
 
         {proposalSubmitted ? (
-          <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-200 text-center">
-            <CheckCircle2 className="w-10 h-10 text-emerald-600 mx-auto mb-2" />
-            <div className="text-base font-black text-emerald-900">Proposal Sponsorship Berhasil Dikirim!</div>
-            <p className="text-xs text-emerald-700 mt-1 max-w-md mx-auto">
-              Event Organizer akan menerima notifikasi penawaran ini. Anda dapat memantau status persetujuan, mengajukan penyesuaian harga, atau menandatangani PKS di tab Kontrak.
+          <div role="status" className="mt-8 rounded-lg bg-brand-forest-light p-8 text-center">
+            <CheckCircle2 aria-hidden="true" className="mx-auto mb-3 h-10 w-10 text-brand-forest" />
+            <p className="font-display text-xl font-extrabold text-brand-forest-dark">Proposal sponsorship terkirim</p>
+            <p className="mx-auto mt-2 max-w-md text-base leading-7 text-slate-700">
+              Event Organizer akan menerima notifikasi penawaran ini. Kamu bisa memantau status persetujuan, mengajukan penyesuaian harga, atau menandatangani PKS di tab Kontrak.
             </p>
           </div>
         ) : (
-          <form onSubmit={handleProposalSubmit} className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <form onSubmit={handleProposalSubmit} className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                Nama Perusahaan / Brand Sponsor
+              <label htmlFor="sponsor-brand" className="mb-2 block text-sm font-semibold text-slate-800">
+                Nama perusahaan atau brand
               </label>
               <input
+                id="sponsor-brand"
                 type="text"
                 required
-                placeholder="Contoh: PT Sumber Minuman Segar / Brand Teh"
+                placeholder="Contoh: PT Sumber Minuman Segar"
                 value={customBrandName}
                 onChange={(e) => setCustomBrandName(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                className={inputClass}
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                Nominal Komitmen Anggaran (Rp)
+              <label htmlFor="sponsor-budget" className="mb-2 block text-sm font-semibold text-slate-800">
+                Nominal komitmen anggaran (Rp)
               </label>
               <input
+                id="sponsor-budget"
                 type="number"
                 required
+                min={0}
+                inputMode="numeric"
+                placeholder="Contoh: 150000000"
                 value={customBudget}
                 onChange={(e) => setCustomBudget(e.target.value)}
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-mono font-bold focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                className={inputClass}
               />
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-xs font-bold text-slate-700 mb-1">
-                Kebutuhan Khusus / Permintaan Hak Aktivasi Brand
+              <label htmlFor="sponsor-notes" className="mb-2 block text-sm font-semibold text-slate-800">
+                Kebutuhan khusus atau hak aktivasi brand
               </label>
               <textarea
-                rows={3}
+                id="sponsor-notes"
+                rows={4}
                 placeholder="Contoh: Kami memerlukan hak eksklusif penjualan minuman non-alkohol di 3 zona panggung dan 1 spot photobooth berukuran 6x6 meter."
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-[#172D46] focus:outline-none"
-                defaultValue="Kami tertarik menjadi mitra resmi dan mengajukan termin pembayaran 50% saat PKS ditandatangani dan 50% setelah penyerahan laporan dokumentasi aktivasi pasca-acara."
+                className={inputClass + ' py-3'}
               />
             </div>
 
-            <div className="sm:col-span-2 flex items-center justify-between pt-2 border-t border-slate-100">
-              <div className="text-xs text-slate-500 flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <span>Terlindungi Rekening Bersama Escrow & Kontrak MoU Resmi</span>
-              </div>
+            <div className="flex flex-col gap-4 border-t border-slate-200 pt-6 sm:col-span-2 sm:flex-row sm:items-center sm:justify-between">
+              <p className="flex items-center gap-2 text-sm text-slate-700">
+                <ShieldCheck aria-hidden="true" className="h-5 w-5 shrink-0 text-brand-forest" />
+                Dilindungi rekening bersama Escrow dan kontrak MoU resmi
+              </p>
               <button
                 type="submit"
-                className="px-6 py-3 rounded-xl text-xs font-bold bg-[#456B39] hover:bg-[#2F5232] text-white flex items-center gap-2 shadow-sm transition"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-brand-navy px-7 text-base font-semibold text-white transition-colors hover:bg-brand-navy-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy"
               >
-                <Send className="w-4 h-4" />
-                <span>Kirim Proposal Kemitraan</span>
+                <Send aria-hidden="true" className="h-5 w-5" />
+                Kirim proposal
               </button>
             </div>
           </form>
         )}
-      </div>
+      </section>
     </div>
   );
 }
