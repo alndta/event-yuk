@@ -121,3 +121,14 @@
     transform: translateY(-6px);
   }
 }
+
+/* Selected text stays readable on light, navy and lime surfaces alike. Kept outside
+   the Tailwind layers so nothing can out-rank it. */
+::selection {
+  background-color: #d7f36a;
+  color: #172d46;
+}
+::-moz-selection {
+  background-color: #d7f36a;
+  color: #172d46;
+}
