@@ -392,7 +392,7 @@ export default function RolesGuidePage() {
   ];
 
   return (
-    <div className="guide-page -mx-5 -my-6 sm:-mx-8 sm:-my-8 lg:-mx-12 2xl:-mx-16 font-sans">
+    <div className="guide-page -mx-5 -mt-6 -mb-[6.5rem] sm:-mx-8 sm:-mt-8 sm:-mb-28 lg:-mx-12 2xl:-mx-16 font-sans">
       <SEOHead
         title="Panduan Peran di Ekosistem Acara | Event Yuk"
         description="Kenali enam peran di Event Yuk, lihat cara kerja tiap mitra, dan ikuti tiga langkah pendaftaran akun."
