@@ -24,3 +24,9 @@ npm run build && npm start
 
 Jalankan `supabase/migrations/20261101000000_modulith_hardening.sql` di database sebelum production.
 Docs API: `/api-docs` (non-production) dan `/api-docs.json`.
+
+## e-KYC dan penyimpanan foto
+
+Foto KTP dan selfie disimpan di bucket Supabase Storage `kyc-documents` yang **privat** (dibuat oleh migrasi).
+Tidak ada tautan publik; admin hanya mendapat tautan bertanda tangan yang berlaku 2 menit, dan setiap pembukaan dicatat di log.
+Akun admin adalah email yang ada di `ADMIN_EMAILS`.

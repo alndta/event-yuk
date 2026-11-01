@@ -234,3 +234,17 @@ Tahap A dan B adalah syarat minimum sebelum Event Yuk menahan uang pengguna sung
 - [ ] Tabel `kyc_*` tidak bisa dibaca dengan kunci anon (diuji).
 - [ ] Dokumen ditolak terhapus otomatis sesuai kebijakan retensi.
 - [ ] Teks persetujuan data pribadi sudah ditinjau konsultan hukum.
+
+---
+
+## Status implementasi (diperbarui)
+
+| Bagian | Status |
+|---|---|
+| Pengajuan e-KYC (NIK sebagai hash, rekening) | Selesai |
+| Foto KTP dan selfie (JPG/PNG, maks 5 MB, tipe dibaca dari isi berkas) | Selesai, perlu diuji dengan Supabase sungguhan |
+| Penyimpanan privat (`kyc-documents`, tanpa tautan publik) | Dibuat lewat migrasi; perlu dicek di dasbor Supabase |
+| Halaman review admin (`/admin/kyc`): lihat foto 2 menit, setujui, tolak dengan alasan | Selesai |
+| DP hanya untuk penerima terverifikasi | Selesai |
+| Penghapusan foto otomatis setelah masa simpan | Belum (menunggu keputusan §11 nomor 3) |
+| Penyedia e-KYC pihak ketiga, dokumen badan usaha | Belum (tahap berikutnya) |

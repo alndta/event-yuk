@@ -211,10 +211,10 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
             className={'flex shrink-0 items-center gap-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current ' + textTone}
           >
             <img src="/logo-event-yuk.png" alt="" className="h-9 w-auto object-contain" />
-            <span className="font-display text-xl font-extrabold leading-none tracking-[-0.03em]">Event Yuk</span>
+            <span className="hidden font-display text-xl font-extrabold leading-none tracking-[-0.03em] min-[360px]:inline">Event Yuk</span>
           </Link>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1 sm:gap-3">
             <button
               type="button"
               onClick={toggleLanguage}
@@ -223,7 +223,7 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
               aria-label={language === 'id' ? 'Switch to English' : 'Ganti ke Bahasa Indonesia'}
             >
               <Globe aria-hidden="true" className="h-4 w-4" />
-              {language.toUpperCase()}
+              <span className="hidden min-[400px]:inline">{language.toUpperCase()}</span>
             </button>
 
             <button
@@ -275,7 +275,7 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
               aria-expanded={menu === 'open'}
               className={
                 pill +
-                'ey-menu-btn border-2 ' +
+                'ey-menu-btn border-2 !px-4 sm:!px-5 ' +
                 (light
                   ? 'border-white text-white hover:bg-white hover:text-brand-navy focus-visible:outline-white'
                   : 'border-brand-navy text-brand-navy hover:bg-brand-navy hover:text-brand-lime focus-visible:outline-brand-navy')
@@ -305,7 +305,7 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
           <div data-menu-top className="mx-auto flex w-full max-w-[96rem] items-center justify-between px-5 py-3 sm:px-8 lg:px-12">
             <Link to="/" className="flex items-center gap-2.5 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-lime">
               <img src="/logo-event-yuk.png" alt="" className="h-9 w-auto rounded-md bg-white p-1 object-contain" />
-              <span className="font-display text-xl font-extrabold leading-none tracking-[-0.03em]">Event Yuk</span>
+              <span className="hidden font-display text-xl font-extrabold leading-none tracking-[-0.03em] min-[360px]:inline">Event Yuk</span>
             </Link>
             <button
               ref={closeBtnRef}
