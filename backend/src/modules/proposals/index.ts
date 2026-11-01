@@ -1,4 +1,5 @@
 import type { RequestHandler } from 'express';
+import type { EventBus } from '../../shared/events/bus';
 import type { AuthGuards } from '../../shared/http/auth';
 import type { EventsApi } from '../events';
 import type { IdentityApi } from '../identity';
@@ -22,8 +23,8 @@ export interface ProposalsApi {
   markEscrowFunded(id: string): Promise<void>;
 }
 
-export function createProposalsModule(deps: { repo: ProposalRepository; identity: IdentityApi; events: EventsApi }) {
-  const service = new ProposalsService(deps.repo, deps.identity, deps.events);
+export function createProposalsModule(deps: { repo: ProposalRepository; identity: IdentityApi; events: EventsApi; bus: EventBus }) {
+  const service = new ProposalsService(deps.repo, deps.identity, deps.events, deps.bus);
   const api: ProposalsApi = {
     countFundedFor: (id) => service.countFundedFor(id),
     getForPayment: (id, who) => service.getForPayment(id, who),

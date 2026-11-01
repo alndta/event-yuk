@@ -12,6 +12,7 @@ import { createCatalogModule, type CatalogRepository } from './modules/catalog';
 import { createEventsModule, type EventRepository } from './modules/events';
 import { createIdentityModule, type DocumentStore, type GoogleIdentityVerifier, type KycRepository, type OtpRepository, type UserRepository } from './modules/identity';
 import { createPaymentsModule, type PaymentGateway, type PaymentsRepository } from './modules/payments';
+import { createNotificationsModule } from './modules/notifications';
 import { createProposalsModule, type ProposalRepository } from './modules/proposals';
 import { mountApiDocs } from './docs/openapi';
 
@@ -60,9 +61,11 @@ export function createApp(deps: AppDeps): Express {
   const guards = createAuthGuards(identity.api, env.adminEmails);
 
   const events = createEventsModule({ repo: deps.events, identity: identity.api, cache });
-  const proposals = createProposalsModule({ repo: deps.proposals, identity: identity.api, events: events.api });
+  const proposals = createProposalsModule({ repo: deps.proposals, identity: identity.api, events: events.api, bus });
   const catalog = createCatalogModule({ repo: deps.catalog, identity: identity.api, events: events.api, proposals: proposals.api, cache });
   const payments = createPaymentsModule({ repo: deps.payments, gateway: deps.gateway, proposals: proposals.api, events: events.api, identity: identity.api, bus, env });
+
+  createNotificationsModule({ bus, identity: identity.api, mailer: deps.mailer, env });
 
   const app = express();
   app.disable('x-powered-by');

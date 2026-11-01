@@ -1,5 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { badRequest, conflict, forbidden, notFound } from '../../shared/errors';
+import type { EventBus } from '../../shared/events/bus';
 import type { AuthContext } from '../../shared/types';
 import type { EventsApi } from '../events';
 import type { IdentityApi } from '../identity';
@@ -30,7 +31,8 @@ export class ProposalsService {
   constructor(
     private readonly repo: ProposalRepository,
     private readonly identity: IdentityApi,
-    private readonly events: EventsApi
+    private readonly events: EventsApi,
+    private readonly bus: EventBus
   ) {}
 
   private async present(p: ProposalRecord, viewerId: string) {
@@ -113,6 +115,7 @@ export class ProposalsService {
       attachedFileSize: input.attached_file_size ?? null,
       contractDocumentUrl: input.contract_document_url ?? null,
     });
+    await this.bus.emit('proposals.created', { proposalId: created.id, title: created.title, senderId: created.senderId, receiverId: created.receiverId });
     return this.present(created, auth.userId);
   }
 
@@ -132,6 +135,7 @@ export class ProposalsService {
       lastActionBy: auth.userId,
     });
     if (!updated) throw conflict('Pengajuan ini baru saja berubah. Muat ulang lalu coba lagi.');
+    await this.bus.emit('proposals.countered', { proposalId: id, title: updated.title, actorId: auth.userId, otherId: updated.senderId === auth.userId ? updated.receiverId : updated.senderId });
     return this.present(updated, auth.userId);
   }
 
@@ -151,6 +155,7 @@ export class ProposalsService {
           };
     const updated = await this.repo.transition(id, ['SUBMITTED', 'COUNTER_OFFER'], patch);
     if (!updated) throw conflict('Pengajuan ini baru saja berubah. Muat ulang lalu coba lagi.');
+    await this.bus.emit('proposals.responded', { proposalId: id, title: updated.title, actorId: auth.userId, otherId: updated.senderId === auth.userId ? updated.receiverId : updated.senderId, action });
     return this.present(updated, auth.userId);
   }
 
