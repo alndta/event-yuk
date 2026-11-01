@@ -89,12 +89,29 @@ export function createIdentityRouter(service: IdentityService, guards: AuthGuard
     })
   );
 
+  router.get(
+    '/users/kyc',
+    guards.requireAuth,
+    asyncHandler(async (req, res) => {
+      res.json({ success: true, kyc: await service.myKyc(currentAuth(req).userId) });
+    })
+  );
+
+  router.get(
+    '/admin/kyc/pending',
+    guards.requireAuth,
+    guards.requireAdmin,
+    asyncHandler(async (_req, res) => {
+      res.json({ success: true, data: await service.pendingKyc() });
+    })
+  );
+
   router.post(
     '/users/kyc',
     guards.requireAuth,
     validate({ body: submitKycSchema }),
     asyncHandler(async (req, res) => {
-      const user = await service.submitKyc(currentAuth(req).userId, req.body.bank_account);
+      const user = await service.submitKyc(currentAuth(req).userId, req.body.nik, req.body.bank_account);
       res.json({ success: true, message: 'Pengajuan e-KYC terkirim dan menunggu verifikasi.', user });
     })
   );
@@ -115,7 +132,7 @@ export function createIdentityRouter(service: IdentityService, guards: AuthGuard
     guards.requireAdmin,
     validate({ params: userIdParams, body: adminKycSchema }),
     asyncHandler(async (req, res) => {
-      await service.decideKyc(req.params.id as string, req.body.decision);
+      await service.decideKyc(currentAuth(req).userId, req.params.id as string, req.body.decision, req.body.reason);
       res.json({ success: true, message: 'Status e-KYC diperbarui.' });
     })
   );

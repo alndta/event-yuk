@@ -43,3 +43,18 @@ begin
     end if;
   end loop;
 end $$;
+
+-- 6. e-KYC submissions (NIK stored only as a keyed hash)
+create table if not exists public.kyc_submissions (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.users(id) on delete cascade,
+  nik_hash text not null,
+  status text not null default 'PENDING' check (status in ('PENDING','APPROVED','REJECTED')),
+  reject_reason text,
+  reviewed_by uuid references public.users(id),
+  reviewed_at timestamptz,
+  created_at timestamptz not null default now()
+);
+create unique index if not exists kyc_one_pending_per_user on public.kyc_submissions (user_id) where status = 'PENDING';
+create unique index if not exists kyc_nik_unique_active on public.kyc_submissions (nik_hash) where status in ('PENDING','APPROVED');
+alter table public.kyc_submissions enable row level security;

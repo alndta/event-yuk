@@ -4,12 +4,13 @@ import type { EventBus } from '../../shared/events/bus';
 import type { AuthGuards } from '../../shared/http/auth';
 import type { Mailer } from '../../shared/mail/mailer';
 import type { Authenticator, Role } from '../../shared/types';
-import type { GoogleIdentityVerifier, OtpRepository, UserRepository } from './ports';
+import type { GoogleIdentityVerifier, KycRepository, OtpRepository, UserRepository } from './ports';
 import { createIdentityRouter, type IdentityLimiters } from './routes';
 import { IdentityService, type PublicProfile } from './service';
 
 export type { PublicProfile } from './service';
-export type { OtpRepository, UserRepository, GoogleIdentityVerifier } from './ports';
+export type { OtpRepository, UserRepository, KycRepository, GoogleIdentityVerifier } from './ports';
+export { SupabaseKycRepository } from './infra/kyc.repository';
 export { SupabaseOtpRepository, SupabaseUserRepository } from './infra/supabase.repository';
 export { SupabaseGoogleVerifier } from './infra/google.verifier';
 
@@ -23,6 +24,7 @@ export interface IdentityApi extends Authenticator {
 export interface IdentityDeps {
   users: UserRepository;
   otps: OtpRepository;
+  kyc: KycRepository;
   google: GoogleIdentityVerifier;
   mailer: Mailer;
   tokens: TokenService;

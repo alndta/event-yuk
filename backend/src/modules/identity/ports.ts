@@ -66,3 +66,23 @@ export interface VerifiedGoogleIdentity {
 export interface GoogleIdentityVerifier {
   verify(accessToken: string): Promise<VerifiedGoogleIdentity | null>;
 }
+
+export type KycDecision = 'PENDING' | 'APPROVED' | 'REJECTED';
+
+export interface KycSubmission {
+  id: string;
+  userId: string;
+  status: KycDecision;
+  rejectReason: string | null;
+  createdAt: string;
+  reviewedAt: string | null;
+}
+
+/** NIK is never stored in the clear: only a keyed hash, enough to spot one ID used by two accounts. */
+export interface KycRepository {
+  /** Throws a 409 AppError when the same NIK hash is already pending or approved on another account. */
+  create(input: { userId: string; nikHash: string }): Promise<KycSubmission>;
+  latestFor(userId: string): Promise<KycSubmission | null>;
+  listPending(): Promise<(KycSubmission & { fullName: string; email: string })[]>;
+  decide(input: { userId: string; status: 'APPROVED' | 'REJECTED'; reviewerId: string; reason: string | null }): Promise<void>;
+}

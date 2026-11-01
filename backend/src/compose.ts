@@ -4,7 +4,7 @@ import { createDb } from './shared/db/supabase';
 import { createMailer } from './shared/mail/mailer';
 import { SupabaseCatalogRepository } from './modules/catalog';
 import { SupabaseEventRepository } from './modules/events';
-import { SupabaseGoogleVerifier, SupabaseOtpRepository, SupabaseUserRepository } from './modules/identity';
+import { SupabaseGoogleVerifier, SupabaseKycRepository, SupabaseOtpRepository, SupabaseUserRepository } from './modules/identity';
 import { MidtransGateway, SupabasePaymentsRepository } from './modules/payments';
 import { SupabaseProposalRepository } from './modules/proposals';
 
@@ -15,6 +15,7 @@ export function productionDeps(env: Env): AppDeps {
     env,
     users: new SupabaseUserRepository(db),
     otps: new SupabaseOtpRepository(db),
+    kyc: new SupabaseKycRepository(db),
     events: new SupabaseEventRepository(db),
     catalog: new SupabaseCatalogRepository(db),
     proposals: new SupabaseProposalRepository(db),

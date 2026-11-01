@@ -42,6 +42,9 @@ export class PaymentsService {
     const { payerId, payeeId } = payerOf(proposal, event.organizerId);
     if (auth.userId !== payerId) throw forbidden('Hanya pihak pembayar pada kontrak ini yang bisa membayar DP.');
 
+    const recipient = await this.identity.getPublicProfile(payeeId);
+    if (!recipient?.verified) throw forbidden('Penerima dana belum lolos verifikasi e-KYC, jadi DP belum bisa dibayarkan.');
+
     const amount = depositAmount(proposal.dealPrice, proposal.dpPercentage);
     if (amount < 1) throw badRequest('Nominal DP tidak valid.');
     const orderId = `EY-${proposal.id.slice(0, 8)}-${Date.now().toString(36)}-${randomBytes(3).toString('hex')}`;

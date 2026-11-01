@@ -56,7 +56,9 @@ export const setRoleSchema = z.object({
   phone_wa: phone.optional(),
 });
 
-export const adminKycSchema = z.object({ decision: z.enum(['VERIFIED', 'UNVERIFIED']) });
+export const adminKycSchema = z
+  .object({ decision: z.enum(['VERIFIED', 'UNVERIFIED']), reason: z.string().trim().min(3).max(300).optional() })
+  .refine((v) => v.decision === 'VERIFIED' || !!v.reason, { message: 'Alasan penolakan wajib diisi.', path: ['reason'] });
 export const userIdParams = z.object({ id: z.uuid() });
 
 export type RegisterInput = z.infer<typeof registerSchema>;

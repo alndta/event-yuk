@@ -9,7 +9,7 @@ import { authLimiter, corsPolicy, docsSecurityHeaders, generalLimiter, perEmailL
 import type { Mailer } from './shared/mail/mailer';
 import { createCatalogModule, type CatalogRepository } from './modules/catalog';
 import { createEventsModule, type EventRepository } from './modules/events';
-import { createIdentityModule, type GoogleIdentityVerifier, type OtpRepository, type UserRepository } from './modules/identity';
+import { createIdentityModule, type GoogleIdentityVerifier, type KycRepository, type OtpRepository, type UserRepository } from './modules/identity';
 import { createPaymentsModule, type PaymentGateway, type PaymentsRepository } from './modules/payments';
 import { createProposalsModule, type ProposalRepository } from './modules/proposals';
 import { mountApiDocs } from './docs/openapi';
@@ -19,6 +19,7 @@ export interface AppDeps {
   env: Env;
   users: UserRepository;
   otps: OtpRepository;
+  kyc: KycRepository;
   events: EventRepository;
   catalog: CatalogRepository;
   proposals: ProposalRepository;
@@ -53,7 +54,7 @@ export function createApp(deps: AppDeps): Express {
   const limited = !deps.disableRateLimits;
   const when = (...handlers: RequestHandler[]) => (limited ? handlers : []);
 
-  const identity = createIdentityModule({ users: deps.users, otps: deps.otps, google: deps.google, mailer: deps.mailer, tokens, bus, env });
+  const identity = createIdentityModule({ users: deps.users, otps: deps.otps, kyc: deps.kyc, google: deps.google, mailer: deps.mailer, tokens, bus, env });
   const guards = createAuthGuards(identity.api, env.adminEmails);
 
   const events = createEventsModule({ repo: deps.events, identity: identity.api, cache });

@@ -1,3 +1,4 @@
+import { createHmac } from 'node:crypto';
 import type { Env } from '../../shared/config/env';
 import { deriveKey, generateOtp, hashOtp, safeEqualHex } from '../../shared/crypto/otp';
 import { hashPassword, verifyAgainstDummy, verifyPassword } from '../../shared/crypto/password';
@@ -10,6 +11,7 @@ import type { AuthContext, Role } from '../../shared/types';
 import type {
   BankAccount,
   GoogleIdentityVerifier,
+  KycRepository,
   KycStatus,
   OtpRepository,
   ProfileRecord,
@@ -57,6 +59,7 @@ export interface PublicProfile {
 export interface IdentityDeps {
   users: UserRepository;
   otps: OtpRepository;
+  kyc: KycRepository;
   google: GoogleIdentityVerifier;
   mailer: Mailer;
   tokens: TokenService;
@@ -235,15 +238,38 @@ export class IdentityService {
    * administrator makes the decision. The NIK is validated but not stored: keeping national ID
    * numbers needs encryption and a retention policy that has not been decided yet.
    */
-  async submitKyc(userId: string, bank: BankAccount): Promise<UserView> {
+  async submitKyc(userId: string, nik: string, bank: BankAccount): Promise<UserView> {
+    const user = await this.d.users.findById(userId);
+    if (!user) throw notFound('Akun tidak ditemukan.');
     if (!(await this.d.users.getProfile(userId))) throw badRequest('Pilih peran akun dulu sebelum mengajukan e-KYC.');
+    if (user.kycStatus === 'VERIFIED') throw conflict('Akunmu sudah terverifikasi.');
+    if (user.kycStatus === 'PENDING') throw conflict('Pengajuan e-KYC sebelumnya masih diproses.');
+    const nikHash = createHmac('sha256', `${this.d.env.jwtSecret}:kyc-nik`).update(nik).digest('hex');
+    await this.d.kyc.create({ userId, nikHash });
     await this.d.users.updateProfile(userId, { bankAccount: bank });
     await this.d.users.update(userId, { kycStatus: 'PENDING' });
     return this.me(userId);
   }
 
-  async decideKyc(userId: string, decision: 'VERIFIED' | 'UNVERIFIED'): Promise<void> {
-    if (!(await this.d.users.findById(userId))) throw notFound('Akun tidak ditemukan.');
+  async myKyc(userId: string) {
+    const user = await this.d.users.findById(userId);
+    if (!user) throw notFound('Akun tidak ditemukan.');
+    const last = await this.d.kyc.latestFor(userId);
+    return { status: user.kycStatus, reject_reason: last?.status === 'REJECTED' ? last.rejectReason : null, submitted_at: last?.createdAt ?? null };
+  }
+
+  async pendingKyc() {
+    const rows = await this.d.kyc.listPending();
+    return rows.map((r) => ({ user_id: r.userId, full_name: r.fullName, email: r.email, submitted_at: r.createdAt }));
+  }
+
+  /** Only a pending submission can be decided, and only by an admin (enforced at the route). */
+  async decideKyc(reviewerId: string, userId: string, decision: 'VERIFIED' | 'UNVERIFIED', reason?: string): Promise<void> {
+    const user = await this.d.users.findById(userId);
+    if (!user) throw notFound('Akun tidak ditemukan.');
+    if (user.kycStatus !== 'PENDING') throw conflict('Akun ini tidak sedang menunggu verifikasi.');
+    if (decision === 'UNVERIFIED' && !reason) throw badRequest('Alasan penolakan wajib diisi.');
+    await this.d.kyc.decide({ userId, reviewerId, status: decision === 'VERIFIED' ? 'APPROVED' : 'REJECTED', reason: reason ?? null });
     await this.d.users.update(userId, { kycStatus: decision });
   }
 

@@ -4,7 +4,7 @@ import type { AppDeps } from '../../src/app';
 import { loadEnv } from '../../src/shared/config/env';
 import type { MailMessage } from '../../src/shared/mail/mailer';
 import type { GoogleIdentityVerifier } from '../../src/modules/identity';
-import type { OtpRecord, OtpRepository, ProfileRecord, ProfileWithUser, UserRecord, UserRepository } from '../../src/modules/identity/ports';
+import type { KycRepository, KycSubmission, OtpRecord, OtpRepository, ProfileRecord, ProfileWithUser, UserRecord, UserRepository } from '../../src/modules/identity/ports';
 
 export class MemoryUsers implements UserRepository {
   users = new Map<string, UserRecord>();
@@ -53,14 +53,35 @@ export class MemoryOtps implements OtpRepository {
   async markUsed(id: string) { this.rows.find((r) => r.id === id)!.used = true; }
 }
 
+export class MemoryKyc implements KycRepository {
+  rows: (KycSubmission & { nikHash: string })[] = [];
+  constructor(private readonly users: MemoryUsers) {}
+  async create(i: { userId: string; nikHash: string }) {
+    if (this.rows.some((r) => r.nikHash === i.nikHash && r.status !== 'REJECTED')) throw conflict('Data identitas sudah dipakai.');
+    const r = { id: randomUUID(), userId: i.userId, nikHash: i.nikHash, status: 'PENDING' as const, rejectReason: null, createdAt: new Date().toISOString(), reviewedAt: null };
+    this.rows.push(r);
+    return r;
+  }
+  async latestFor(userId: string) { return [...this.rows].reverse().find((r) => r.userId === userId) ?? null; }
+  async listPending() {
+    return this.rows.filter((r) => r.status === 'PENDING').map((r) => ({ ...r, fullName: this.users.users.get(r.userId)!.fullName, email: this.users.users.get(r.userId)!.email }));
+  }
+  async decide(i: { userId: string; status: 'APPROVED' | 'REJECTED'; reviewerId: string; reason: string | null }) {
+    const r = this.rows.find((x) => x.userId === i.userId && x.status === 'PENDING')!;
+    r.status = i.status; r.rejectReason = i.reason; r.reviewedAt = new Date().toISOString();
+  }
+}
+
 /** Builds deps with in-memory identity storage; other modules get throwing stubs unless overridden. */
 export function memoryDeps(over: Partial<AppDeps> = {}) {
   const sent: MailMessage[] = [];
+  const users = new MemoryUsers();
   const google: GoogleIdentityVerifier = { verify: async () => null };
   const deps: AppDeps = {
     env: loadEnv({ NODE_ENV: 'test', JWT_SECRET: 'x'.repeat(40), EXPOSE_OTP_PREVIEW: 'true', ADMIN_EMAILS: 'admin@eventyuk.id' } as never),
-    users: new MemoryUsers(),
+    users,
     otps: new MemoryOtps(),
+    kyc: new MemoryKyc(users),
     events: {} as never, catalog: {} as never, proposals: {} as never, payments: {} as never,
     google,
     mailer: { send: async (m) => { sent.push(m); } },
