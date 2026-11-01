@@ -23,6 +23,7 @@ import { useAuth } from '../context/AuthContext';
 import { SEOHead } from '../components/SEOHead';
 import { DetailSkeleton } from '../components/skeletons/DetailSkeleton';
 import { cachedFetch } from '../utils/apiCache';
+import Avatar from '../components/Avatar';
 
 interface Props {
   onProposePartner: (partner: PartnerItem) => void;
@@ -102,8 +103,30 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
     return <DetailSkeleton />;
   }
 
+  const backTo = isVendor ? '/vendors' : isTalent ? '/bands' : '/organizers';
+  const backLabel = isVendor ? 'Kembali ke direktori vendor' : isTalent ? 'Kembali ke direktori band' : 'Kembali ke direktori mitra';
+  const ctaLabel = isVendor ? 'Ajukan sewa alat' : isTalent ? 'Ajukan tawaran manggung' : 'Ajak kolaborasi';
+  const contactPhone: string | undefined = partner.managerContact;
+  const contactEmail: string | undefined = partner.contactEmail;
+
+  const Card = ({ children }: { children: React.ReactNode }) => (
+    <div className="space-y-5 rounded-lg bg-white p-6 sm:p-8">{children}</div>
+  );
+  const CardTitle = ({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) => (
+    <h2 className="flex items-center gap-2.5 font-display text-2xl font-extrabold tracking-[-0.03em] text-brand-ink">
+      <span aria-hidden="true" className="text-brand-forest">{icon}</span>
+      {children}
+    </h2>
+  );
+  const Fact = ({ label, value, wide = false }: { label: string; value: React.ReactNode; wide?: boolean }) => (
+    <div className={'rounded-lg bg-brand-cream p-4 ' + (wide ? 'sm:col-span-2' : '')}>
+      <dt className="text-sm text-slate-700">{label}</dt>
+      <dd className="mt-1 text-base font-semibold text-brand-ink">{value}</dd>
+    </div>
+  );
+
   return (
-    <div className="space-y-6 sm:space-y-8 font-sans">
+    <div className="space-y-8 font-sans sm:space-y-10">
       <SEOHead
         title={`${partner.name} — Spesifikasi, Rate Card & Sewa | Event Yuk`}
         description={
@@ -117,373 +140,291 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
         schemaJson={partnerSchema}
       />
 
-      {/* Top Back Navigation */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <Link
-          to={isVendor ? '/vendors' : isTalent ? '/bands' : '/organizers'}
-          className="inline-flex items-center gap-2 text-xs font-bold text-slate-500 hover:text-slate-900 transition"
+          to={backTo}
+          className="inline-flex min-h-11 items-center gap-2 text-base font-semibold text-slate-700 hover:text-brand-ink focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
         >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Kembali ke Direktori {isVendor ? 'Vendor' : isTalent ? 'Band & Musisi' : 'Mitra'}</span>
+          <ArrowLeft aria-hidden="true" className="h-4 w-4" />
+          {backLabel}
         </Link>
-
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-800 text-xs font-bold border border-emerald-200">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-          <span>Mitra Terverifikasi e-KYC & Escrow</span>
+        <span className="inline-flex items-center gap-2 rounded-full bg-brand-forest-light px-4 py-1.5 text-sm font-semibold text-brand-forest-dark">
+          <ShieldCheck aria-hidden="true" className="h-4 w-4" />
+          Mitra terverifikasi e-KYC dan Escrow
         </span>
       </div>
 
-      {/* Hero Header Banner */}
-      <div className="relative rounded-3xl overflow-hidden bg-slate-900 border border-slate-200 shadow-xl mb-8">
-        <div className="h-56 sm:h-72 relative">
-          <img
-            src={partner.avatar || '/assets/hero-concert.jpg'}
-            alt={partner.name}
-            className="w-full h-full object-cover opacity-40 blur-xs scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
-
-          {/* Partner Info Overlaid */}
-          <div className="absolute bottom-6 left-6 right-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4 text-white">
-            <div className="flex items-center gap-4">
-              <img
-                src={partner.avatar || '/assets/vendor-sound.jpg'}
-                alt={partner.name}
-                className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl object-cover border-2 border-white/20 shadow-xl"
-              />
-              <div>
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#456B39] text-white mb-1.5">
-                  {isVendor ? (
-                    <Sliders className="w-3 h-3" />
-                  ) : isTalent ? (
-                    <Music className="w-3 h-3" />
-                  ) : (
-                    <Building2 className="w-3 h-3" />
-                  )}
-                  <span>{partner.categoryLabel}</span>
-                </div>
-                <h1 className="text-2xl sm:text-3xl font-black tracking-tight flex items-center gap-2">
-                  <span>{partner.name}</span>
-                  <CheckCircle2 className="w-5 h-5 text-sky-400" />
-                </h1>
-                <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300 mt-1">
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-3.5 h-3.5 text-[#456B39]" />
-                    <span>{partner.city}</span>
-                  </span>
-                  <span>•</span>
-                  <span className="flex items-center gap-1 text-[#5E7628] font-bold">
-                    <Star className="w-3.5 h-3.5 fill-[#5E7628]" />
-                    <span>{partner.rating} / 5.0 Rating Mitra</span>
-                  </span>
-                  <span>•</span>
-                  <span className="text-slate-200 font-semibold">
-                    {partner.completedGigs || 45} Acara Berhasil
-                  </span>
-                </div>
-              </div>
+      <header className="rounded-lg bg-brand-navy p-6 text-white sm:p-10">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+            <Avatar
+              src={partner.avatar}
+              name={partner.name}
+              decorative
+              className="h-24 w-24 rounded-lg sm:h-28 sm:w-28"
+            />
+            <div>
+              <p className="inline-flex items-center gap-2 rounded-full bg-brand-lime px-3 py-1 text-sm font-semibold text-brand-navy">
+                {isVendor ? (
+                  <Sliders aria-hidden="true" className="h-4 w-4" />
+                ) : isTalent ? (
+                  <Music aria-hidden="true" className="h-4 w-4" />
+                ) : (
+                  <Building2 aria-hidden="true" className="h-4 w-4" />
+                )}
+                {partner.categoryLabel}
+              </p>
+              <h1 className="mt-3 flex items-center gap-2 font-display text-3xl font-extrabold leading-tight tracking-[-0.04em] sm:text-5xl">
+                {partner.name}
+                <CheckCircle2 aria-label="Terverifikasi" className="h-7 w-7 shrink-0 text-brand-lime" />
+              </h1>
+              <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-base text-slate-200">
+                <span className="inline-flex items-center gap-1.5">
+                  <MapPin aria-hidden="true" className="h-4 w-4" />
+                  {partner.city}
+                </span>
+                <span className="inline-flex items-center gap-1.5 font-semibold text-brand-lime">
+                  <Star aria-hidden="true" className="h-4 w-4 fill-current" />
+                  {partner.rating} / 5.0 rating mitra
+                </span>
+                <span>{partner.completedGigs || 45} acara berhasil</span>
+              </p>
             </div>
-
-            <button
-              onClick={handleProposeClick}
-              className="px-6 py-3 rounded-2xl bg-gradient-to-r from-[#456B39] to-[#5E7628] hover:from-[#2F5232] hover:to-[#3F531D] text-white text-xs sm:text-sm font-extrabold shadow-lg shadow-[#456B39]/30 transition flex items-center justify-center gap-2 shrink-0"
-            >
-              <Send className="w-4 h-4" />
-              <span>{isVendor ? 'Ajukan Sewa Alat' : isTalent ? 'Ajukan Tawaran Manggung' : 'Ajak Kolaborasi'}</span>
-            </button>
           </div>
-        </div>
-      </div>
 
-      {/* Main Grid: Details + Sticky Sidebar */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column (2 Cols) */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Section 1: About & Capabilities */}
-          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-sm space-y-4">
-            <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
-              <FileText className="w-4 h-4 text-[#172D46]" />
-              <span>Tentang & Karakteristik Mitra</span>
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+          <button
+            type="button"
+            onClick={handleProposeClick}
+            className="inline-flex min-h-14 shrink-0 items-center justify-center gap-2 rounded-full bg-brand-lime px-8 text-base font-semibold text-brand-navy transition-colors hover:bg-brand-lime-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+          >
+            <Send aria-hidden="true" className="h-5 w-5" />
+            {ctaLabel}
+          </button>
+        </div>
+      </header>
+
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+        <div className="space-y-5 lg:col-span-2">
+          <Card>
+            <CardTitle icon={<FileText className="h-5 w-5" />}>Tentang mitra</CardTitle>
+            <p className="text-base leading-7 text-slate-700">
               {partner.description ||
                 'Mitra terverifikasi resmi dalam ekosistem Event Yuk dengan jaminan kepatuhan teknis, transparansi biaya, dan kontrak digital yang mengikat secara hukum.'}
             </p>
+            <dl className="grid grid-cols-1 gap-3 border-t border-slate-200 pt-5 sm:grid-cols-3">
+              <Fact label="Pengalaman kerja" value={(partner.experienceYears || 6) + ' tahun di industri'} />
+              <Fact
+                label="Status verifikasi"
+                value={
+                  <span className="inline-flex items-center gap-1.5">
+                    <CheckCircle2 aria-hidden="true" className="h-4 w-4 text-brand-forest" />
+                    e-KYC lolos
+                  </span>
+                }
+              />
+              <Fact label="Garansi escrow" value="Pencairan bertahap" />
+            </dl>
+          </Card>
 
-            {/* Quick Metrics */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-3 border-t border-slate-100 text-xs">
-              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                <span className="text-slate-400 font-medium block">Pengalaman Kerja</span>
-                <span className="text-slate-900 font-extrabold text-sm mt-0.5 block">
-                  {partner.experienceYears || 6} Tahun di Industri
-                </span>
-              </div>
-              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100">
-                <span className="text-slate-400 font-medium block">Status Verifikasi</span>
-                <span className="text-emerald-700 font-extrabold text-sm mt-0.5 block flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>e-KYC Lolos</span>
-                </span>
-              </div>
-              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 col-span-2 sm:col-span-1">
-                <span className="text-slate-400 font-medium block">Garansi Escrow</span>
-                <span className="text-[#172D46] font-extrabold text-sm mt-0.5 block">
-                  Pencairan Bertahap
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Section 2: Specific Details for VENDOR */}
           {isVendor && (
-            <div className="space-y-6">
-              {/* Equipment Catalog & Packages */}
-              <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-sm space-y-5">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
-                    <Wrench className="w-4 h-4 text-indigo-600" />
-                    <span>Katalog Paket & Inventaris Peralatan</span>
-                  </h2>
-                  <span className="text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">
-                    Standar Keselamatan K3
+            <>
+              <Card>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <CardTitle icon={<Wrench className="h-5 w-5" />}>Paket dan inventaris peralatan</CardTitle>
+                  <span className="rounded-full bg-brand-lime-soft px-3 py-1 text-sm font-semibold text-brand-navy">
+                    Standar keselamatan K3
                   </span>
                 </div>
 
                 {packages.length > 0 ? (
                   <div className="space-y-4">
                     {packages.map((pkg: any) => (
-                      <div
-                        key={pkg.id}
-                        className="p-5 rounded-2xl border border-slate-200 bg-slate-50/50 hover:border-indigo-300 transition space-y-3"
-                      >
-                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                          <h3 className="font-extrabold text-sm text-slate-900">{pkg.package_name}</h3>
-                          <span className="font-black text-base text-indigo-900 font-mono">
+                      <div key={pkg.id} className="space-y-4 rounded-lg bg-brand-cream p-5">
+                        <div className="flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+                          <h3 className="font-display text-xl font-extrabold tracking-[-0.02em] text-brand-ink">{pkg.package_name}</h3>
+                          <span className="font-display text-xl font-extrabold text-brand-ink">
                             Rp {Number(pkg.base_price).toLocaleString('id-ID')}
-                            <span className="text-xs font-normal text-slate-500"> / Hari</span>
+                            <span className="text-sm font-normal text-slate-600"> / hari</span>
                           </span>
                         </div>
 
                         {pkg.tech_specs && (
-                          <div className="p-3.5 bg-white rounded-xl border border-slate-200/80 text-xs space-y-1.5">
-                            <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                              Spesifikasi Teknis Alat:
-                            </div>
+                          <div className="space-y-2 rounded-lg bg-white p-4 text-base">
+                            <p className="text-sm font-semibold text-slate-800">Spesifikasi teknis alat</p>
                             {Object.entries(pkg.tech_specs).map(([key, val]) => (
-                              <div key={key} className="flex justify-between text-slate-700">
-                                <span className="capitalize text-slate-500">{key.replace('_', ' ')}:</span>
-                                <span className="font-semibold text-slate-900">{String(val)}</span>
+                              <div key={key} className="flex justify-between gap-4 text-slate-700">
+                                <span className="capitalize text-slate-600">{key.replace('_', ' ')}</span>
+                                <span className="text-right font-semibold text-brand-ink">{String(val)}</span>
                               </div>
                             ))}
                           </div>
                         )}
 
-                        <div className="flex items-center justify-between text-xs pt-1">
-                          <span className="text-slate-500">
-                            Kuota Harian: {pkg.daily_quota || 2} Unit Maksimal
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <span className="text-sm text-slate-600">
+                            Kuota harian: maksimal {pkg.daily_quota || 2} unit
                           </span>
                           <button
+                            type="button"
                             onClick={handleProposeClick}
-                            className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold text-xs shadow-xs transition"
+                            className="inline-flex min-h-11 items-center justify-center rounded-full bg-brand-navy px-5 text-sm font-semibold text-white transition-colors hover:bg-brand-navy-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy"
                           >
-                            Pilih Paket Ini
+                            Pilih paket ini
                           </button>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <div className="space-y-3">
+                  <ul className="space-y-3">
                     {partner.specsOrRiders?.map((spec: string, idx: number) => (
-                      <div
+                      <li
                         key={idx}
-                        className="p-3.5 rounded-2xl bg-indigo-50/50 border border-indigo-100 text-xs flex items-center justify-between"
+                        className="flex flex-col justify-between gap-1 rounded-lg bg-brand-cream p-4 sm:flex-row sm:items-center"
                       >
-                        <span className="font-bold text-slate-800">• {spec}</span>
-                        <span className="text-indigo-700 font-semibold">Tersedia untuk Acara</span>
-                      </div>
+                        <span className="text-base font-medium text-brand-ink">{spec}</span>
+                        <span className="text-sm font-semibold text-brand-forest-dark">Tersedia untuk acara</span>
+                      </li>
                     ))}
-                  </div>
+                  </ul>
                 )}
-              </div>
+              </Card>
 
-              {/* BAST & Escrow terms */}
-              <div className="p-6 bg-slate-900 rounded-3xl text-white space-y-3">
-                <div className="flex items-center gap-2 text-amber-400 font-extrabold text-sm">
-                  <ShieldCheck className="w-5 h-5" />
-                  <span>Jaminan BAST Digital & Pencairan DP Aman</span>
-                </div>
-                <p className="text-xs text-slate-300 leading-relaxed">
+              <div className="space-y-3 rounded-lg bg-brand-navy p-6 text-white sm:p-8">
+                <p className="flex items-center gap-2 font-display text-xl font-extrabold">
+                  <ShieldCheck aria-hidden="true" className="h-5 w-5 text-brand-lime" />
+                  Jaminan BAST digital dan pencairan DP yang aman
+                </p>
+                <p className="text-base leading-7 text-slate-200">
                   Vendor ini mematuhi standar kerja Event Yuk: DP 30%–50% ditahan di Rekening Bersama Escrow dan baru dicairkan saat surat jalan atau alat tiba di lokasi. Sisa pelunasan dicairkan setelah Berita Acara Serah Terima (BAST) digital ditandatangani kedua belah pihak pasca-acara selesai.
                 </p>
               </div>
-            </div>
+            </>
           )}
 
-          {/* Section 3: Specific Details for TALENT / BAND */}
           {isTalent && (
-            <div className="space-y-6">
-              {/* Technical & Sound Riders */}
-              <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-sm space-y-4">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
-                    <Volume2 className="w-4 h-4 text-purple-600" />
-                    <span>Technical & Sound Riders Panggung</span>
-                  </h2>
-                  <span className="text-xs font-bold text-purple-700 bg-purple-50 px-2.5 py-1 rounded-full border border-purple-100">
+            <>
+              <Card>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <CardTitle icon={<Volume2 className="h-5 w-5" />}>Technical dan sound rider panggung</CardTitle>
+                  <span className="rounded-full bg-brand-lime-soft px-3 py-1 text-sm font-semibold text-brand-navy">
                     Genre: {talentProfile?.genre || 'Indie Pop-Rock'}
                   </span>
                 </div>
 
-                <div className="space-y-3 text-xs">
-                  {talentProfile?.technical_riders ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div className="p-3.5 bg-purple-50/50 rounded-2xl border border-purple-100">
-                        <span className="text-slate-400 font-medium block">Kebutuhan Channel Mixer FOH</span>
-                        <span className="font-bold text-slate-900 mt-1 block">
-                          {talentProfile.technical_riders.channels || 24} Channel Digital
-                        </span>
-                      </div>
-                      <div className="p-3.5 bg-purple-50/50 rounded-2xl border border-purple-100">
-                        <span className="text-slate-400 font-medium block">Sistem Monitor Panggung</span>
-                        <span className="font-bold text-slate-900 mt-1 block">
-                          {talentProfile.technical_riders.monitors || '4 IEM Wireless + 2 Wedges'}
-                        </span>
-                      </div>
-                      <div className="p-3.5 bg-purple-50/50 rounded-2xl border border-purple-100 sm:col-span-2">
-                        <span className="text-slate-400 font-medium block">Backline Amplifiers Pilihan</span>
-                        <span className="font-bold text-slate-900 mt-1 block">
-                          {talentProfile.technical_riders.amps || 'Fender Twin Reverb (Gitar) & Ampeg SVT-CL (Bass)'}
-                        </span>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      {partner.specsOrRiders?.map((rider: string, idx: number) => (
-                        <div key={idx} className="p-3 rounded-xl bg-purple-50/40 border border-purple-100 text-slate-700">
-                          • {rider}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
+                {talentProfile?.technical_riders ? (
+                  <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    <Fact label="Kebutuhan channel mixer FOH" value={(talentProfile.technical_riders.channels || 24) + ' channel digital'} />
+                    <Fact label="Sistem monitor panggung" value={talentProfile.technical_riders.monitors || '4 IEM Wireless + 2 Wedges'} />
+                    <Fact
+                      wide
+                      label="Backline amplifier pilihan"
+                      value={talentProfile.technical_riders.amps || 'Fender Twin Reverb (Gitar) & Ampeg SVT-CL (Bass)'}
+                    />
+                  </dl>
+                ) : (
+                  <ul className="space-y-2">
+                    {partner.specsOrRiders?.map((rider: string, idx: number) => (
+                      <li key={idx} className="rounded-lg bg-brand-cream p-4 text-base text-slate-800">
+                        {rider}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </Card>
 
-              {/* Hospitality Riders */}
-              <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-sm space-y-4">
-                <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
-                  <Users className="w-4 h-4 text-purple-600" />
-                  <span>Hospitality & Kebutuhan Ruang Artis</span>
-                </h2>
+              <Card>
+                <CardTitle icon={<Users className="h-5 w-5" />}>Hospitality dan ruang artis</CardTitle>
+                <dl className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                  <Fact label="Ruang tunggu backstage" value={talentProfile?.hospitality_riders?.rooms || '1 Ruang VIP AC Bersih'} />
+                  <Fact label="Konsumsi personel" value={talentProfile?.hospitality_riders?.meals || '15 Box Bento & Buah'} />
+                  <Fact label="Transportasi lokal" value={talentProfile?.hospitality_riders?.transfers || '2 Unit Van / HiAce'} />
+                </dl>
+              </Card>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
-                    <span className="text-slate-400 font-medium block">Ruang Tunggu Backstage</span>
-                    <span className="font-bold text-slate-800 mt-1 block">
-                      {talentProfile?.hospitality_riders?.rooms || '1 Ruang VIP AC Bersih'}
-                    </span>
-                  </div>
-                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
-                    <span className="text-slate-400 font-medium block">Konsumsi Personil</span>
-                    <span className="font-bold text-slate-800 mt-1 block">
-                      {talentProfile?.hospitality_riders?.meals || '15 Box Bento & Buah'}
-                    </span>
-                  </div>
-                  <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
-                    <span className="text-slate-400 font-medium block">Transportasi Lokal</span>
-                    <span className="font-bold text-slate-800 mt-1 block">
-                      {talentProfile?.hospitality_riders?.transfers || '2 Unit Van / HiAce'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Booking & Cancellation Guarantee */}
-              <div className="p-6 bg-purple-950 rounded-3xl text-white space-y-2.5">
-                <div className="flex items-center gap-2 text-purple-300 font-bold text-sm">
-                  <ShieldCheck className="w-4 h-4 text-[#5E7628]" />
-                  <span>PKS Sah & Kebijakan Anti-Cancel Sepihak</span>
-                </div>
-                <p className="text-xs text-purple-200 leading-relaxed">
+              <div className="space-y-3 rounded-lg bg-brand-navy p-6 text-white sm:p-8">
+                <p className="flex items-center gap-2 font-display text-xl font-extrabold">
+                  <ShieldCheck aria-hidden="true" className="h-5 w-5 text-brand-lime" />
+                  PKS sah dan kebijakan anti-cancel sepihak
+                </p>
+                <p className="text-base leading-7 text-slate-200">
                   Semua penawaran manggung wajib dituangkan ke dalam PKS digital resmi. DP terkunci aman di Escrow dan hanya cair sesuai termin kesepakatan (50% saat PKS ditandatangani, 50% setelah soundcheck/tampil).
                 </p>
               </div>
-            </div>
+            </>
           )}
 
-          {/* Section 4: Specific Details for EO / ORGANIZER */}
           {isEO && (
-            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200 shadow-sm space-y-4">
-              <h2 className="text-base font-black text-slate-900 flex items-center gap-2">
-                <Building2 className="w-4 h-4 text-[#172D46]" />
-                <span>Standar Produksi & Manajemen Acara</span>
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+            <Card>
+              <CardTitle icon={<Building2 className="h-5 w-5" />}>Standar produksi dan manajemen acara</CardTitle>
+              <p className="text-base leading-7 text-slate-700">
                 Penyelenggara acara resmi dengan rekam jejak penyelenggaraan festival terbuka, pensi kampus/sekolah, dan bazaar tematik. Mengedepankan standarisasi keselamatan massa, perizinan lengkap, dan ketepatan waktu pembayaran vendor & kru.
               </p>
-              <div className="p-4 bg-sky-50 rounded-2xl border border-sky-100 text-xs text-sky-900">
-                <span className="font-bold block mb-1">Membuka Kemitraan:</span>
-                <span>Vendor sound & lighting, tenant kuliner/bazaar, serta kru lapangan untuk proyek acara aktif.</span>
+              <div className="rounded-lg bg-brand-lime-soft p-5">
+                <p className="text-base font-semibold text-brand-ink">Membuka kemitraan</p>
+                <p className="mt-1 text-base leading-7 text-slate-700">
+                  Vendor sound & lighting, tenant kuliner/bazaar, serta kru lapangan untuk proyek acara aktif.
+                </p>
               </div>
-            </div>
+            </Card>
           )}
         </div>
 
-        {/* Right Sticky Sidebar */}
-        <div className="space-y-6">
-          <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-5 sticky top-24">
+        <aside>
+          <div className="sticky top-24 space-y-6 rounded-lg bg-white p-6 sm:p-8">
             <div>
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                Perkiraan Honor / Tarif
-              </span>
-              <div className="text-2xl font-black text-slate-900 mt-1 font-mono">
+              <p className="text-sm text-slate-700">Perkiraan honor / tarif</p>
+              <p className="mt-1 font-display text-3xl font-extrabold tracking-[-0.04em] text-brand-ink">
                 {partner.priceRange || 'Rp 25.000.000'}
-              </div>
-              <p className="text-[11px] text-slate-500 mt-1">
-                Dapat dinegosiasikan melalui fitur Counter-Offer di ruang kerja PKS.
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                Bisa dinegosiasikan lewat fitur Counter-Offer di ruang kerja PKS.
               </p>
             </div>
 
             <button
+              type="button"
               onClick={handleProposeClick}
-              className="w-full py-3.5 px-4 rounded-2xl bg-gradient-to-r from-[#172D46] to-[#0F263B] hover:from-[#0F263B] hover:to-[#0B1F31] text-white text-xs sm:text-sm font-extrabold shadow-md shadow-[#172D46]/25 transition flex items-center justify-center gap-2"
+              className="flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-brand-navy px-6 text-base font-semibold text-white transition-colors hover:bg-brand-navy-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy"
             >
-              <Send className="w-4 h-4 text-[#5E7628]" />
-              <span>{isVendor ? 'Ajukan Tawaran Sewa Alat' : isTalent ? 'Ajukan Jadwal Manggung' : 'Ajak Kolaborasi Proyek'}</span>
+              <Send aria-hidden="true" className="h-5 w-5 text-brand-lime" />
+              {isVendor ? 'Ajukan tawaran sewa alat' : isTalent ? 'Ajukan jadwal manggung' : 'Ajak kolaborasi proyek'}
             </button>
 
-            {/* Value Guarantees */}
-            <div className="pt-4 border-t border-slate-100 space-y-2.5 text-xs text-slate-600">
-              <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Dana DP 50% terlindungi di Escrow Midtrans</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <FileText className="w-4 h-4 text-sky-600 shrink-0" />
-                <span>Surat Perjanjian Kerjasama (PKS) digital resmi</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock className="w-4 h-4 text-amber-600 shrink-0" />
-                <span>Respon kurasi rata-rata dalam 1x24 jam</span>
-              </div>
-            </div>
+            <ul className="space-y-3 border-t border-slate-200 pt-5 text-base text-slate-700">
+              <li className="flex items-start gap-3">
+                <ShieldCheck aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-brand-forest" />
+                Dana DP 50% terlindungi di Escrow Midtrans
+              </li>
+              <li className="flex items-start gap-3">
+                <FileText aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-brand-forest" />
+                Surat Perjanjian Kerja Sama (PKS) digital resmi
+              </li>
+              <li className="flex items-start gap-3">
+                <Clock aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-brand-forest" />
+                Respons kurasi rata-rata dalam 1x24 jam
+              </li>
+            </ul>
 
-            {/* Manager / Business Info */}
-            <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-1.5">
-              <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                Kontak & Komunikasi:
+            {(contactPhone || contactEmail) && (
+              <div className="space-y-2 rounded-lg bg-brand-cream p-4">
+                <p className="text-sm font-semibold text-slate-800">Kontak</p>
+                {contactPhone && (
+                  <p className="flex items-center gap-2 text-base font-semibold text-brand-ink">
+                    <Phone aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-600" />
+                    {contactPhone}
+                  </p>
+                )}
+                {contactEmail && (
+                  <p className="flex items-center gap-2 break-all text-base text-slate-700">
+                    <Mail aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-600" />
+                    {contactEmail}
+                  </p>
+                )}
               </div>
-              <div className="font-bold text-slate-900 flex items-center gap-1.5">
-                <Phone className="w-3.5 h-3.5 text-slate-500" />
-                <span>+62 811-2233-4455 (WhatsApp Resmi)</span>
-              </div>
-              <div className="text-slate-500 flex items-center gap-1.5">
-                <Mail className="w-3.5 h-3.5 text-slate-400" />
-                <span>kerjasama@{partner.name.toLowerCase().replace(/[^a-z0-9]/g, '')}.id</span>
-              </div>
-            </div>
+            )}
           </div>
-        </div>
+        </aside>
       </div>
     </div>
   );
