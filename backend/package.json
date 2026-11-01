@@ -2,11 +2,14 @@
   "name": "event-yuk-backend",
   "version": "1.0.0",
   "description": "Express.js RESTful API for Event-Yuk Platform with Supabase & Escrow Engine",
-  "main": "dist/server.js",
+  "main": "dist/main.js",
   "scripts": {
-    "dev": "tsx watch src/server.ts",
-    "build": "tsc",
-    "start": "node dist/server.js"
+    "dev": "tsx watch src/main.ts",
+    "build": "tsc -p tsconfig.build.json",
+    "start": "node dist/main.js",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.1",
@@ -15,20 +18,26 @@
     "express": "^4.21.2",
     "express-rate-limit": "^8.7.1",
     "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
     "midtrans-client": "^1.4.3",
     "nodemailer": "^10.2.1",
-    "swagger-jsdoc": "^6.3.0",
     "swagger-ui-express": "^5.0.1",
     "zod": "^4.6.7"
   },
   "devDependencies": {
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.13.10",
     "@types/nodemailer": "^8.0.2",
-    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/supertest": "^7.2.1",
     "@types/swagger-ui-express": "^4.1.8",
+    "supertest": "^7.3.1",
     "tsx": "^4.19.3",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vitest": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=20"
   }
 }
