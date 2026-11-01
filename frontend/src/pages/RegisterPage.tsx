@@ -154,7 +154,7 @@ export default function RegisterPage() {
       setStep('OTP');
       setOtpCountdown(60);
       setSuccessMessage(`Kode verifikasi 6 angka sudah dikirim ke ${formData.email}`);
-      if (data.otp_preview) setPreviewOtp(data.otp_preview);
+      if (import.meta.env.DEV && data.otp_preview) setPreviewOtp(data.otp_preview);
     } catch (err) {
       setErrorMessage(err instanceof ApiError ? err.message : 'Gagal mengirim kode.');
     } finally {
