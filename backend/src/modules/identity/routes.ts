@@ -1,9 +1,10 @@
-import { Router, type RequestHandler } from 'express';
+import express, { Router, type RequestHandler } from 'express';
 import { asyncHandler } from '../../shared/http/asyncHandler';
 import { currentAuth, type AuthGuards } from '../../shared/http/auth';
 import { validate } from '../../shared/http/validate';
 import {
   adminKycSchema,
+  kycDocumentQuery,
   googleSyncSchema,
   loginSchema,
   registerSchema,
@@ -103,6 +104,29 @@ export function createIdentityRouter(service: IdentityService, guards: AuthGuard
     guards.requireAdmin,
     asyncHandler(async (_req, res) => {
       res.json({ success: true, data: await service.pendingKyc() });
+    })
+  );
+
+  // Photos arrive as the raw image body (not JSON) so the 100 KB JSON limit does not apply.
+  router.post(
+    '/users/kyc/documents',
+    guards.requireAuth,
+    ...limits.auth,
+    express.raw({ type: ['image/jpeg', 'image/png'], limit: '5mb' }),
+    validate({ query: kycDocumentQuery }),
+    asyncHandler(async (req, res) => {
+      await service.uploadKycDocument(currentAuth(req).userId, (req.query as { kind: 'KTP' | 'SELFIE' }).kind, req.body as Buffer);
+      res.status(201).json({ success: true, message: 'Foto tersimpan.' });
+    })
+  );
+
+  router.get(
+    '/admin/kyc/:id/documents',
+    guards.requireAuth,
+    guards.requireAdmin,
+    validate({ params: userIdParams }),
+    asyncHandler(async (req, res) => {
+      res.json({ success: true, data: await service.kycDocumentLinks(currentAuth(req).userId, req.params.id as string) });
     })
   );
 

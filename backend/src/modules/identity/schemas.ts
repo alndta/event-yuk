@@ -59,6 +59,7 @@ export const setRoleSchema = z.object({
 export const adminKycSchema = z
   .object({ decision: z.enum(['VERIFIED', 'UNVERIFIED']), reason: z.string().trim().min(3).max(300).optional() })
   .refine((v) => v.decision === 'VERIFIED' || !!v.reason, { message: 'Alasan penolakan wajib diisi.', path: ['reason'] });
+export const kycDocumentQuery = z.object({ kind: z.enum(['KTP', 'SELFIE']) });
 export const userIdParams = z.object({ id: z.uuid() });
 
 export type RegisterInput = z.infer<typeof registerSchema>;

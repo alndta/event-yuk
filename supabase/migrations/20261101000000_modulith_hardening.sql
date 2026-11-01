@@ -58,3 +58,20 @@ create table if not exists public.kyc_submissions (
 create unique index if not exists kyc_one_pending_per_user on public.kyc_submissions (user_id) where status = 'PENDING';
 create unique index if not exists kyc_nik_unique_active on public.kyc_submissions (nik_hash) where status in ('PENDING','APPROVED');
 alter table public.kyc_submissions enable row level security;
+
+-- 7. e-KYC photos: metadata table and a PRIVATE storage bucket (files are served only through short-lived signed links)
+create table if not exists public.kyc_documents (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid not null references public.users(id) on delete cascade,
+  kind text not null check (kind in ('KTP','SELFIE')),
+  path text not null,
+  content_type text not null,
+  size_bytes integer not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists kyc_documents_user_idx on public.kyc_documents (user_id, kind, created_at desc);
+alter table public.kyc_documents enable row level security;
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('kyc-documents', 'kyc-documents', false, 5242880, array['image/jpeg','image/png'])
+on conflict (id) do update set public = false, file_size_limit = 5242880, allowed_mime_types = array['image/jpeg','image/png'];

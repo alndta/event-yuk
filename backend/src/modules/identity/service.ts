@@ -1,4 +1,4 @@
-import { createHmac } from 'node:crypto';
+import { createHmac, randomUUID } from 'node:crypto';
 import type { Env } from '../../shared/config/env';
 import { deriveKey, generateOtp, hashOtp, safeEqualHex } from '../../shared/crypto/otp';
 import { hashPassword, verifyAgainstDummy, verifyPassword } from '../../shared/crypto/password';
@@ -11,6 +11,8 @@ import type { AuthContext, Role } from '../../shared/types';
 import type {
   BankAccount,
   GoogleIdentityVerifier,
+  DocumentStore,
+  KycDocumentKind,
   KycRepository,
   KycStatus,
   OtpRepository,
@@ -20,6 +22,15 @@ import type {
   UserRepository,
 } from './ports';
 import type { RegisterInput, SetRoleInput, UpdateProfileInput } from './schemas';
+
+const MAX_DOC_BYTES = 5 * 1024 * 1024;
+
+/** Reads the real image type from the first bytes of the file. */
+function detectImage(b: Buffer): { mime: string; ext: string } | null {
+  if (b.length > 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff) return { mime: 'image/jpeg', ext: 'jpg' };
+  if (b.length > 8 && b.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return { mime: 'image/png', ext: 'png' };
+  return null;
+}
 
 const OTP_TTL_MS = 10 * 60 * 1000;
 const OTP_WINDOW_MS = 10 * 60 * 1000;
@@ -37,6 +48,8 @@ export interface UserView {
   business_name: string;
   city_region: string | null;
   bank_account: BankAccount | null;
+  /** True for accounts listed in ADMIN_EMAILS; the web app uses it to show the review page. */
+  is_admin: boolean;
 }
 
 export interface Session {
@@ -60,6 +73,7 @@ export interface IdentityDeps {
   users: UserRepository;
   otps: OtpRepository;
   kyc: KycRepository;
+  documents: DocumentStore;
   google: GoogleIdentityVerifier;
   mailer: Mailer;
   tokens: TokenService;
@@ -87,6 +101,7 @@ export class IdentityService {
       business_name: profile?.businessName ?? user.fullName,
       city_region: profile?.cityRegion ?? null,
       bank_account: profile?.bankAccount ?? null,
+      is_admin: this.d.env.adminEmails.includes(user.email.toLowerCase()),
     };
   }
 
@@ -244,6 +259,8 @@ export class IdentityService {
     if (!(await this.d.users.getProfile(userId))) throw badRequest('Pilih peran akun dulu sebelum mengajukan e-KYC.');
     if (user.kycStatus === 'VERIFIED') throw conflict('Akunmu sudah terverifikasi.');
     if (user.kycStatus === 'PENDING') throw conflict('Pengajuan e-KYC sebelumnya masih diproses.');
+    const have = new Set((await this.d.kyc.listDocuments(userId)).map((d) => d.kind));
+    if (!have.has('KTP') || !have.has('SELFIE')) throw badRequest('Unggah foto KTP dan selfie dulu sebelum mengirim pengajuan.');
     const nikHash = createHmac('sha256', `${this.d.env.jwtSecret}:kyc-nik`).update(nik).digest('hex');
     await this.d.kyc.create({ userId, nikHash });
     await this.d.users.updateProfile(userId, { bankAccount: bank });
@@ -255,7 +272,39 @@ export class IdentityService {
     const user = await this.d.users.findById(userId);
     if (!user) throw notFound('Akun tidak ditemukan.');
     const last = await this.d.kyc.latestFor(userId);
-    return { status: user.kycStatus, reject_reason: last?.status === 'REJECTED' ? last.rejectReason : null, submitted_at: last?.createdAt ?? null };
+    const docs = new Set((await this.d.kyc.listDocuments(userId)).map((d) => d.kind));
+    return {
+      status: user.kycStatus,
+      reject_reason: last?.status === 'REJECTED' ? last.rejectReason : null,
+      submitted_at: last?.createdAt ?? null,
+      documents: { ktp: docs.has('KTP'), selfie: docs.has('SELFIE') },
+    };
+  }
+
+  /**
+   * Stores one identity photo. The file type is read from the bytes, not from what the browser claims,
+   * and the file goes to private storage under the account's own folder.
+   */
+  async uploadKycDocument(userId: string, kind: KycDocumentKind, body: Buffer): Promise<void> {
+    const user = await this.d.users.findById(userId);
+    if (!user) throw notFound('Akun tidak ditemukan.');
+    if (user.kycStatus === 'VERIFIED') throw conflict('Akunmu sudah terverifikasi.');
+    if (user.kycStatus === 'PENDING') throw conflict('Pengajuanmu sedang diperiksa, foto tidak bisa diganti sekarang.');
+    if (!Buffer.isBuffer(body) || body.length === 0) throw badRequest('Foto belum terkirim. Pilih berkas JPG atau PNG.');
+    if (body.length > MAX_DOC_BYTES) throw badRequest('Ukuran foto maksimal 5 MB.');
+    const type = detectImage(body);
+    if (!type) throw badRequest('Berkas harus berupa foto JPG atau PNG.');
+    const path = `${userId}/${kind.toLowerCase()}-${randomUUID()}.${type.ext}`;
+    await this.d.documents.put(path, body, type.mime);
+    await this.d.kyc.addDocument({ userId, kind, path, contentType: type.mime, size: body.length });
+  }
+
+  /** Short-lived links so a reviewer can look at the photos; each look is written to the log. */
+  async kycDocumentLinks(reviewerId: string, userId: string) {
+    if (!(await this.d.users.findById(userId))) throw notFound('Akun tidak ditemukan.');
+    const docs = await this.d.kyc.listDocuments(userId);
+    logger.info('kyc documents viewed', { reviewer: reviewerId, subject: userId, count: docs.length });
+    return Promise.all(docs.map(async (d) => ({ kind: d.kind, url: await this.d.documents.signedUrl(d.path, 120), expires_in: 120 })));
   }
 
   async pendingKyc() {

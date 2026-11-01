@@ -1,6 +1,6 @@
 import { AppError, conflict } from '../../../shared/errors';
 import type { Db } from '../../../shared/db/supabase';
-import type { KycRepository, KycSubmission } from '../ports';
+import type { DocumentStore, KycDocument, KycDocumentKind, KycRepository, KycSubmission } from '../ports';
 
 const toSubmission = (r: any): KycSubmission => ({
   id: r.id,
@@ -53,5 +53,42 @@ export class SupabaseKycRepository implements KycRepository {
       .eq('user_id', input.userId)
       .eq('status', 'PENDING');
     if (error) fail();
+  }
+
+  async addDocument(input: { userId: string; kind: KycDocumentKind; path: string; contentType: string; size: number }) {
+    const { error } = await (this.db as any)
+      .from('kyc_documents')
+      .insert({ user_id: input.userId, kind: input.kind, path: input.path, content_type: input.contentType, size_bytes: input.size });
+    if (error) fail();
+  }
+
+  async listDocuments(userId: string): Promise<KycDocument[]> {
+    const { data, error } = await (this.db as any).from('kyc_documents').select('*').eq('user_id', userId).order('created_at', { ascending: false });
+    if (error) return fail();
+    const latest = new Map<string, KycDocument>();
+    for (const r of data ?? []) {
+      if (!latest.has(r.kind)) {
+        latest.set(r.kind, { id: r.id, userId: r.user_id, kind: r.kind, path: r.path, contentType: r.content_type, size: r.size_bytes, createdAt: r.created_at });
+      }
+    }
+    return [...latest.values()];
+  }
+}
+
+const BUCKET = 'kyc-documents';
+
+/** Private Supabase Storage bucket; nothing in it is ever public. */
+export class SupabaseDocumentStore implements DocumentStore {
+  constructor(private readonly db: Db) {}
+
+  async put(path: string, body: Buffer, contentType: string) {
+    const { error } = await this.db.storage.from(BUCKET).upload(path, body, { contentType, upsert: false });
+    if (error) fail();
+  }
+
+  async signedUrl(path: string, expiresInSeconds: number) {
+    const { data, error } = await this.db.storage.from(BUCKET).createSignedUrl(path, expiresInSeconds);
+    if (error || !data) return fail();
+    return data.signedUrl;
   }
 }

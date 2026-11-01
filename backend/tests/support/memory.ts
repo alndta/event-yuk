@@ -4,7 +4,7 @@ import type { AppDeps } from '../../src/app';
 import { loadEnv } from '../../src/shared/config/env';
 import type { MailMessage } from '../../src/shared/mail/mailer';
 import type { GoogleIdentityVerifier } from '../../src/modules/identity';
-import type { KycRepository, KycSubmission, OtpRecord, OtpRepository, ProfileRecord, ProfileWithUser, UserRecord, UserRepository } from '../../src/modules/identity/ports';
+import type { DocumentStore, KycDocument, KycDocumentKind, KycRepository, KycSubmission, OtpRecord, OtpRepository, ProfileRecord, ProfileWithUser, UserRecord, UserRepository } from '../../src/modules/identity/ports';
 
 export class MemoryUsers implements UserRepository {
   users = new Map<string, UserRecord>();
@@ -53,8 +53,22 @@ export class MemoryOtps implements OtpRepository {
   async markUsed(id: string) { this.rows.find((r) => r.id === id)!.used = true; }
 }
 
+export class MemoryDocuments implements DocumentStore {
+  files = new Map<string, Buffer>();
+  async put(path: string, body: Buffer) { this.files.set(path, body); }
+  async signedUrl(path: string, seconds: number) { return `https://files.test/${path}?exp=${seconds}`; }
+}
+
 export class MemoryKyc implements KycRepository {
   rows: (KycSubmission & { nikHash: string })[] = [];
+  docs: KycDocument[] = [];
+  async addDocument(i: { userId: string; kind: KycDocumentKind; path: string; contentType: string; size: number }) {
+    this.docs.unshift({ id: randomUUID(), createdAt: new Date().toISOString(), ...i });
+  }
+  async listDocuments(userId: string) {
+    const seen = new Set<string>();
+    return this.docs.filter((d) => d.userId === userId && !seen.has(d.kind) && seen.add(d.kind));
+  }
   constructor(private readonly users: MemoryUsers) {}
   async create(i: { userId: string; nikHash: string }) {
     if (this.rows.some((r) => r.nikHash === i.nikHash && r.status !== 'REJECTED')) throw conflict('Data identitas sudah dipakai.');
@@ -82,6 +96,7 @@ export function memoryDeps(over: Partial<AppDeps> = {}) {
     users,
     otps: new MemoryOtps(),
     kyc: new MemoryKyc(users),
+    documents: new MemoryDocuments(),
     events: {} as never, catalog: {} as never, proposals: {} as never, payments: {} as never,
     google,
     mailer: { send: async (m) => { sent.push(m); } },

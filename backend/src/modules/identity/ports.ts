@@ -85,4 +85,25 @@ export interface KycRepository {
   latestFor(userId: string): Promise<KycSubmission | null>;
   listPending(): Promise<(KycSubmission & { fullName: string; email: string })[]>;
   decide(input: { userId: string; status: 'APPROVED' | 'REJECTED'; reviewerId: string; reason: string | null }): Promise<void>;
+  addDocument(input: { userId: string; kind: KycDocumentKind; path: string; contentType: string; size: number }): Promise<void>;
+  /** The newest document of each kind. */
+  listDocuments(userId: string): Promise<KycDocument[]>;
+}
+
+export type KycDocumentKind = 'KTP' | 'SELFIE';
+
+export interface KycDocument {
+  id: string;
+  userId: string;
+  kind: KycDocumentKind;
+  path: string;
+  contentType: string;
+  size: number;
+  createdAt: string;
+}
+
+/** Private file storage for identity documents. Files are never public; admins get short-lived links. */
+export interface DocumentStore {
+  put(path: string, body: Buffer, contentType: string): Promise<void>;
+  signedUrl(path: string, expiresInSeconds: number): Promise<string>;
 }
