@@ -1,6 +1,7 @@
 import { ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLanguage } from '../../../context/LanguageContext';
+import Band from './Band';
 
 interface Props {
   onOpenCreateEvent: () => void;
@@ -10,28 +11,32 @@ export default function HomeCallToAction({ onOpenCreateEvent }: Props) {
   const { t } = useLanguage();
 
   return (
-    <section aria-labelledby="home-cta-title" data-gsap-reveal className="bg-brand-navy px-6 py-10 text-white sm:px-10 sm:py-14 lg:px-14">
-      <div className="max-w-3xl">
-        <h2 id="home-cta-title" className="max-w-[16ch] font-display text-4xl font-bold leading-[1.05] tracking-[-0.04em] sm:text-5xl">
+    <Band tone="bg-brand-lime text-brand-navy" className="sm:!py-32">
+      <section aria-labelledby="home-cta-title" data-gsap-reveal className="mx-auto flex max-w-4xl flex-col items-center text-center">
+        <h2
+          id="home-cta-title"
+          className="font-display text-5xl font-extrabold leading-[0.98] tracking-[-0.045em] sm:text-7xl lg:text-8xl"
+        >
           {t('cta.title')}
         </h2>
-        <p className="mt-5 max-w-2xl text-base leading-7 text-white sm:text-lg sm:leading-8">{t('cta.desc')}</p>
-        <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+        <p className="mt-6 max-w-2xl text-lg leading-8 sm:text-xl sm:leading-9">{t('cta.desc')}</p>
+        <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
           <button
+            type="button"
             onClick={onOpenCreateEvent}
-            className="inline-flex min-h-12 items-center justify-center gap-2 bg-white px-6 py-3 text-sm font-semibold text-brand-navy transition-colors hover:bg-brand-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            className="inline-flex min-h-14 items-center gap-3 rounded-full bg-brand-navy px-8 text-base font-semibold text-brand-lime transition-colors hover:bg-brand-navy-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy"
           >
             {t('cta.btnPrimary')}
-            <ArrowRight aria-hidden="true" className="h-4 w-4" />
+            <ArrowRight aria-hidden="true" className="h-5 w-5" />
           </button>
           <Link
             to="/events"
-            className="inline-flex min-h-12 items-center justify-center px-6 py-3 text-sm font-semibold text-white underline underline-offset-4 transition hover:text-brand-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+            className="inline-flex min-h-14 items-center rounded-full border-2 border-brand-navy px-7 text-base font-semibold transition-colors hover:bg-brand-navy hover:text-brand-lime focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy"
           >
             {t('cta.btnSecondary')}
           </Link>
         </div>
-      </div>
-    </section>
+      </section>
+    </Band>
   );
 }

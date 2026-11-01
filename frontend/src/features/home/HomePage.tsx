@@ -68,10 +68,10 @@ export default function HomePage({
         ]}
       />
 
-      <div ref={pageRef} className="space-y-24 pb-20 sm:space-y-32 sm:pb-28">
+      <div ref={pageRef} className="-mb-[6.5rem] sm:-mb-28">
 
       {user && !user.activeRole && (
-        <div className="flex flex-col gap-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+        <div className="mb-10 flex flex-col gap-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
           <div>
             <p className="font-semibold text-amber-950">{t('nav.completeRole')}</p>
             <p className="mt-1 text-sm leading-6 text-amber-900">{t('home.rolePrompt')}</p>

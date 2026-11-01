@@ -161,7 +161,7 @@ export const translations = {
     'events.bazaar': 'Bazaar Kuliner',
     'events.portfolioTitle': 'Katalog Portofolio Acara Sukses',
     'events.portfolioDesc': 'Arsip pertunjukan dan festival yang telah sukses terlaksana dengan rekam jejak penyelesaian transaksi 100% tuntas di ekosistem kami.',
-    'events.exploreAll': 'Jelajahi Semua Portofolio Selesai',
+    'events.exploreAll': 'Lihat semua acara',
 
     'eventSearch.eyebrow': 'Direktori acara',
     'eventSearch.title': 'Cari event yang sedang butuh mitra.',
@@ -384,7 +384,7 @@ export const translations = {
     'events.bazaar': 'Food & Bazaars',
     'events.portfolioTitle': 'Successful Event Portfolio Archive',
     'events.portfolioDesc': 'Archive of completed festivals and showcases with 100% completed escrow settlements across our ecosystem.',
-    'events.exploreAll': 'Explore Full Completed Archive',
+    'events.exploreAll': 'See all events',
 
     'eventSearch.eyebrow': 'Event directory',
     'eventSearch.title': 'Find events looking for partners.',

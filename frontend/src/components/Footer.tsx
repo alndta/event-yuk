@@ -80,6 +80,13 @@ export default function Footer() {
             <span>Protokol Arbitrase Escrow</span>
           </div>
         </div>
+
+        <p
+          aria-hidden="true"
+          className="mt-12 select-none overflow-hidden whitespace-nowrap text-center font-display text-[clamp(4.5rem,21vw,22rem)] font-extrabold leading-[0.8] tracking-[-0.06em] text-white/10"
+        >
+          Event Yuk
+        </p>
       </div>
     </footer>
   );

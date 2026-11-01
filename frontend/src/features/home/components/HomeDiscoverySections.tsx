@@ -6,6 +6,8 @@ import { PartnerItem } from '../../../data/mockPartners';
 import { useLanguage } from '../../../context/LanguageContext';
 import EventCardLive from '../../../components/events/EventCardLive';
 import EventCardPortfolio from '../../../components/events/EventCardPortfolio';
+import Avatar from '../../../components/Avatar';
+import Band from './Band';
 import SectionHeading from './SectionHeading';
 
 interface Props {
@@ -41,10 +43,12 @@ export default function HomeDiscoverySections({
     : liveEvents.filter((event) => event.category === selectedCategory);
 
   return (
-    <div className="space-y-24 sm:space-y-32">
-      <section aria-labelledby="home-events-title" data-gsap-reveal className="space-y-7">
+    <>
+      <Band tone="bg-brand-cream">
+      <section aria-labelledby="home-events-title" data-gsap-reveal className="space-y-10">
         <SectionHeading
           id="home-events-title"
+          align="center"
           title={t('events.title')}
           description={t('events.desc')}
           action={
@@ -58,7 +62,7 @@ export default function HomeDiscoverySections({
           }
         />
 
-        <div aria-label={t('events.filterLabel')} className="flex flex-wrap gap-x-5 gap-y-2">
+        <div aria-label={t('events.filterLabel')} className="flex flex-wrap justify-center gap-2">
           {categories.map(({ id, label }) => (
             <button
               key={id}
@@ -66,10 +70,10 @@ export default function HomeDiscoverySections({
               aria-pressed={selectedCategory === id}
               onClick={() => setSelectedCategory(id)}
               className={
-                'min-h-11 shrink-0 border-b-2 px-1 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy ' +
+                'min-h-11 shrink-0 rounded-full border-2 px-5 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy ' +
                 (selectedCategory === id
-                  ? 'border-brand-navy text-brand-navy'
-                  : 'border-transparent text-slate-600 hover:border-slate-300 hover:text-slate-950')
+                  ? 'border-brand-navy bg-brand-navy text-white'
+                  : 'border-brand-navy/25 text-brand-ink hover:border-brand-navy')
               }
             >
               {label}
@@ -100,10 +104,13 @@ export default function HomeDiscoverySections({
           </div>
         )}
       </section>
+      </Band>
 
-      <section aria-labelledby="home-partners-title" data-gsap-reveal className="space-y-8">
+      <Band tone="bg-brand-clay">
+      <section aria-labelledby="home-partners-title" data-gsap-reveal className="space-y-12">
         <SectionHeading
           id="home-partners-title"
+          align="center"
           title={t('partners.title')}
           description={t('partners.desc')}
           action={
@@ -122,14 +129,11 @@ export default function HomeDiscoverySections({
           <ul className="grid grid-cols-1 gap-x-12 gap-y-10 sm:grid-cols-2">
             {featuredPartners.map((partner) => (
               <li key={partner.id} data-gsap-reveal className="flex min-w-0 gap-4 sm:gap-5">
-                <img
+                <Avatar
                   src={partner.avatar}
-                  alt=""
-                  width={56}
-                  height={56}
-                  loading="lazy"
-                  decoding="async"
-                  className="h-14 w-14 shrink-0 rounded-full object-cover"
+                  name={partner.name}
+                  decorative
+                  className="h-14 w-14 rounded-full"
                 />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-brand-navy">
@@ -162,10 +166,13 @@ export default function HomeDiscoverySections({
           <p className="bg-white px-6 py-8 text-base leading-7 text-slate-600">{t('partners.empty')}</p>
         )}
       </section>
+      </Band>
 
-      <section aria-labelledby="home-portfolio-title" data-gsap-reveal className="space-y-7">
+      <Band tone="bg-brand-cream">
+      <section aria-labelledby="home-portfolio-title" data-gsap-reveal className="space-y-10">
         <SectionHeading
           id="home-portfolio-title"
+          align="center"
           title={t('portfolio.title')}
           description={t('portfolio.desc')}
           action={
@@ -188,6 +195,7 @@ export default function HomeDiscoverySections({
           <p className="bg-white px-6 py-8 text-base leading-7 text-slate-600">{t('portfolio.empty')}</p>
         )}
       </section>
-    </div>
+      </Band>
+    </>
   );
 }

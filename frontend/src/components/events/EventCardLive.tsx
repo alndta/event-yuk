@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { EventItem } from '../../data/mockEvents';
 import { useLanguage } from '../../context/LanguageContext';
+import Avatar from '../Avatar';
 
 interface Props {
   event: EventItem;
@@ -87,14 +88,11 @@ export default function EventCardLive({ event, onSelectAction }: Props) {
         </div>
 
         <div className="mt-4 flex min-w-0 items-center gap-3">
-          <img
+          <Avatar
             src={event.organizer.avatar}
-            alt=""
-            width={36}
-            height={36}
-            loading="lazy"
-            decoding="async"
-            className="h-9 w-9 shrink-0 rounded-full object-cover"
+            name={event.organizer.name}
+            decorative
+            className="h-9 w-9 rounded-full"
           />
           <div className="min-w-0">
             <p className="flex items-center gap-1.5 truncate text-sm font-semibold text-slate-900">
