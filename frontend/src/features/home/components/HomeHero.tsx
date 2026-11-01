@@ -60,7 +60,7 @@ export default function HomeHero({ onOpenCreateEvent }: Props) {
           <path d={BLOB} fill="currentColor" />
         </svg>
 
-        <div className="relative z-10 mx-auto max-w-[96rem] px-5 pt-8 sm:px-8 sm:pt-10 lg:min-h-[27rem] lg:px-12 lg:pb-24 lg:pt-10">
+        <div className="relative z-10 mx-auto max-w-[96rem] px-5 pt-24 sm:px-8 lg:min-h-[31rem] lg:px-12 lg:pb-24">
           <h1
             id="home-title"
             className="font-display text-[clamp(2.9rem,7.4vw,7.25rem)] font-extrabold uppercase leading-[0.9] tracking-[-0.04em]"

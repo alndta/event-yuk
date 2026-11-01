@@ -21,6 +21,7 @@
   display: flex;
   align-items: center;
   min-height: min(850px, 88svh);
+  padding-top: 4rem;
   background: var(--guide-navy);
   color: #fff;
 }
