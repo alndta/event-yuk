@@ -34,17 +34,15 @@ export default function RoleContextBar({
       case 'EO':
         return {
           title: 'Event Organizer & Promotor',
-          badgeText: 'Akses Penuh Pengadaan & Escrow Acara',
+          badgeText: 'Akses penuh pengadaan dan escrow acara',
           icon: Calendar,
-          colorClass: 'bg-[#456B39] text-white',
-          bgBanner: 'from-[#172D46] via-[#1B3B56] to-[#0B1F31]',
           stats: [
             { label: 'Proyek Acara Aktif', value: '2 Acara', icon: Calendar },
             { label: 'Total Pagu Produksi', value: 'Rp 750 Jt', icon: DollarSign },
             { label: 'Pengajuan Vendor & Band', value: '3 Masuk', icon: FileCheck },
             { label: 'Jaminan Escrow Tersimpan', value: 'Rp 280 Jt', icon: ShieldCheck },
           ],
-          primaryActionText: '+ Buat Event Baru',
+          primaryActionText: 'Buat event baru',
           onPrimaryAction: onOpenCreateEvent || (() => navigate('/dashboard')),
         };
       case 'VENDOR':
@@ -52,8 +50,6 @@ export default function RoleContextBar({
           title: 'Vendor Produksi & Peralatan',
           badgeText: 'Katalog Alat, Smart Calendar, & Klaim BAST',
           icon: Sliders,
-          colorClass: 'bg-indigo-600 text-white',
-          bgBanner: 'from-indigo-900/90 via-slate-900 to-slate-950',
           stats: [
             { label: 'Paket Peralatan Aktif', value: '4 Paket', icon: Sliders },
             { label: 'Kalender Terkunci', value: '2 Tanggal', icon: Clock },
@@ -68,8 +64,6 @@ export default function RoleContextBar({
           title: 'Talenta & Manajemen Band Musik',
           badgeText: 'Jadwal Manggung, Riders Teknis, & PKS Manggung',
           icon: Music,
-          colorClass: 'bg-purple-600 text-white',
-          bgBanner: 'from-purple-950 via-slate-900 to-slate-950',
           stats: [
             { label: 'Jadwal Tampil (Confirmed)', value: '1 Pensi', icon: Calendar },
             { label: 'Status Technical Riders', value: 'Terverifikasi', icon: ShieldCheck },
@@ -84,8 +78,6 @@ export default function RoleContextBar({
           title: 'Tenant Bazaar & Pameran',
           badgeText: 'Pemilihan Kaveling, Kurasi Merek, & QR Pass',
           icon: Store,
-          colorClass: 'bg-emerald-600 text-white',
-          bgBanner: 'from-emerald-950 via-slate-900 to-slate-950',
           stats: [
             { label: 'Booth Tersewa', value: '1 Booth (FNB-04)', icon: Store },
             { label: 'Status Kurasi Produk', value: 'Disetujui EO', icon: ShieldCheck },
@@ -100,8 +92,6 @@ export default function RoleContextBar({
           title: 'Sponsor & Mitra Brand',
           badgeText: 'Paket Sponsorship, Aktivasi Stan, & Laporan Acara',
           icon: Building2,
-          colorClass: 'bg-amber-600 text-white',
-          bgBanner: 'from-amber-950 via-slate-900 to-slate-950',
           stats: [
             { label: 'Event yang Didukung', value: '1 Konser', icon: Calendar },
             { label: 'Ukuran Stan Aktivasi', value: '6x6 Meter', icon: Building2 },
@@ -116,8 +106,6 @@ export default function RoleContextBar({
           title: 'Event Crew Lapangan',
           badgeText: 'Lowongan Shift Anti-Bentrok & Presensi QR GPS',
           icon: Users,
-          colorClass: 'bg-rose-600 text-white',
-          bgBanner: 'from-rose-950 via-slate-900 to-slate-950',
           stats: [
             { label: 'Shift Diterima (Hired)', value: '2 Shift (LO & Usher)', icon: Calendar },
             { label: 'Presensi QR Lokasi Acara', value: 'Radius < 50m', icon: ShieldCheck },
@@ -134,86 +122,74 @@ export default function RoleContextBar({
   const RoleIcon = details.icon;
 
   return (
-    <div className={`relative overflow-hidden rounded-lg bg-gradient-to-r ${details.bgBanner} text-white p-5 sm:p-7  border border-slate-800`}>
-      <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
-        {/* Left Info */}
-        <div className="space-y-2">
+    <div data-gsap-reveal className="rounded-lg bg-brand-navy p-6 text-white sm:p-8">
+      <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
+        <div className="space-y-3">
           <div className="flex flex-wrap items-center gap-2">
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold ${details.colorClass} `}>
-              <RoleIcon className="w-3.5 h-3.5" />
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-lime px-3 py-1 text-sm font-semibold text-brand-navy">
+              <RoleIcon aria-hidden="true" className="h-4 w-4" />
               <span>{details.title}</span>
             </span>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-sm font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-              <ShieldCheck className="w-3 h-3 text-emerald-400" />
-              <span>1 Akun = 1 Peran Tetap</span>
-            </span>
-            <span className="text-sm text-slate-300 font-medium hidden sm:inline">
-              • {details.badgeText}
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-white">
+              <ShieldCheck aria-hidden="true" className="h-4 w-4 text-brand-lime" />
+              <span>1 akun, 1 peran tetap</span>
             </span>
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
-            Ruang Kerja & Kendali Peran Aktif kamu
+          <h2 className="font-display text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">
+            Ruang kerja peranmu
           </h2>
-          <p className="text-sm sm:text-sm text-slate-300 max-w-xl leading-relaxed">
-            Sistem otomatis menyesuaikan fitur, izin pengajuan, dan hak akses transaksi berdasarkan profil peran yang sedang kamu gunakan saat ini.
+          <p className="max-w-xl text-base leading-7 text-slate-200">
+            {details.badgeText}. Fitur, izin pengajuan, dan akses transaksi menyesuaikan peran yang sedang kamu pakai.
           </p>
         </div>
 
-        {/* Right Actions */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+        <div className="flex flex-wrap items-center gap-3">
           <button
+            type="button"
             onClick={() => navigate('/dashboard')}
-            className="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm transition flex items-center gap-1.5 backdrop-blur-sm"
+            className="inline-flex min-h-12 items-center gap-2 rounded-full border-2 border-white/40 px-6 text-base font-semibold text-white transition-colors hover:border-white"
           >
-            <LayoutDashboard className="w-3.5 h-3.5 text-coral" />
-            <span>Buka Dashboard Dagangan</span>
-            <ArrowRight className="w-3.5 h-3.5 text-slate-300" />
+            <LayoutDashboard aria-hidden="true" className="h-5 w-5 text-brand-lime" />
+            <span>Buka dashboard</span>
+            <ArrowRight aria-hidden="true" className="h-4 w-4" />
           </button>
 
           {currentRole === 'EO' && onOpenUploadPortfolio && (
             <button
+              type="button"
               onClick={onOpenUploadPortfolio}
-              className="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-300 font-bold text-sm transition flex items-center gap-1.5"
+              className="inline-flex min-h-12 items-center gap-2 rounded-full border-2 border-white/40 px-6 text-base font-semibold text-white transition-colors hover:border-white"
             >
-              <FileCheck className="w-3.5 h-3.5" />
-              <span>Upload Portofolio EO</span>
+              <FileCheck aria-hidden="true" className="h-5 w-5 text-brand-lime" />
+              <span>Unggah portofolio</span>
             </button>
           )}
 
           <button
+            type="button"
             onClick={details.onPrimaryAction}
-            className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg font-bold text-sm transition flex items-center gap-2  ${
-              currentRole === 'EO'
-                ? 'bg-gradient-to-r from-[#456B39] to-[#5E7628] hover:from-[#2F5232] hover:to-[#3F531D] text-white /25'
-                : 'bg-white hover:bg-slate-100 text-[#172D46]'
-            }`}
+            className="inline-flex min-h-12 items-center gap-2 rounded-full bg-brand-lime px-6 text-base font-semibold text-brand-navy transition-colors hover:bg-brand-lime-hover"
           >
             <span>{details.primaryActionText}</span>
           </button>
         </div>
       </div>
 
-      {/* Role-Specific Stats Strip */}
-      <div className="relative z-10 grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3.5 mt-5 sm:mt-6 pt-5 border-t border-white/10">
+      <dl className="mt-6 grid grid-cols-2 gap-3 border-t border-white/15 pt-6 md:grid-cols-4">
         {details.stats.map((s, idx) => {
           const SIcon = s.icon;
           return (
-            <div key={idx} className="bg-white/5 backdrop-blur-md p-3 sm:p-3.5 rounded-lg border border-white/10">
-              <div className="text-sm text-slate-400 font-medium flex items-center gap-1.5 mb-1">
-                <SIcon className="w-3.5 h-3.5 text-slate-300 shrink-0" />
-                <span className="truncate">{s.label}</span>
-              </div>
-              <div className="text-base sm:text-lg font-extrabold tracking-tight text-white tabular-nums truncate">
-                {s.value}
-              </div>
+            <div key={idx} className="rounded-lg bg-brand-navy-dark p-4">
+              <dt className="mb-1 flex items-center gap-2 text-sm text-slate-300">
+                <SIcon aria-hidden="true" className="h-4 w-4 shrink-0 text-brand-lime" />
+                <span>{s.label}</span>
+              </dt>
+              <dd className="font-display text-xl font-extrabold tracking-[-0.02em] text-white tabular-nums">{s.value}</dd>
             </div>
           );
         })}
-      </div>
-
-      {/* Background radial accent */}
-      <div className="absolute right-0 top-0 w-96 h-96 bg-white/5 rounded-full blur-3xl pointer-events-none" />
+      </dl>
     </div>
   );
 }
