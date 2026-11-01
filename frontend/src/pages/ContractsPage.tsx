@@ -41,79 +41,13 @@ export interface ContractProposalItem {
   contractDocumentUrl?: string | null;
 }
 
-export const initialProposalsData: ContractProposalItem[] = [
-  {
-    id: 'cnt-1',
-    contractNumber: 'PKS/EY/2026/089124',
-    partyOne: 'Nusantara Live Kreasi (EO)',
-    partyTwo: 'Nusantara Audio & Rigging Pro',
-    roleType: 'VENDOR',
-    eventTitle: 'Soundfest Archipelago 2027: Indie Waves',
-    totalAmount: 65000000,
-    dpPercentage: 50,
-    scopeOfWork: 'Penyediaan Line Array 40.000 Watt, Rigging 12x10m, dan 100kVA Genset.',
-    date: '26 Oktober 2026',
-    status: 'ESCROW_FUNDED',
-    lastUpdatedBy: 'Sistem Escrow Midtrans',
-    attachedFileName: 'PKS_Audio_Rigging_Nusantara.pdf',
-    attachedFileSize: '2.8 MB',
-  },
-  {
-    id: 'cnt-2',
-    contractNumber: 'PKS/EY/2026/091402',
-    partyOne: 'OSIS SMA Labschool Rawamangun (EO)',
-    partyTwo: 'Senja Di Batavia (Indie Rock Band)',
-    roleType: 'TALENT',
-    eventTitle: 'Pensi Labschool: RETROSPEKTA 2027',
-    totalAmount: 35000000,
-    dpPercentage: 50,
-    scopeOfWork: 'Penampilan panggung live 45 menit sebagai Guest Star Utama + Meet & Greet.',
-    date: '26 Oktober 2026',
-    status: 'CONTRACT_SIGNED',
-    lastUpdatedBy: 'Reza (Manajer Band)',
-    attachedFileName: 'Kontrak_Penampilan_SenjaDiBatavia.docx',
-    attachedFileSize: '1.4 MB',
-  },
-  {
-    id: 'cnt-3',
-    contractNumber: 'PKS/EY/2026/092551',
-    partyOne: 'Kolektif Ruang Rasa (EO)',
-    partyTwo: 'Luminary Stage & Visual FX',
-    roleType: 'VENDOR',
-    eventTitle: 'Urban Coffee & Craft Bazaar Vol. 5',
-    totalAmount: 32000000,
-    dpPercentage: 40,
-    scopeOfWork: 'Instalasi Videotron LED P3.9 6x4m dan 16 Moving Head Beam.',
-    date: '26 Oktober 2026',
-    status: 'COUNTER_OFFER',
-    counterAmount: 28000000,
-    counterDpPercentage: 50,
-    counterNotes: 'Pihak EO mengajukan penyesuaian anggaran ke Rp 28.000.000 dengan skema 50:50 (DP 50% saat loading alat, 50% setelah BAST penutupan acara).',
-    lastUpdatedBy: 'Kolektif Ruang Rasa (EO)',
-  },
-  {
-    id: 'cnt-4',
-    contractNumber: 'PKS/EY/2026/093880',
-    partyOne: 'Nusantara Live Kreasi (EO)',
-    partyTwo: 'Teh Segar Nusantara (Brand FMCG)',
-    roleType: 'SPONSOR',
-    eventTitle: 'Soundfest Archipelago 2027: Indie Waves',
-    totalAmount: 175000000,
-    dpPercentage: 70,
-    scopeOfWork: 'Platinum Sponsorship Package: Hak booth sampling 6x6m, branding LED panggung dan 15 VIP passes.',
-    date: '26 Oktober 2026',
-    status: 'SUBMITTED',
-    lastUpdatedBy: 'Teh Segar Nusantara',
-  },
-];
-
 interface Props {
   onShowToast?: (msg: string) => void;
 }
 
 export default function ContractsPage({ onShowToast }: Props) {
   const { user } = useAuth();
-  const [proposals, setProposals] = useState<ContractProposalItem[]>(import.meta.env.DEV ? initialProposalsData : []);
+  const [proposals, setProposals] = useState<ContractProposalItem[]>([]);
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -159,7 +93,7 @@ export default function ContractsPage({ onShowToast }: Props) {
         setLoadError(null);
       })
       .catch((err) => {
-        if (!import.meta.env.DEV) setProposals([]);
+        setProposals([]);
         setLoadError(err instanceof ApiError ? err.message : 'Daftar kontrak belum bisa dimuat.');
       });
   };

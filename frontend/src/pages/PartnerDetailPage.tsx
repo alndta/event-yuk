@@ -19,7 +19,8 @@ import {
   Clock,
   Building2,
 } from 'lucide-react';
-import { mockPartners, PartnerItem } from '../data/mockPartners';
+import EmptyState from '../components/EmptyState';
+import { PartnerItem } from '../types/models';
 import { useAuth } from '../context/AuthContext';
 import { SEOHead } from '../components/SEOHead';
 import { DetailSkeleton } from '../components/skeletons/DetailSkeleton';
@@ -34,9 +35,8 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
   const { id } = useParams();
   const { requireAuth } = useAuth();
 
-  const fallbackPartner = mockPartners.find((p) => p.id === id) || mockPartners[0];
-  const [partner, setPartner] = useState<any>(fallbackPartner);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [partner, setPartner] = useState<any>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const pageRef = useRef<HTMLDivElement>(null);
   useGsapReveal(pageRef, '[data-gsap-reveal]', [id, loading]);
 
@@ -74,12 +74,12 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
     }, `Ingin mengajak ${partner.name} berkolaborasi? Masuk akun dulu agar pengajuan resmi langsung terkirim.`);
   };
 
-  const isVendor = partner.type === 'VENDOR';
-  const isTalent = partner.type === 'TALENT';
-  const isEO = partner.type === 'EO';
+  const isVendor = partner?.type === 'VENDOR';
+  const isTalent = partner?.type === 'TALENT';
+  const isEO = partner?.type === 'EO';
 
-  const packages = partner.packages || [];
-  const talentProfile = partner.talentProfile;
+  const packages = partner?.packages || [];
+  const talentProfile = partner?.talentProfile;
 
   const partnerSchema = partner
     ? {
@@ -130,6 +130,10 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
       <dd className="mt-1 text-base font-semibold text-brand-ink">{value}</dd>
     </div>
   );
+
+  if (!partner) {
+    return <EmptyState title="Mitra tidak ditemukan" body="Profil ini mungkin sudah tidak aktif." actionLabel="Lihat direktori mitra" actionTo="/vendors" />;
+  }
 
   return (
     <div ref={pageRef} className="space-y-8 font-sans sm:space-y-10">

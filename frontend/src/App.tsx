@@ -3,8 +3,8 @@ import { mapBackendEvent } from './utils/mapEvent';
 import { Suspense, lazy, useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { CheckCircle2 } from 'lucide-react';
-import { initialEvents, EventItem } from './data/mockEvents';
-import { PartnerItem } from './data/mockPartners';
+import { EventItem } from './types/models';
+import { PartnerItem } from './types/models';
 
 // Auth Context & Protected Route
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -84,7 +84,7 @@ function AppContent() {
     closeAuthPrompt,
   } = useAuth();
 
-  const [events, setEvents] = useState<EventItem[]>(import.meta.env.DEV ? initialEvents : []);
+  const [events, setEvents] = useState<EventItem[]>([]);
   const currentRole: UserRole = user?.activeRole || 'EO';
 
   // Helper: Map Supabase database event to frontend EventItem
@@ -93,9 +93,7 @@ function AppContent() {
   const fetchLiveEvents = () => {
     api('/events', { anonymous: true })
       .then((res) => setEvents((res.data || []).map(mapBackendEvent)))
-      .catch(() => {
-        if (!import.meta.env.DEV) setEvents([]);
-      });
+      .catch(() => setEvents([]));
   };
 
   useEffect(() => {

@@ -12,7 +12,7 @@ import {
   FileText,
   ArrowRight,
 } from 'lucide-react';
-import { mockPartners, PartnerItem } from '../data/mockPartners';
+import { PartnerItem } from '../types/models';
 import { PartnerCardsSkeletonList } from '../components/skeletons/PartnerCardSkeleton';
 import { SEOHead } from '../components/SEOHead';
 import { useLanguage } from '../context/LanguageContext';
@@ -26,9 +26,7 @@ interface Props {
 
 export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: Props) {
   const { t, language } = useLanguage();
-  const [bands, setBands] = useState<PartnerItem[]>(() =>
-    import.meta.env.DEV ? mockPartners.filter((p) => p.type === 'TALENT') : []
-  );
+  const [bands, setBands] = useState<PartnerItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const pageRef = useRef<HTMLDivElement>(null);
   useGsapReveal(pageRef, '[data-gsap-reveal]', [loading]);
@@ -46,7 +44,7 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
     api('/partners' + query({ type: 'TALENT', q: debouncedSearch, city: cityFilter }), { anonymous: true, signal: controller.signal })
       .then((resData) => setBands(resData.data || []))
       .catch((err) => {
-        if (err?.name !== 'AbortError' && !import.meta.env.DEV) setBands([]);
+        if (err?.name !== 'AbortError') setBands([]);
       })
       .finally(() => setLoading(false));
     return () => controller.abort();

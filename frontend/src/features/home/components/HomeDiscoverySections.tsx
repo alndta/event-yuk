@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { ArrowRight, CalendarDays, ChevronRight, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { EventItem } from '../../../data/mockEvents';
-import { PartnerItem } from '../../../data/mockPartners';
+import { EventItem } from '../../../types/models';
+import { PartnerItem } from '../../../types/models';
 import { useLanguage } from '../../../context/LanguageContext';
 import EventCardLive from '../../../components/events/EventCardLive';
 import EventCardPortfolio from '../../../components/events/EventCardPortfolio';

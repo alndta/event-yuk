@@ -13,8 +13,8 @@ import {
   Trash2,
   FileCheck,
 } from 'lucide-react';
-import { EventItem } from '../data/mockEvents';
-import { PartnerItem } from '../data/mockPartners';
+import { EventItem } from '../types/models';
+import { PartnerItem } from '../types/models';
 import { api, ApiError } from '../lib/api';
 
 interface Props {

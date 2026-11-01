@@ -1,4 +1,4 @@
-import type { EventItem } from '../data/mockEvents';
+import type { EventItem } from '../types/models';
 
 /** Turns an event from the API into the shape the pages render. */
 export function mapBackendEvent(ev: any): EventItem {

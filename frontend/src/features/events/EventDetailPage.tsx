@@ -17,7 +17,8 @@ import {
   Briefcase,
   X,
 } from 'lucide-react';
-import { initialEvents, EventItem } from '../../data/mockEvents';
+import EmptyState from '../../components/EmptyState';
+import { EventItem } from '../../types/models';
 import { useAuth } from '../../context/AuthContext';
 import { SEOHead } from '../../components/SEOHead';
 import { DetailSkeleton } from '../../components/skeletons/DetailSkeleton';
@@ -39,8 +40,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
   const pageRef = useRef<HTMLDivElement>(null);
   useGsapReveal(pageRef);
 
-  const fallbackEvent = (propEvents || initialEvents).find((e) => e.id === id) || initialEvents[0];
-  const [event, setEvent] = useState<any>(fallbackEvent);
+  const [event, setEvent] = useState<any>((propEvents || []).find((e) => e.id === id) ?? null);
   const [booths, setBooths] = useState<any[]>([]);
   const [crewShifts, setCrewShifts] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'overview' | 'booths' | 'crew' | 'sponsorship'>('overview');
@@ -60,7 +60,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
     setTimeout(() => setFeedbackToast(null), 4000);
   };
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!id) return;
@@ -138,18 +138,9 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
     }, `Silakan masuk ke akun Kru Lapangan untuk melamar shift ${shift.role_title}.`);
   };
 
-  const displayBooths = booths.length > 0 || !import.meta.env.DEV ? booths : [
-    { id: 'bth-1', booth_code: 'FNB-01', booth_category: 'FNB', size_dimension: '3x3m', rental_price: 7500000, is_occupied: false },
-    { id: 'bth-2', booth_code: 'FNB-02', booth_category: 'FNB', size_dimension: '3x3m', rental_price: 7500000, is_occupied: false },
-    { id: 'bth-3', booth_code: 'FASHION-01', booth_category: 'FASHION', size_dimension: '3x3m', rental_price: 6000000, is_occupied: false },
-    { id: 'bth-4', booth_code: 'SPONSOR-A', booth_category: 'SPONSOR', size_dimension: '6x6m', rental_price: 25000000, is_occupied: false },
-  ];
+  const displayBooths = booths;
 
-  const displayShifts = crewShifts.length > 0 || !import.meta.env.DEV ? crewShifts : [
-    { id: 'shf-1', role_title: 'LO', shift_date: '2027-05-15', headcount_req: 8, rate_per_shift: 350000 },
-    { id: 'shf-2', role_title: 'USHER', shift_date: '2027-05-15', headcount_req: 12, rate_per_shift: 300000 },
-    { id: 'shf-3', role_title: 'STAGEHAND', shift_date: '2027-05-15', headcount_req: 6, rate_per_shift: 400000 },
-  ];
+  const displayShifts = crewShifts;
 
   const eventSchema = event
     ? {
@@ -181,6 +172,10 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
   if (loading && !event) {
     return <DetailSkeleton />;
+  }
+
+  if (!event) {
+    return <EmptyState title="Acara tidak ditemukan" body="Acara ini mungkin sudah dihapus atau belum dipublikasikan." actionLabel="Lihat semua acara" actionTo="/events" />;
   }
 
   return (

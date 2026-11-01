@@ -12,7 +12,7 @@ import {
   ShieldCheck,
   ArrowRight,
 } from 'lucide-react';
-import { mockPartners, PartnerItem } from '../data/mockPartners';
+import { PartnerItem } from '../types/models';
 import { PartnerCardsSkeletonList } from '../components/skeletons/PartnerCardSkeleton';
 import { SEOHead } from '../components/SEOHead';
 import { useLanguage } from '../context/LanguageContext';
@@ -26,9 +26,7 @@ interface Props {
 
 export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }: Props) {
   const { t, language } = useLanguage();
-  const [vendors, setVendors] = useState<PartnerItem[]>(() =>
-    import.meta.env.DEV ? mockPartners.filter((p) => p.type === 'VENDOR') : []
-  );
+  const [vendors, setVendors] = useState<PartnerItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const pageRef = useRef<HTMLDivElement>(null);
   useGsapReveal(pageRef, '[data-gsap-reveal]', [loading]);
@@ -46,7 +44,7 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
     api('/partners' + query({ type: 'VENDOR', q: debouncedSearch, city: cityFilter }), { anonymous: true, signal: controller.signal })
       .then((resData) => setVendors(resData.data || []))
       .catch((err) => {
-        if (err?.name !== 'AbortError' && !import.meta.env.DEV) setVendors([]);
+        if (err?.name !== 'AbortError') setVendors([]);
       })
       .finally(() => setLoading(false));
     return () => controller.abort();

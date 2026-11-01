@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Award, CalendarDays, Filter, RotateCcw, Search, Zap } from 'lucide-react';
-import { EventItem, initialEvents } from '../../data/mockEvents';
+import { EventItem } from '../../types/models';
 import EventCardLive from '../../components/events/EventCardLive';
 import EventCardPortfolio from '../../components/events/EventCardPortfolio';
 import { EventCardsSkeletonList } from '../../components/skeletons/EventCardSkeleton';
@@ -28,7 +28,7 @@ export default function SearchEventsPage({
 }: Props) {
   const { t } = useLanguage();
   const pageRef = useRef<HTMLDivElement>(null);
-  const [eventsList, setEventsList] = useState<EventItem[]>(propEvents || initialEvents);
+  const [eventsList, setEventsList] = useState<EventItem[]>(propEvents || []);
   const [loading, setLoading] = useState<boolean>(!propEvents || propEvents.length === 0);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<(typeof categoryIds)[number]>('ALL');
@@ -54,7 +54,7 @@ export default function SearchEventsPage({
       .then((res) => setEventsList((res.data || []).map(mapBackendEvent)))
       .catch((err) => {
         if (err?.name === 'AbortError') return;
-        setEventsList(import.meta.env.DEV && propEvents ? propEvents : []);
+        setEventsList([]);
       })
       .finally(() => setLoading(false));
     return () => controller.abort();

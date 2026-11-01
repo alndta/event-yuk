@@ -9,7 +9,8 @@ import {
   ShieldCheck,
   ArrowRight,
 } from 'lucide-react';
-import { initialEvents, EventItem } from '../data/mockEvents';
+import EmptyState from '../components/EmptyState';
+import { EventItem } from '../types/models';
 import { SEOHead } from '../components/SEOHead';
 
 interface Props {
@@ -18,8 +19,8 @@ interface Props {
 }
 
 export default function SponsorHubPage({ events, onApplySponsorship }: Props) {
-  const availableEvents = (events && events.length > 0 ? events : initialEvents).filter(e => !e.isPortfolio);
-  const [selectedEvent, setSelectedEvent] = useState<EventItem>(availableEvents[0] || initialEvents[0]);
+  const availableEvents = (events || []).filter(e => !e.isPortfolio);
+  const [selectedEvent, setSelectedEvent] = useState<EventItem | undefined>(availableEvents[0]);
   const [selectedTier, setSelectedTier] = useState<string>('PLATINUM');
   const [customBrandName, setCustomBrandName] = useState('');
   const [customBudget, setCustomBudget] = useState('');
@@ -98,7 +99,7 @@ export default function SponsorHubPage({ events, onApplySponsorship }: Props) {
 
   const handleProposalSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (onApplySponsorship) {
+    if (onApplySponsorship && selectedEvent) {
       onApplySponsorship(selectedEvent, selectedTier, customBudget);
     }
     setProposalSubmitted(true);
@@ -139,6 +140,10 @@ export default function SponsorHubPage({ events, onApplySponsorship }: Props) {
 
   const inputClass =
     'min-h-12 w-full rounded-lg border border-slate-300 bg-white px-4 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30';
+
+  if (!selectedEvent) {
+    return <EmptyState title="Belum ada acara yang membuka sponsor" body="Paket sponsorship akan muncul di sini begitu penyelenggara membuka acaranya." actionLabel="Lihat acara" actionTo="/events" />;
+  }
 
   return (
     <div ref={pageRef} className="space-y-16 font-sans sm:space-y-20">

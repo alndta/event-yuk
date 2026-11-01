@@ -8,7 +8,7 @@ import {
   SlidersHorizontal,
   Users,
 } from 'lucide-react';
-import { EventItem } from '../../data/mockEvents';
+import { EventItem } from '../../types/models';
 import { useLanguage } from '../../context/LanguageContext';
 import Avatar from '../Avatar';
 

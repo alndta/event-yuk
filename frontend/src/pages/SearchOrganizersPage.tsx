@@ -11,7 +11,7 @@ import {
   Mail,
   ArrowRight,
 } from 'lucide-react';
-import { mockOrganizers, OrganizerItem } from '../data/mockOrganizers';
+import { OrganizerItem } from '../types/models';
 import { PartnerCardsSkeletonList } from '../components/skeletons/PartnerCardSkeleton';
 import { SEOHead } from '../components/SEOHead';
 import { useLanguage } from '../context/LanguageContext';
@@ -25,7 +25,7 @@ interface Props {
 
 export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrganizer }: Props) {
   const { t, language } = useLanguage();
-  const [organizers, setOrganizers] = useState<OrganizerItem[]>(import.meta.env.DEV ? mockOrganizers : []);
+  const [organizers, setOrganizers] = useState<OrganizerItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const pageRef = useRef<HTMLDivElement>(null);
   useGsapReveal(pageRef, '[data-gsap-reveal]', [loading]);
@@ -59,7 +59,7 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
           pastHighlightEvents: [],
         }))))
       .catch((err) => {
-        if (err?.name !== 'AbortError' && !import.meta.env.DEV) setOrganizers([]);
+        if (err?.name !== 'AbortError') setOrganizers([]);
       })
       .finally(() => setLoading(false));
     return () => controller.abort();
