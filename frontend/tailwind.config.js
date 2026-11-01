@@ -13,7 +13,7 @@ export default {
           'navy-dark': '#0F263B',
           'navy-light': '#375872',
           ink: '#142637',
-          canvas: '#F6F8F3',
+          canvas: '#F4EDE0',
           sand: '#E9EFD9',
           cream: '#F4EDE0',
           clay: '#E5DACB',
