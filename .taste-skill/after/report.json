@@ -1,0 +1,1669 @@
+{
+ "url": "http://127.0.0.1:3001/",
+ "at": "2026-10-28T22:41:26.238Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 8,
+   "filled": [
+    0.86,
+    0.58,
+    0.64,
+    0.43,
+    0.38,
+    0.51,
+    0.77,
+    0.78
+   ],
+   "motion": {
+    "elements": 22,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 22,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 6491,
+     "screens": 7.2,
+     "words": 937,
+     "img": 16,
+     "video": 0,
+     "canvas": 0,
+     "svg": 66,
+     "sections": 7,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 7,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "event-organizer-registration-3d.png",
+      "hero-concert.jpg",
+      "band-folk.jpg",
+      "tenant-bazaar.jpg",
+      "crowd-festival.jpg",
+      "tenant-food.jpg",
+      "vendor-rigging.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Bikin event jadi nyata.",
+     "words": 4,
+     "chars": 23,
+     "lines": 2,
+     "size": 136.8,
+     "vw": 9.5,
+     "font": "Plus Jakarta Sans",
+     "weight": 900,
+     "tracking": -0.075,
+     "leading": 0.84,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "left",
+     "widthRatio": 0.43,
+     "top": 152,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Bikin event jadi nyata.",
+     "words": 4,
+     "lines": 2,
+     "size": 136.8,
+     "font": "Plus Jakarta Sans"
+    },
+    "headings": [
+     {
+      "text": "Bikin event jadi nyata.",
+      "words": 4,
+      "chars": 23,
+      "lines": 2,
+      "size": 136.8,
+      "vw": 9.5,
+      "font": "Plus Jakarta Sans",
+      "weight": 900,
+      "tracking": -0.075,
+      "leading": 0.84,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.43,
+      "top": 152,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Tahapan acara",
+      "words": 2,
+      "chars": 13,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Plus Jakarta Sans",
+      "weight": 700,
+      "tracking": -0.04,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.87,
+      "top": 948,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Proyek yang sedang mencari mitra",
+      "words": 5,
+      "chars": 32,
+      "lines": 2,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Plus Jakarta Sans",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.35,
+      "top": 1274,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Kenalan dengan vendor dan band",
+      "words": 5,
+      "chars": 30,
+      "lines": 2,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Plus Jakarta Sans",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.35,
+      "top": 2447,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Acara yang sudah terlaksana",
+      "words": 4,
+      "chars": 27,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Plus Jakarta Sans",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.35,
+      "top": 3243,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Pilih peran sesuai pekerjaanmu.",
+      "words": 4,
+      "chars": 31,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Plus Jakarta Sans",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.35,
+      "top": 4248,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Dari proyek ke hari-H.",
+      "words": 4,
+      "chars": 22,
+      "lines": 1,
+      "size": 36,
+      "vw": 2.5,
+      "font": "Plus Jakarta Sans",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.35,
+      "top": 4976,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Temukan mitra untuk acara berikutnya.",
+      "words": 5,
+      "chars": 37,
+      "lines": 2,
+      "size": 48,
+      "vw": 3.3,
+      "font": "Plus Jakarta Sans",
+      "weight": 700,
+      "tracking": -0.04,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.38,
+      "top": 5491,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 8,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 4,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Plus Jakarta Sans",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      11,
+      13,
+      14,
+      16,
+      18,
+      20,
+      36,
+      48,
+      137
+     ],
+     "sizeCount": 9,
+     "notLoaded": [],
+     "body": {
+      "font": "Plus Jakarta Sans",
+      "size": 16,
+      "leading": 1.75,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 7.6
+     },
+     "measureChars": 72,
+     "max": {
+      "size": 136.8,
+      "vw": 9.5,
+      "font": "Plus Jakarta Sans",
+      "text": "Bikin event"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0.02,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#f6f8f3",
+     "bodyBgHsl": {
+      "h": 84,
+      "s": 0.26,
+      "l": 0.96
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#f6f8f3",
+       "top": 0,
+       "hsl": {
+        "h": 84,
+        "s": 0.26,
+        "l": 0.96
+       }
+      },
+      {
+       "color": "#172d46",
+       "top": 96,
+       "hsl": {
+        "h": 212,
+        "s": 0.51,
+        "l": 0.18
+       }
+      },
+      {
+       "color": "#142637",
+       "top": 4920,
+       "hsl": {
+        "h": 209,
+        "s": 0.47,
+        "l": 0.15
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#475569",
+       "share": 0.43
+      },
+      {
+       "color": "#020617",
+       "share": 0.15
+      },
+      {
+       "color": "#cbd5e1",
+       "share": 0.11
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.1
+      },
+      {
+       "color": "#172d46",
+       "share": 0.1
+      }
+     ],
+     "button": {
+      "bg": "#142637",
+      "hsl": {
+       "h": 209,
+       "s": 0.47,
+       "l": 0.15
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 14,
+     "inHero": 3,
+     "radius": 0,
+     "height": 44,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Masuk",
+      "Daftar Akun Baru",
+      "Buat proyek acara"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 3,
+     "boxRadius": 16,
+     "squareMedia": 4,
+     "roundedMedia": 3,
+     "mediaRadius": 16,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 3,
+       "iconTopped": false,
+       "rounded": true,
+       "top": 1502
+      }
+     ]
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.43
+     }
+    ],
+    "nav": {
+     "links": 7,
+     "fixed": true,
+     "height": 64,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "plus jakarta sans"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 6491,
+    "margins": {
+     "left": 48,
+     "right": 48
+    },
+    "sections": [
+     {
+      "sel": "main.flex-1.w-full",
+      "tag": "main",
+      "top": 64,
+      "height": 5883,
+      "words": 877,
+      "media": 7,
+      "middle": 0,
+      "heading": {
+       "text": "Bikin event",
+       "size": 137,
+       "tag": "h1"
+      },
+      "left": 48,
+      "right": 0,
+      "textLeft": 48,
+      "textRight": 48,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "footer.mt-20.bg-brand-ink",
+      "tag": "footer",
+      "top": 6027,
+      "height": 464,
+      "words": 92,
+      "media": 0,
+      "middle": 167,
+      "heading": {
+       "text": "Transaksi Terproteksi Rekening Bersama Escrow",
+       "size": 18,
+       "tag": "h2"
+      },
+      "left": 48,
+      "right": 48,
+      "textLeft": 48,
+      "textRight": 48,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Bikin event jadi nyata.",
+      "size": 137,
+      "top": 152,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 48,
+      "n": 9
+     },
+     {
+      "x": 96,
+      "n": 8
+     },
+     {
+      "x": 72,
+      "n": 2
+     },
+     {
+      "x": 503,
+      "n": 2
+     },
+     {
+      "x": 527,
+      "n": 2
+     },
+     {
+      "x": 957,
+      "n": 2
+     },
+     {
+      "x": 981,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 27,
+    "bodySize": 16,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0.1,
+    "voidBox": {
+     "x": 0,
+     "y": 480,
+     "w": 540,
+     "h": 240
+    }
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 9,
+   "filled": [
+    0.92,
+    0.68,
+    0.61,
+    0.4,
+    0.54,
+    0.25,
+    0.29,
+    0.8,
+    0.8
+   ],
+   "motion": {
+    "elements": 22,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 22,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 9184,
+     "screens": 9,
+     "words": 930,
+     "img": 16,
+     "video": 0,
+     "canvas": 0,
+     "svg": 66,
+     "sections": 7,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 7,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "event-organizer-registration-3d.png",
+      "hero-concert.jpg",
+      "band-folk.jpg",
+      "tenant-bazaar.jpg",
+      "crowd-festival.jpg",
+      "tenant-food.jpg",
+      "vendor-rigging.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Bikin event jadi nyata.",
+     "words": 4,
+     "chars": 23,
+     "lines": 2,
+     "size": 73,
+     "vw": 9.5,
+     "font": "Plus Jakarta Sans",
+     "weight": 900,
+     "tracking": -0.075,
+     "leading": 0.84,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "left",
+     "widthRatio": 0.43,
+     "top": 152,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Bikin event jadi nyata.",
+     "words": 4,
+     "lines": 2,
+     "size": 73,
+     "font": "Plus Jakarta Sans"
+    },
+    "headings": [
+     {
+      "text": "Bikin event jadi nyata.",
+      "words": 4,
+      "chars": 23,
+      "lines": 2,
+      "size": 73,
+      "vw": 9.5,
+      "font": "Plus Jakarta Sans",
+      "weight": 900,
+      "tracking": -0.075,
+      "leading": 0.84,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.43,
+      "top": 152,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Tahapan acara",
+      "words": 2,
+      "chars": 13,
+      "lines": 1,
+      "size": 36,
+      "vw": 4.7,
+      "font": "Plus Jakarta Sans",
+      "weight": 700,
+      "tracking": -0.04,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.83,
+      "top": 856,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Proyek yang sedang mencari mitra",
+      "words": 5,
+      "chars": 32,
+      "lines": 2,
+      "size": 36,
+      "vw": 4.7,
+      "font": "Plus Jakarta Sans",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.57,
+      "top": 1256,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Kenalan dengan vendor dan band",
+      "words": 5,
+      "chars": 30,
+      "lines": 2,
+      "size": 36,
+      "vw": 4.7,
+      "font": "Plus Jakarta Sans",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.58,
+      "top": 3321,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Acara yang sudah terlaksana",
+      "words": 4,
+      "chars": 27,
+      "lines": 1,
+      "size": 36,
+      "vw": 4.7,
+      "font": "Plus Jakarta Sans",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.66,
+      "top": 4357,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Pilih peran sesuai pekerjaanmu.",
+      "words": 4,
+      "chars": 31,
+      "lines": 2,
+      "size": 36,
+      "vw": 4.7,
+      "font": "Plus Jakarta Sans",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.58,
+      "top": 6152,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Dari proyek ke hari-H.",
+      "words": 4,
+      "chars": 22,
+      "lines": 1,
+      "size": 36,
+      "vw": 4.7,
+      "font": "Plus Jakarta Sans",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.11,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.66,
+      "top": 7180,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Temukan mitra untuk acara berikutnya.",
+      "words": 5,
+      "chars": 37,
+      "lines": 2,
+      "size": 48,
+      "vw": 6.3,
+      "font": "Plus Jakarta Sans",
+      "weight": 700,
+      "tracking": -0.04,
+      "leading": 1,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.71,
+      "top": 7878,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 8,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 4,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Plus Jakarta Sans",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      11,
+      13,
+      14,
+      16,
+      18,
+      20,
+      36,
+      48,
+      73
+     ],
+     "sizeCount": 9,
+     "notLoaded": [],
+     "body": {
+      "font": "Plus Jakarta Sans",
+      "size": 16,
+      "leading": 1.75,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 7.6
+     },
+     "measureChars": 32,
+     "max": {
+      "size": 73,
+      "vw": 9.5,
+      "font": "Plus Jakarta Sans",
+      "text": "Bikin event"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0.02,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#f6f8f3",
+     "bodyBgHsl": {
+      "h": 84,
+      "s": 0.26,
+      "l": 0.96
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#f6f8f3",
+       "top": 0,
+       "hsl": {
+        "h": 84,
+        "s": 0.26,
+        "l": 0.96
+       }
+      },
+      {
+       "color": "#172d46",
+       "top": 96,
+       "hsl": {
+        "h": 212,
+        "s": 0.51,
+        "l": 0.18
+       }
+      },
+      {
+       "color": "#ffffff",
+       "top": 1516,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      },
+      {
+       "color": "#142637",
+       "top": 7124,
+       "hsl": {
+        "h": 209,
+        "s": 0.47,
+        "l": 0.15
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#475569",
+       "share": 0.43
+      },
+      {
+       "color": "#020617",
+       "share": 0.15
+      },
+      {
+       "color": "#cbd5e1",
+       "share": 0.11
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.1
+      },
+      {
+       "color": "#172d46",
+       "share": 0.1
+      }
+     ],
+     "button": {
+      "bg": "#142637",
+      "hsl": {
+       "h": 209,
+       "s": 0.47,
+       "l": 0.15
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 14,
+     "inHero": 5,
+     "radius": 0,
+     "height": 44,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Masuk",
+      "Daftar Akun Baru",
+      "Buat proyek acara",
+      "Rencana",
+      "Persiapan"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 3,
+     "boxRadius": 16,
+     "squareMedia": 4,
+     "roundedMedia": 3,
+     "mediaRadius": 16,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 3,
+       "iconTopped": false,
+       "rounded": true,
+       "top": 1516
+      }
+     ]
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.34
+     }
+    ],
+    "nav": {
+     "links": 3,
+     "fixed": true,
+     "height": 64,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "plus jakarta sans"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 9184,
+    "margins": {
+     "left": 32,
+     "right": 32
+    },
+    "sections": [
+     {
+      "sel": "main.flex-1.w-full",
+      "tag": "main",
+      "top": 64,
+      "height": 8270,
+      "words": 877,
+      "media": 7,
+      "middle": 0,
+      "heading": {
+       "text": "Bikin event",
+       "size": 73,
+       "tag": "h1"
+      },
+      "left": 32,
+      "right": 0,
+      "textLeft": 32,
+      "textRight": 32,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "footer.mt-20.bg-brand-ink",
+      "tag": "footer",
+      "top": 8414,
+      "height": 770,
+      "words": 92,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Transaksi Terproteksi Rekening Bersama Escrow",
+       "size": 18,
+       "tag": "h2"
+      },
+      "left": 32,
+      "right": 87,
+      "textLeft": 32,
+      "textRight": 87,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Bikin event jadi nyata.",
+      "size": 73,
+      "top": 152,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 32,
+      "n": 11
+     },
+     {
+      "x": 56,
+      "n": 8
+     },
+     {
+      "x": 72,
+      "n": 4
+     },
+     {
+      "x": 394,
+      "n": 2
+     },
+     {
+      "x": 418,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 27,
+    "bodySize": 16,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 12,
+   "filled": [
+    0.86,
+    0.34,
+    0.74,
+    0.8,
+    0.74,
+    0.4,
+    0.36,
+    0.63,
+    0.67,
+    0.67,
+    0.28,
+    0.28
+   ],
+   "motion": {
+    "elements": 22,
+    "css": 0,
+    "transitions": 0,
+    "scripted": 22,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 12949,
+     "screens": 15.3,
+     "words": 826,
+     "img": 16,
+     "video": 0,
+     "canvas": 0,
+     "svg": 66,
+     "sections": 7,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 7,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [
+      "event-organizer-registration-3d.png",
+      "hero-concert.jpg",
+      "band-folk.jpg",
+      "tenant-bazaar.jpg",
+      "crowd-festival.jpg",
+      "tenant-food.jpg",
+      "vendor-rigging.jpg"
+     ],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Bikin event jadi nyata.",
+     "words": 4,
+     "chars": 23,
+     "lines": 2,
+     "size": 60,
+     "vw": 15.4,
+     "font": "Plus Jakarta Sans",
+     "weight": 900,
+     "tracking": -0.075,
+     "leading": 0.84,
+     "upper": false,
+     "italic": false,
+     "mono": false,
+     "align": "left",
+     "position": "center",
+     "widthRatio": 0.7,
+     "top": 128,
+     "tag": "h1",
+     "kind": "heading"
+    },
+    "h1": {
+     "text": "Bikin event jadi nyata.",
+     "words": 4,
+     "lines": 2,
+     "size": 60,
+     "font": "Plus Jakarta Sans"
+    },
+    "headings": [
+     {
+      "text": "Bikin event jadi nyata.",
+      "words": 4,
+      "chars": 23,
+      "lines": 2,
+      "size": 60,
+      "vw": 15.4,
+      "font": "Plus Jakarta Sans",
+      "weight": 900,
+      "tracking": -0.075,
+      "leading": 0.84,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.7,
+      "top": 128,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Proyek yang sedang mencari mitra",
+      "words": 5,
+      "chars": 32,
+      "lines": 2,
+      "size": 30,
+      "vw": 7.7,
+      "font": "Plus Jakarta Sans",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 1168,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Kenalan dengan vendor dan band",
+      "words": 5,
+      "chars": 30,
+      "lines": 2,
+      "size": 30,
+      "vw": 7.7,
+      "font": "Plus Jakarta Sans",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 4156,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Acara yang sudah terlaksana",
+      "words": 4,
+      "chars": 27,
+      "lines": 2,
+      "size": 30,
+      "vw": 7.7,
+      "font": "Plus Jakarta Sans",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 5812,
+      "tag": "h2",
+      "kind": "heading"
+     },
+     {
+      "text": "Pilih peran sesuai pekerjaanmu.",
+      "words": 4,
+      "chars": 31,
+      "lines": 2,
+      "size": 30,
+      "vw": 7.7,
+      "font": "Plus Jakarta Sans",
+      "weight": 700,
+      "tracking": -0.035,
+      "leading": 1.08,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.9,
+      "top": 8538,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 5,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 5,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Plus Jakarta Sans",
+       "share": 1,
+       "mono": false
+      }
+     ],
+     "familyCount": 1,
+     "sizes": [
+      11,
+      13,
+      14,
+      16,
+      18,
+      20,
+      30,
+      60
+     ],
+     "sizeCount": 8,
+     "notLoaded": [],
+     "body": {
+      "font": "Plus Jakarta Sans",
+      "size": 16,
+      "leading": 1.75,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": null
+     },
+     "measureChars": 35,
+     "max": {
+      "size": 60,
+      "vw": 15.4,
+      "font": "Plus Jakarta Sans",
+      "text": "Bikin event"
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 0,
+     "microLabelShare": 0,
+     "microSamples": [],
+     "upperShare": 0,
+     "centerShare": 0.02,
+     "smallText": 0
+    },
+    "eyebrows": [],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#f6f8f3",
+     "bodyBgHsl": {
+      "h": 84,
+      "s": 0.26,
+      "l": 0.96
+     },
+     "dark": false,
+     "sectionBgs": [
+      {
+       "color": "#f6f8f3",
+       "top": 0,
+       "hsl": {
+        "h": 84,
+        "s": 0.26,
+        "l": 0.96
+       }
+      },
+      {
+       "color": "#172d46",
+       "top": 88,
+       "hsl": {
+        "h": 212,
+        "s": 0.51,
+        "l": 0.18
+       }
+      },
+      {
+       "color": "#d7f36a",
+       "top": 458,
+       "hsl": {
+        "h": 72,
+        "s": 0.85,
+        "l": 0.68
+       }
+      },
+      {
+       "color": "#ffffff",
+       "top": 1569,
+       "hsl": {
+        "h": 0,
+        "s": 0,
+        "l": 1
+       }
+      },
+      {
+       "color": "#142637",
+       "top": 11859,
+       "hsl": {
+        "h": 209,
+        "s": 0.47,
+        "l": 0.15
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#475569",
+       "share": 0.49
+      },
+      {
+       "color": "#020617",
+       "share": 0.17
+      },
+      {
+       "color": "#172d46",
+       "share": 0.11
+      },
+      {
+       "color": "#ffffff",
+       "share": 0.06
+      },
+      {
+       "color": "#cbd5e1",
+       "share": 0.05
+      }
+     ],
+     "button": {
+      "bg": "#142637",
+      "hsl": {
+       "h": 209,
+       "s": 0.47,
+       "l": 0.15
+      },
+      "fg": "#ffffff"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 12,
+     "inHero": 1,
+     "radius": 0,
+     "height": 44,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Buat proyek acara"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 0,
+     "shadowOverlay": 0,
+     "shadowSamples": [],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 0,
+     "hairlineSamples": [],
+     "outlinedBoxes": 0,
+     "dashed": 0,
+     "blurred": 0,
+     "roundedBoxes": 3,
+     "boxRadius": 16,
+     "squareMedia": 4,
+     "roundedMedia": 3,
+     "mediaRadius": 16,
+     "textShadow": 0,
+     "cardRows": [
+      {
+       "count": 3,
+       "iconTopped": false,
+       "rounded": true,
+       "top": 1569
+      }
+     ]
+    },
+    "heroMedia": [
+     {
+      "type": "img",
+      "ratio": 0.34
+     }
+    ],
+    "nav": {
+     "links": 1,
+     "fixed": true,
+     "height": 64,
+     "floatingPill": false,
+     "blur": false
+    },
+    "fontsLoaded": [
+     "plus jakarta sans"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 12949,
+    "margins": {
+     "left": 20,
+     "right": 20
+    },
+    "sections": [
+     {
+      "sel": "main.flex-1.w-full",
+      "tag": "main",
+      "top": 64,
+      "height": 11715,
+      "words": 771,
+      "media": 7,
+      "middle": 0,
+      "heading": {
+       "text": "Bikin event",
+       "size": 60,
+       "tag": "h1"
+      },
+      "left": 20,
+      "right": 20,
+      "textLeft": 20,
+      "textRight": 20,
+      "fullBleed": true,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "footer.mt-20.bg-brand-ink",
+      "tag": "footer",
+      "top": 11859,
+      "height": 1090,
+      "words": 92,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Transaksi Terproteksi Rekening Bersama Escrow",
+       "size": 18,
+       "tag": "h2"
+      },
+      "left": 20,
+      "right": 26,
+      "textLeft": 20,
+      "textRight": 26,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Bikin event jadi nyata.",
+      "size": 60,
+      "top": 128,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 20,
+      "n": 13
+     },
+     {
+      "x": 40,
+      "n": 10
+     }
+    ],
+    "leftBlocks": 23,
+    "bodySize": 16,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": null,
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "WARN",
+   "id": "no-footage",
+   "width": 1440,
+   "message": "No video anywhere on the page.",
+   "fix": "Look for one honest clip with scripts/assets.mjs --video (the place, the material, the process) and use it as a muted loop with a poster frame. Defend its absence only if no clip fits the subject."
+  },
+  {
+   "level": "WARN",
+   "id": "dev-server",
+   "width": 1440,
+   "message": "This page is served by a development server (Vite, webpack or Next in dev mode).",
+   "fix": "Run the last gate on the production build too (vite build && vite preview, next build && next start, or the built index.html): minifiers and bundlers change the CSS a visitor receives.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "/home/goy/bisnis/eventYuk/event-yuk/.taste-skill/after/desktop-fold.jpg",
+   "pages": [
+    "/home/goy/bisnis/eventYuk/event-yuk/.taste-skill/after/desktop-page-01.jpg",
+    "/home/goy/bisnis/eventYuk/event-yuk/.taste-skill/after/desktop-page-02.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "/home/goy/bisnis/eventYuk/event-yuk/.taste-skill/after/tablet-fold.jpg",
+   "pages": [
+    "/home/goy/bisnis/eventYuk/event-yuk/.taste-skill/after/tablet-page-01.jpg",
+    "/home/goy/bisnis/eventYuk/event-yuk/.taste-skill/after/tablet-page-02.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "/home/goy/bisnis/eventYuk/event-yuk/.taste-skill/after/mobile-fold.jpg",
+   "pages": [
+    "/home/goy/bisnis/eventYuk/event-yuk/.taste-skill/after/mobile-page-01.jpg",
+    "/home/goy/bisnis/eventYuk/event-yuk/.taste-skill/after/mobile-page-02.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

@@ -1,0 +1,294 @@
+import { useEffect, useRef, useState } from 'react';
+import { Award, CalendarDays, Filter, RotateCcw, Search, Zap } from 'lucide-react';
+import { EventItem, initialEvents } from '../../data/mockEvents';
+import EventCardLive from '../../components/events/EventCardLive';
+import EventCardPortfolio from '../../components/events/EventCardPortfolio';
+import { EventCardsSkeletonList } from '../../components/skeletons/EventCardSkeleton';
+import { SEOHead } from '../../components/SEOHead';
+import { useLanguage } from '../../context/LanguageContext';
+import { cachedFetch } from '../../utils/apiCache';
+import useGsapReveal from '../../hooks/useGsapReveal';
+
+interface Props {
+  events?: EventItem[];
+  onSelectAction: (action: string, event: EventItem) => void;
+  onViewDetails: (event: EventItem) => void;
+}
+
+type StatusFilter = 'ALL' | 'LIVE' | 'PORTFOLIO';
+
+const categoryIds = ['ALL', 'CONCERT', 'PENSI', 'BAZAAR', 'EXPO'] as const;
+
+export default function SearchEventsPage({
+  events: propEvents,
+  onSelectAction,
+  onViewDetails,
+}: Props) {
+  const { t } = useLanguage();
+  const pageRef = useRef<HTMLDivElement>(null);
+  const [eventsList, setEventsList] = useState<EventItem[]>(propEvents || initialEvents);
+  const [loading, setLoading] = useState<boolean>(!propEvents || propEvents.length === 0);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<(typeof categoryIds)[number]>('ALL');
+  const [selectedStatus, setSelectedStatus] = useState<StatusFilter>('ALL');
+
+  useGsapReveal(pageRef);
+
+  useEffect(() => {
+    if (propEvents && propEvents.length > 0) {
+      setEventsList(propEvents);
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    cachedFetch('/api/v1/events')
+      .then((response: any) => {
+        if (response?.success && Array.isArray(response.data) && response.data.length > 0) {
+          const mapped: EventItem[] = response.data.map((event: any) => ({
+            id: event.id,
+            title: event.title,
+            category: event.event_category,
+            venue: event.venue_name,
+            date: event.start_date,
+            organizer: {
+              name: event.organizer?.full_name || 'Nusantara Live Kreasi',
+              avatar: event.organizer?.avatar_url || '/assets/crew-production.jpg',
+              verified: event.organizer?.kyc_status === 'VERIFIED',
+              city: event.organizer?.city || 'Jakarta',
+            },
+            description: event.description || '',
+            bannerImage: event.banner_image || '/assets/hero-concert.jpg',
+            isPortfolio: Boolean(event.is_portfolio || event.status === 'COMPLETED'),
+            progress: event.is_portfolio
+              ? undefined
+              : {
+                  stage: t('eventSearch.productionStage'),
+                  vendorFilled: 35,
+                  boothFilled: (event.tenant_booths || []).filter((booth: any) => !booth.is_occupied).length,
+                  crewNeeded:
+                    (event.crew_shifts || []).reduce(
+                      (total: number, shift: any) => total + (shift.headcount_req || 1),
+                      0
+                    ) || 0,
+                },
+          }));
+          setEventsList(mapped);
+        }
+      })
+      .catch(() => {})
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [propEvents, t]);
+
+  const normalizedSearch = searchTerm.trim().toLocaleLowerCase();
+  const filteredEvents = eventsList.filter((event) => {
+    const matchesSearch =
+      !normalizedSearch ||
+      [event.title, event.venue, event.organizer.name, event.organizer.city].some((value) =>
+        value.toLocaleLowerCase().includes(normalizedSearch)
+      );
+    const matchesCategory = selectedCategory === 'ALL' || event.category === selectedCategory;
+    const matchesStatus =
+      selectedStatus === 'ALL' ||
+      (selectedStatus === 'LIVE' && !event.isPortfolio) ||
+      (selectedStatus === 'PORTFOLIO' && event.isPortfolio);
+    return matchesSearch && matchesCategory && matchesStatus;
+  });
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setSelectedCategory('ALL');
+    setSelectedStatus('ALL');
+  };
+
+  const categories = categoryIds.map((id) => ({
+    id,
+    label:
+      id === 'ALL'
+        ? t('events.all')
+        : id === 'CONCERT'
+          ? t('events.concert')
+          : id === 'PENSI'
+            ? t('events.pensi')
+            : id === 'BAZAAR'
+              ? t('events.bazaar')
+              : t('events.expo'),
+  }));
+
+  const statusFilters: { id: StatusFilter; label: string; icon: typeof Zap }[] = [
+    { id: 'ALL', label: t('eventSearch.allStatus'), icon: CalendarDays },
+    { id: 'LIVE', label: t('eventSearch.liveStatus'), icon: Zap },
+    { id: 'PORTFOLIO', label: t('eventSearch.portfolioStatus'), icon: Award },
+  ];
+
+  return (
+    <>
+      <SEOHead
+        title="Peluang Acara & Festival Musik Indonesia | Event Yuk"
+        description={t('eventSearch.description')}
+        keywords="proyek konser musik, bazaar kuliner, lowongan kru event, sewa booth, vendor acara"
+        canonicalPath="/events"
+      />
+
+      <div ref={pageRef} data-ui="event-directory" className="space-y-8 pb-12 sm:space-y-10">
+
+      <section
+        aria-labelledby="event-search-title"
+        data-gsap-reveal
+        className="bg-white px-5 py-7 sm:px-8 sm:py-9"
+      >
+        <h1
+          id="event-search-title"
+          className="max-w-[18ch] font-display text-4xl font-bold leading-[1.05] tracking-[-0.04em] text-slate-950 sm:text-5xl"
+        >
+          {t('eventSearch.title')}
+        </h1>
+        <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg sm:leading-8">
+          {t('eventSearch.description')}
+        </p>
+
+        <div className="mt-7 max-w-4xl">
+          <label htmlFor="event-search-query" className="sr-only">
+            {t('eventSearch.searchLabel')}
+          </label>
+          <div className="flex min-h-14 items-center gap-3 border-b-2 border-slate-300 bg-white px-3 focus-within:border-brand-navy">
+            <Search aria-hidden="true" className="h-5 w-5 shrink-0 text-slate-400" />
+            <input
+              id="event-search-query"
+              type="search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder={t('eventSearch.searchPlaceholder')}
+              className="min-w-0 flex-1 border-0 bg-transparent py-3 text-base text-slate-900 outline-none placeholder:text-slate-400 focus:ring-0"
+            />
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={() => setSearchTerm('')}
+                className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
+                aria-label={t('eventSearch.clearSearch')}
+              >
+                <RotateCcw aria-hidden="true" className="h-4 w-4" />
+              </button>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <section
+        aria-label={t('eventSearch.filters')}
+        data-gsap-reveal
+        className="space-y-4 py-2"
+      >
+        <div className="flex items-center gap-2 text-sm font-semibold text-slate-700">
+          <Filter aria-hidden="true" className="h-4 w-4 text-slate-500" />
+          <span>{t('eventSearch.filters')}</span>
+        </div>
+
+        <div className="flex flex-col gap-5">
+          <div
+            role="group"
+            aria-label={t('eventSearch.statusLabel')}
+            className="flex flex-wrap gap-x-5 gap-y-1"
+          >
+            {statusFilters.map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                type="button"
+                aria-pressed={selectedStatus === id}
+                onClick={() => setSelectedStatus(id)}
+                className={
+                  'inline-flex min-h-11 items-center gap-2 border-b-2 px-1 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy ' +
+                  (selectedStatus === id
+                    ? 'border-brand-navy text-brand-navy'
+                    : 'border-transparent text-slate-600 hover:border-slate-300 hover:text-slate-950')
+                }
+              >
+                <Icon aria-hidden="true" className="h-4 w-4" />
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <div
+            role="group"
+            aria-label={t('eventSearch.categoryLabel')}
+            className="flex flex-wrap gap-x-5 gap-y-1"
+          >
+            {categories.map(({ id, label }) => (
+              <button
+                key={id}
+                type="button"
+                aria-pressed={selectedCategory === id}
+                onClick={() => setSelectedCategory(id)}
+                className={
+                  'min-h-11 shrink-0 border-b-2 px-1 text-sm font-semibold transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy ' +
+                  (selectedCategory === id
+                    ? 'border-brand-navy text-brand-navy'
+                    : 'border-transparent text-slate-600 hover:border-slate-300 hover:text-slate-950')
+                }
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-2 text-sm">
+          <p className="text-slate-600">
+            <span className="font-bold text-slate-950">{filteredEvents.length}</span>{' '}
+            {t('eventSearch.resultCount')}
+          </p>
+          {(searchTerm || selectedCategory !== 'ALL' || selectedStatus !== 'ALL') && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="inline-flex min-h-10 items-center gap-2 rounded-full px-3 font-semibold text-brand-navy transition hover:bg-brand-navy/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
+            >
+              <RotateCcw aria-hidden="true" className="h-4 w-4" />
+              {t('eventSearch.reset')}
+            </button>
+          )}
+        </div>
+      </section>
+
+      {loading ? (
+        <div aria-live="polite" aria-busy="true">
+          <span className="sr-only">{t('app.loading')}</span>
+          <EventCardsSkeletonList count={6} />
+        </div>
+      ) : filteredEvents.length > 0 ? (
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {filteredEvents.map((event) =>
+            event.isPortfolio ? (
+              <EventCardPortfolio key={event.id} event={event} onViewDetails={onViewDetails} />
+            ) : (
+              <EventCardLive key={event.id} event={event} onSelectAction={onSelectAction} />
+            )
+          )}
+        </div>
+      ) : (
+        <div className="mx-auto max-w-xl bg-white px-6 py-12 text-center">
+          <CalendarDays aria-hidden="true" className="mx-auto h-8 w-8 text-brand-navy" />
+          <h2 className="mt-4 font-display text-2xl font-semibold text-slate-950">
+            {t('eventSearch.noResultsTitle')}
+          </h2>
+          <p className="mx-auto mt-2 max-w-sm text-base leading-7 text-slate-600">
+            {t('eventSearch.noResultsDescription')}
+          </p>
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="mt-5 inline-flex min-h-11 items-center gap-2 bg-brand-navy px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-navy-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
+          >
+            <RotateCcw aria-hidden="true" className="h-4 w-4" />
+            {t('eventSearch.reset')}
+          </button>
+        </div>
+      )}
+      </div>
+    </>
+  );
+}

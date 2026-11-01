@@ -1,0 +1,24 @@
+User-agent: *
+Allow: /
+Allow: /events
+Allow: /events/*
+Allow: /vendors
+Allow: /bands
+Allow: /organizers
+Allow: /partners/*
+Allow: /sponsors
+Allow: /panduan-role
+Allow: /roles-guide
+
+# Disallow private user workspace & authentication pages from search indexing
+Disallow: /login
+Disallow: /register
+Disallow: /onboarding-role
+Disallow: /dashboard
+Disallow: /dashboard/*
+Disallow: /contracts
+Disallow: /contracts/*
+Disallow: /profile
+Disallow: /api/
+
+Sitemap: https://horizon-coordinated-toolbox-continuity.trycloudflare.com/sitemap.xml

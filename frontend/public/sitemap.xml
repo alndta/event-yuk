@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Core Landing Page -->
+  <url>
+    <loc>https://horizon-coordinated-toolbox-continuity.trycloudflare.com/</loc>
+    <lastmod>2026-10-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Events Catalog -->
+  <url>
+    <loc>https://horizon-coordinated-toolbox-continuity.trycloudflare.com/events</loc>
+    <lastmod>2026-10-27</lastmod>
+    <changefreq>hourly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- Event Detail Pages -->
+  <url>
+    <loc>https://horizon-coordinated-toolbox-continuity.trycloudflare.com/events/ed7ddcb4-ed2a-4bd9-8cc4-1955906ed550</loc>
+    <lastmod>2026-10-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://horizon-coordinated-toolbox-continuity.trycloudflare.com/events/b0000000-0000-0000-0000-000000000001</loc>
+    <lastmod>2026-10-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://horizon-coordinated-toolbox-continuity.trycloudflare.com/events/b0000000-0000-0000-0000-000000000002</loc>
+    <lastmod>2026-10-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://horizon-coordinated-toolbox-continuity.trycloudflare.com/events/f62714cd-0279-4cce-bae0-966284b6351c</loc>
+    <lastmod>2026-10-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Partners Directories -->
+  <url>
+    <loc>https://horizon-coordinated-toolbox-continuity.trycloudflare.com/vendors</loc>
+    <lastmod>2026-10-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://horizon-coordinated-toolbox-continuity.trycloudflare.com/bands</loc>
+    <lastmod>2026-10-27</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://horizon-coordinated-toolbox-continuity.trycloudflare.com/organizers</loc>
+    <lastmod>2026-10-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Sponsorship & Ecosystem Guides -->
+  <url>
+    <loc>https://horizon-coordinated-toolbox-continuity.trycloudflare.com/sponsors</loc>
+    <lastmod>2026-10-27</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.75</priority>
+  </url>
+  <url>
+    <loc>https://horizon-coordinated-toolbox-continuity.trycloudflare.com/panduan-role</loc>
+    <lastmod>2026-10-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://horizon-coordinated-toolbox-continuity.trycloudflare.com/roles-guide</loc>
+    <lastmod>2026-10-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+</urlset>

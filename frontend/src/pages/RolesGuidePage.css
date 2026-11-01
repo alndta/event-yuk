@@ -1,0 +1,767 @@
+.guide-page {
+  --guide-navy: #0f263b;
+  --guide-ink: #142637;
+  --guide-lime: #d7f36a;
+  --guide-paper: #f6f8f3;
+  --guide-sand: #e9efd9;
+  color: var(--guide-ink);
+  overflow: clip;
+}
+
+.guide-chapter {
+  padding-block: clamp(4.5rem, 8vw, 8rem);
+}
+
+.guide-shell {
+  width: 100%;
+  padding-inline: clamp(1.25rem, 4.5vw, 5rem);
+}
+
+.guide-hero {
+  display: flex;
+  align-items: center;
+  min-height: min(850px, 88svh);
+  background: var(--guide-navy);
+  color: #fff;
+}
+
+.guide-hero__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  align-items: center;
+  gap: clamp(2rem, 5vw, 6rem);
+}
+
+.guide-hero__copy h1 {
+  margin: 0;
+  font-size: clamp(3.25rem, 5vw, 6rem);
+  font-weight: 800;
+  line-height: 0.98;
+  letter-spacing: -0.065em;
+  text-wrap: balance;
+}
+
+.guide-hero__copy h1 span {
+  display: block;
+}
+
+.guide-hero__copy > p {
+  max-width: 35rem;
+  margin: 1.6rem 0 2rem;
+  color: #edf2f5;
+  font-size: clamp(1rem, 1.35vw, 1.25rem);
+  line-height: 1.6;
+}
+
+.guide-action {
+  display: inline-flex;
+  min-height: 3.5rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  padding: 0.9rem 1.35rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: color 180ms ease, background-color 180ms ease, transform 180ms ease;
+}
+
+.guide-action svg,
+.guide-text-link svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  transition: transform 180ms ease;
+}
+
+.guide-action:hover svg,
+.guide-text-link:hover svg {
+  transform: translateX(4px);
+}
+
+.guide-action--lime {
+  background: var(--guide-lime);
+  color: var(--guide-navy);
+}
+
+.guide-action--lime:hover {
+  background: #e4ff83;
+}
+
+.guide-hero__scene {
+  position: relative;
+  min-height: clamp(380px, 42vw, 590px);
+  perspective: 1300px;
+}
+
+.guide-hero__photo {
+  position: absolute;
+  inset: 3% 12% 7% 0;
+  width: 88%;
+  height: 90%;
+  object-fit: cover;
+  object-position: center 46%;
+  filter: saturate(0.82);
+}
+
+.guide-register-card {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  bottom: 8%;
+  width: min(75%, 485px);
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+  background: #fff;
+  color: var(--guide-ink);
+  transform: rotateY(-11deg) rotateX(3deg) rotateZ(-1deg);
+  transform-style: preserve-3d;
+}
+
+.guide-register-card[data-ui='true'] {
+  box-shadow: 20px 28px 52px rgb(0 0 0 / 25%);
+}
+
+.guide-register-card::before {
+  position: absolute;
+  z-index: -1;
+  inset: 12px -13px -13px 12px;
+  background: var(--guide-lime);
+  content: '';
+  transform: translateZ(-24px);
+}
+
+.guide-register-card__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 3px solid #e5e9e2;
+}
+
+.guide-register-card__head span {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--guide-navy);
+}
+
+.guide-register-card__head strong {
+  font-size: clamp(1.3rem, 2.4vw, 2rem);
+  letter-spacing: -0.04em;
+}
+
+.guide-register-steps {
+  display: grid;
+  gap: 0.55rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guide-register-steps li {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  min-height: 3.25rem;
+  padding: 0.45rem 0.7rem;
+  color: #314450;
+}
+
+.guide-register-steps li span {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 2rem;
+  place-items: center;
+  border-radius: 50%;
+  background: #e9efd9;
+  color: var(--guide-navy);
+  font-weight: 800;
+}
+
+.guide-register-steps li.is-current {
+  background: #eff6d8;
+  color: var(--guide-navy);
+}
+
+.guide-register-steps li.is-current span {
+  background: var(--guide-navy);
+  color: var(--guide-lime);
+}
+
+.guide-register-card > p {
+  margin: 1rem 0 0;
+  color: #42535d;
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+
+.guide-hero__caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  color: #edf2f5;
+  font-size: 0.88rem;
+}
+
+.guide-roles {
+  background: var(--guide-paper);
+}
+
+.guide-section-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 2.5rem;
+  margin-bottom: clamp(2rem, 4vw, 3.5rem);
+}
+
+.guide-section-heading h2,
+.guide-role-summary h3,
+.guide-agreements h2,
+.guide-cta h2 {
+  margin: 0;
+  font-size: clamp(2.25rem, 4.8vw, 5rem);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  text-wrap: balance;
+}
+
+.guide-section-heading > p {
+  max-width: 31rem;
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.guide-role-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: clamp(0.7rem, 1.5vw, 1.4rem);
+}
+
+.guide-role-option {
+  min-width: 0;
+  padding: 0 0 0.8rem;
+  border: 0;
+  border-bottom: 5px solid transparent;
+  background: transparent;
+  color: var(--guide-ink);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 160ms ease, color 160ms ease;
+}
+
+.guide-role-option img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1.34 / 1;
+  object-fit: cover;
+  filter: saturate(0.8);
+  transition: filter 180ms ease, transform 180ms ease;
+}
+
+.guide-role-option:hover img {
+  filter: saturate(1);
+  transform: translateY(-3px);
+}
+
+.guide-role-option[aria-pressed='true'] {
+  border-color: var(--guide-navy);
+  color: var(--guide-navy);
+}
+
+.guide-role-option__name {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 3rem;
+  padding-top: 0.6rem;
+  font-size: clamp(0.82rem, 1vw, 1rem);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.guide-role-option__name svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: 0 0 1.1rem;
+}
+
+.guide-role-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(2rem, 6vw, 7rem);
+  align-items: start;
+  margin-top: clamp(3rem, 6vw, 5.5rem);
+}
+
+.guide-role-summary h3 {
+  max-width: 14ch;
+  font-size: clamp(2.1rem, 4.2vw, 4.5rem);
+}
+
+.guide-role-summary__tagline {
+  max-width: 33rem;
+  margin: 1.1rem 0 0;
+  color: #304d5e;
+  font-size: clamp(1rem, 1.4vw, 1.25rem);
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.guide-role-summary__detail > p {
+  max-width: 54rem;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.guide-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-top: 1.45rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 3px solid var(--guide-navy);
+  color: var(--guide-navy);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.guide-features {
+  background: var(--guide-lime);
+  color: var(--guide-navy);
+}
+
+.guide-feature-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: clamp(2rem, 6vw, 7rem);
+  row-gap: clamp(1.7rem, 3.2vw, 3rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guide-feature-list li {
+  display: grid;
+  grid-template-columns: 1.6rem minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: start;
+}
+
+.guide-feature-list svg {
+  width: 1.4rem;
+  height: 1.4rem;
+  margin-top: 0.2rem;
+}
+
+.guide-feature-list h3 {
+  margin: 0;
+  font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+  line-height: 1.3;
+  letter-spacing: -0.025em;
+}
+
+.guide-feature-list p {
+  max-width: 42rem;
+  margin: 0.55rem 0 0;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.guide-workflow {
+  background: var(--guide-navy);
+  color: #fff;
+}
+
+.guide-workflow .guide-section-heading > p {
+  color: #e8eff4;
+}
+
+.guide-workflow-list {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(1.3rem, 3vw, 3rem);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guide-workflow-list::before {
+  position: absolute;
+  top: 1.35rem;
+  right: 9%;
+  left: 4%;
+  height: 4px;
+  background: var(--guide-lime);
+  content: '';
+}
+
+.guide-workflow-list li {
+  position: relative;
+  z-index: 1;
+}
+
+.guide-workflow-list__number {
+  display: grid;
+  width: 2.8rem;
+  height: 2.8rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--guide-lime);
+  color: var(--guide-navy);
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.guide-workflow-list h3 {
+  max-width: 19rem;
+  margin: 1.45rem 0 0;
+  font-size: clamp(1.1rem, 1.55vw, 1.45rem);
+  line-height: 1.35;
+}
+
+.guide-workflow-list p {
+  max-width: 24rem;
+  margin: 0.7rem 0 0;
+  color: #edf2f5;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.guide-agreements {
+  background: var(--guide-paper);
+}
+
+.guide-agreements__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: clamp(3rem, 8vw, 9rem);
+  align-items: start;
+}
+
+.guide-agreements__icon {
+  width: 2rem;
+  height: 2rem;
+  margin-bottom: 1.5rem;
+  color: var(--guide-navy);
+}
+
+.guide-agreements h2 {
+  max-width: 11ch;
+  font-size: clamp(2.25rem, 4vw, 4.2rem);
+}
+
+.guide-agreements__intro {
+  max-width: 41rem;
+  margin: 1.2rem 0 1.7rem;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.guide-agreement-list {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.guide-agreement-list li {
+  position: relative;
+  padding-left: 1.4rem;
+  font-size: 0.98rem;
+  line-height: 1.65;
+}
+
+.guide-agreement-list li::before {
+  position: absolute;
+  top: 0.62rem;
+  left: 0;
+  width: 0.55rem;
+  height: 0.55rem;
+  background: var(--guide-navy);
+  content: '';
+}
+
+.guide-faq h2 {
+  margin-bottom: 1.6rem;
+}
+
+.guide-faq details {
+  margin-top: 0.65rem;
+  padding: 1.15rem 1.3rem;
+  background: var(--guide-sand);
+  color: var(--guide-navy);
+}
+
+.guide-faq details[open] {
+  background: var(--guide-lime);
+}
+
+.guide-faq summary {
+  position: relative;
+  padding-right: 2rem;
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.45;
+  cursor: pointer;
+  list-style: none;
+}
+
+.guide-faq summary::-webkit-details-marker {
+  display: none;
+}
+
+.guide-faq summary::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  content: '+';
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.guide-faq details[open] summary::after {
+  content: '−';
+}
+
+.guide-faq details p {
+  max-width: 52ch;
+  margin: 0.8rem 0 0;
+  font-size: 0.96rem;
+  line-height: 1.65;
+}
+
+.guide-cta {
+  display: flex;
+  min-height: 390px;
+  align-items: center;
+  background: var(--guide-lime);
+  color: var(--guide-navy);
+}
+
+.guide-cta__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  column-gap: 3rem;
+  row-gap: 1.5rem;
+}
+
+.guide-cta h2 {
+  grid-column: 1 / -1;
+  font-size: clamp(3rem, 7vw, 7rem);
+}
+
+.guide-cta p {
+  max-width: 36rem;
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.guide-action--navy {
+  background: var(--guide-navy);
+  color: #fff;
+}
+
+.guide-action--navy:hover {
+  background: #193b59;
+}
+
+.guide-action:focus-visible,
+.guide-role-option:focus-visible,
+.guide-text-link:focus-visible,
+.guide-faq summary:focus-visible {
+  outline: 3px solid currentColor;
+  outline-offset: 4px;
+}
+
+@media (max-width: 1100px) {
+  .guide-role-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: 1.5rem;
+  }
+
+  .guide-hero__layout {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .guide-hero__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .guide-hero__copy h1 {
+    font-size: clamp(3.25rem, 8vw, 5.5rem);
+  }
+}
+
+@media (max-width: 760px) {
+  .guide-chapter {
+    padding-block: 4.5rem;
+  }
+
+  .guide-hero {
+    min-height: auto;
+  }
+
+  .guide-hero__layout,
+  .guide-role-summary,
+  .guide-agreements__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .guide-hero__layout {
+    gap: 2.4rem;
+  }
+
+  .guide-hero__copy h1 {
+    font-size: clamp(2.9rem, 11vw, 4.5rem);
+  }
+
+  .guide-hero__scene {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    align-items: flex-end;
+    margin-inline: -0.2rem;
+    padding-bottom: 0.7rem;
+  }
+
+  .guide-hero__photo {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1.42 / 1;
+    object-position: center 46%;
+  }
+
+  .guide-register-card {
+    position: relative;
+    right: auto;
+    bottom: auto;
+    width: min(94%, 420px);
+    margin-top: -2.25rem;
+    transform: rotateY(-7deg) rotateX(2deg) rotateZ(-0.5deg);
+  }
+
+  .guide-hero__caption {
+    position: relative;
+    align-self: flex-start;
+    margin-top: 0.8rem;
+    font-size: 0.8rem;
+  }
+
+  .guide-section-heading {
+    display: block;
+  }
+
+  .guide-section-heading > p {
+    margin-top: 1rem;
+  }
+
+  .guide-role-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 0.7rem;
+  }
+
+  .guide-role-option__name {
+    min-height: 2.6rem;
+    font-size: 0.86rem;
+  }
+
+  .guide-role-summary {
+    gap: 1.4rem;
+    margin-top: 2.8rem;
+  }
+
+  .guide-feature-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .guide-workflow-list {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.8rem;
+    padding-left: 0.2rem;
+  }
+
+  .guide-workflow-list::before {
+    top: 1.4rem;
+    bottom: 1.7rem;
+    left: 1.35rem;
+    width: 4px;
+    height: auto;
+  }
+
+  .guide-workflow-list li {
+    display: grid;
+    grid-template-columns: 2.8rem minmax(0, 1fr);
+    column-gap: 1rem;
+  }
+
+  .guide-workflow-list__number {
+    grid-row: span 2;
+  }
+
+  .guide-workflow-list h3 {
+    margin: 0.1rem 0 0;
+  }
+
+  .guide-workflow-list p {
+    grid-column: 2;
+  }
+
+  .guide-agreements__layout {
+    gap: 3.5rem;
+  }
+
+  .guide-cta {
+    min-height: 0;
+  }
+
+  .guide-cta__layout {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+
+  .guide-cta h2 {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .guide-hero__scene {
+    min-height: 0;
+  }
+
+  .guide-register-card {
+    width: 96%;
+  }
+
+  .guide-register-card__head {
+    align-items: start;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .guide-agreements h2 {
+    font-size: 2.4rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guide-page *,
+  .guide-page *::before,
+  .guide-page *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,0 +1,89 @@
+import { Link } from 'react-router-dom';
+import { ShieldCheck, X, LogIn, UserPlus, CheckCircle2 } from 'lucide-react';
+
+interface Props {
+  isOpen: boolean;
+  message?: string;
+  onClose: () => void;
+}
+
+export default function AuthPromptModal({ isOpen, message, onClose }: Props) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fadeIn font-sans">
+      <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col relative">
+        {/* Top Accent Gradient */}
+        <div className="h-2 bg-gradient-to-r from-[#172D46] via-[#456B39] to-[#5E7628]" />
+
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full transition cursor-pointer"
+        >
+          <X className="w-5 h-5" />
+        </button>
+
+        <div className="p-7 text-center">
+          {/* Official Event Yuk Brand Logo */}
+          <div className="w-16 h-16 rounded-2xl bg-slate-50 flex items-center justify-center mx-auto mb-4 border border-slate-200/90 shadow-xs p-2">
+            <img
+              src="/logo-event-yuk.png"
+              alt="Event Yuk Logo"
+              className="w-full h-full object-contain"
+            />
+          </div>
+
+          <h3 className="text-xl font-black text-slate-900 tracking-tight">
+            Yuk, Masuk atau Gabung Dulu!
+          </h3>
+
+          <p className="text-xs sm:text-sm text-slate-600 mt-2 leading-relaxed">
+            {message ||
+              'Untuk mengajukan penawaran, mengunci kaveling booth, atau menandatangani PKS resmi, yuk masuk ke akunmu atau daftar gratis dalam sekejap.'}
+          </p>
+
+          {/* Reassuring Value Points */}
+          <div className="mt-5 p-3.5 bg-slate-50/80 rounded-2xl border border-slate-200/80 text-left space-y-2 text-xs text-slate-700">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>DP & transaksi selalu aman di Rekening Bersama Escrow</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-sky-600 shrink-0" />
+              <span>Kesepakatan sah berkekuatan hukum lewat PKS digital</span>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="mt-6 space-y-2.5">
+            <Link
+              to="/login"
+              onClick={onClose}
+              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#172D46] to-[#0F263B] hover:from-[#0F263B] hover:to-[#0B1F31] text-white font-bold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2"
+            >
+              <LogIn className="w-4 h-4 text-[#5E7628]" />
+              <span>Masuk Sekarang</span>
+            </Link>
+
+            <Link
+              to="/register"
+              onClick={onClose}
+              className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#456B39] to-[#5E7628] hover:from-[#2F5232] hover:to-[#3F531D] text-white font-bold text-xs sm:text-sm shadow-md shadow-[#456B39]/25 transition flex items-center justify-center gap-2"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>Buat Akun Baru (Daftar Cepat & Gratis)</span>
+            </Link>
+
+            <button
+              onClick={onClose}
+              className="w-full py-2 text-xs font-semibold text-slate-400 hover:text-slate-600 transition"
+            >
+              Nanti Saja, Mau Lihat-Lihat Dulu
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
