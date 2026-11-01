@@ -15,7 +15,8 @@ import {
 import { mockPartners, PartnerItem } from '../data/mockPartners';
 import { PartnerCardsSkeletonList } from '../components/skeletons/PartnerCardSkeleton';
 import { SEOHead } from '../components/SEOHead';
-import { cachedFetch } from '../utils/apiCache';
+import { api, query } from '../lib/api';
+import useDebounced from '../hooks/useDebounced';
 import Avatar from '../components/Avatar';
 
 interface Props {
@@ -24,7 +25,7 @@ interface Props {
 
 export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }: Props) {
   const [vendors, setVendors] = useState<PartnerItem[]>(() =>
-    mockPartners.filter((p) => p.type === 'VENDOR')
+    import.meta.env.DEV ? mockPartners.filter((p) => p.type === 'VENDOR') : []
   );
   const [loading, setLoading] = useState<boolean>(false);
   const pageRef = useRef<HTMLDivElement>(null);
@@ -33,26 +34,24 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedCity, setSelectedCity] = useState<string>('ALL');
 
+  const debouncedSearch = useDebounced(searchTerm.trim(), 300);
+  const cityFilter = selectedCity === 'ALL' ? undefined : selectedCity;
+
+  // Search runs on the server. Without a running server, development builds fall back to the bundled samples.
   useEffect(() => {
+    const controller = new AbortController();
     setLoading(true);
-    cachedFetch('/api/v1/users/partners?type=VENDOR')
-      .then((resData: any) => {
-        if (resData.success && Array.isArray(resData.data) && resData.data.length > 0) {
-          setVendors(resData.data);
-        }
+    api('/partners' + query({ type: 'VENDOR', q: debouncedSearch, city: cityFilter }), { anonymous: true, signal: controller.signal })
+      .then((resData) => setVendors(resData.data || []))
+      .catch((err) => {
+        if (err?.name !== 'AbortError' && !import.meta.env.DEV) setVendors([]);
       })
-      .catch(() => {})
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, [debouncedSearch, cityFilter]);
 
   const filtered = vendors.filter((v) => {
-    const matchesSearch =
-      v.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      v.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      v.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      v.categoryLabel.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = true;
     const matchesCat =
       selectedCategory === 'ALL' ||
       v.categoryLabel.toLowerCase().includes(selectedCategory.toLowerCase());

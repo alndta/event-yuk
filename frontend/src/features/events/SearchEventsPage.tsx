@@ -6,7 +6,9 @@ import EventCardPortfolio from '../../components/events/EventCardPortfolio';
 import { EventCardsSkeletonList } from '../../components/skeletons/EventCardSkeleton';
 import { SEOHead } from '../../components/SEOHead';
 import { useLanguage } from '../../context/LanguageContext';
-import { cachedFetch } from '../../utils/apiCache';
+import { api, query } from '../../lib/api';
+import useDebounced from '../../hooks/useDebounced';
+import { mapBackendEvent } from '../../utils/mapEvent';
 import useGsapReveal from '../../hooks/useGsapReveal';
 
 interface Props {
@@ -34,68 +36,31 @@ export default function SearchEventsPage({
 
   useGsapReveal(pageRef);
 
+  const debouncedSearch = useDebounced(searchTerm.trim(), 300);
+
+  // Searching and filtering happen on the server; the page only shows what comes back.
   useEffect(() => {
-    if (propEvents && propEvents.length > 0) {
-      setEventsList(propEvents);
-      setLoading(false);
-      return;
-    }
-
+    const controller = new AbortController();
     setLoading(true);
-    cachedFetch('/api/v1/events')
-      .then((response: any) => {
-        if (response?.success && Array.isArray(response.data) && response.data.length > 0) {
-          const mapped: EventItem[] = response.data.map((event: any) => ({
-            id: event.id,
-            title: event.title,
-            category: event.event_category,
-            venue: event.venue_name,
-            date: event.start_date,
-            organizer: {
-              name: event.organizer?.full_name || 'Nusantara Live Kreasi',
-              avatar: event.organizer?.avatar_url || '/assets/crew-production.jpg',
-              verified: event.organizer?.kyc_status === 'VERIFIED',
-              city: event.organizer?.city || 'Jakarta',
-            },
-            description: event.description || '',
-            bannerImage: event.banner_image || '/assets/hero-concert.jpg',
-            isPortfolio: Boolean(event.is_portfolio || event.status === 'COMPLETED'),
-            progress: event.is_portfolio
-              ? undefined
-              : {
-                  stage: t('eventSearch.productionStage'),
-                  vendorFilled: 35,
-                  boothFilled: (event.tenant_booths || []).filter((booth: any) => !booth.is_occupied).length,
-                  crewNeeded:
-                    (event.crew_shifts || []).reduce(
-                      (total: number, shift: any) => total + (shift.headcount_req || 1),
-                      0
-                    ) || 0,
-                },
-          }));
-          setEventsList(mapped);
-        }
+    api(
+      '/events' +
+        query({
+          q: debouncedSearch,
+          category: selectedCategory === 'ALL' ? undefined : selectedCategory,
+          type: selectedStatus === 'LIVE' ? 'live' : selectedStatus === 'PORTFOLIO' ? 'portfolio' : undefined,
+        }),
+      { anonymous: true, signal: controller.signal }
+    )
+      .then((res) => setEventsList((res.data || []).map(mapBackendEvent)))
+      .catch((err) => {
+        if (err?.name === 'AbortError') return;
+        setEventsList(import.meta.env.DEV && propEvents ? propEvents : []);
       })
-      .catch(() => {})
-      .finally(() => {
-        setLoading(false);
-      });
-  }, [propEvents, t]);
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, [debouncedSearch, selectedCategory, selectedStatus, propEvents]);
 
-  const normalizedSearch = searchTerm.trim().toLocaleLowerCase();
-  const filteredEvents = eventsList.filter((event) => {
-    const matchesSearch =
-      !normalizedSearch ||
-      [event.title, event.venue, event.organizer.name, event.organizer.city].some((value) =>
-        value.toLocaleLowerCase().includes(normalizedSearch)
-      );
-    const matchesCategory = selectedCategory === 'ALL' || event.category === selectedCategory;
-    const matchesStatus =
-      selectedStatus === 'ALL' ||
-      (selectedStatus === 'LIVE' && !event.isPortfolio) ||
-      (selectedStatus === 'PORTFOLIO' && event.isPortfolio);
-    return matchesSearch && matchesCategory && matchesStatus;
-  });
+  const filteredEvents = eventsList;
 
   const clearFilters = () => {
     setSearchTerm('');

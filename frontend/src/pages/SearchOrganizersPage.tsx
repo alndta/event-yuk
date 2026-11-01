@@ -14,7 +14,8 @@ import {
 import { mockOrganizers, OrganizerItem } from '../data/mockOrganizers';
 import { PartnerCardsSkeletonList } from '../components/skeletons/PartnerCardSkeleton';
 import { SEOHead } from '../components/SEOHead';
-import { cachedFetch } from '../utils/apiCache';
+import { api, query } from '../lib/api';
+import useDebounced from '../hooks/useDebounced';
 import Avatar from '../components/Avatar';
 
 interface Props {
@@ -22,7 +23,7 @@ interface Props {
 }
 
 export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrganizer }: Props) {
-  const [organizers, setOrganizers] = useState<OrganizerItem[]>(mockOrganizers);
+  const [organizers, setOrganizers] = useState<OrganizerItem[]>(import.meta.env.DEV ? mockOrganizers : []);
   const [loading, setLoading] = useState<boolean>(false);
   const pageRef = useRef<HTMLDivElement>(null);
   useGsapReveal(pageRef, '[data-gsap-reveal]', [loading]);
@@ -30,42 +31,40 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedCity, setSelectedCity] = useState<string>('ALL');
 
+  const debouncedSearch = useDebounced(searchTerm.trim(), 300);
+  const cityFilter = selectedCity === 'ALL' ? undefined : selectedCity;
+
+  // Search runs on the server. Without a running server, development builds fall back to the bundled samples.
   useEffect(() => {
+    const controller = new AbortController();
     setLoading(true);
-    cachedFetch('/api/v1/users/partners?type=EO')
-      .then((resData: any) => {
-        if (resData.success && Array.isArray(resData.data) && resData.data.length > 0) {
-          const mapped: OrganizerItem[] = resData.data.map((eo: any) => ({
-            id: eo.id,
-            name: eo.name,
-            category: 'CONCERT' as const,
-            city: eo.city || 'Jakarta Selatan',
-            avatar: eo.avatar || '/assets/crowd-festival.jpg',
-            bannerImage: '/assets/hero-concert.jpg',
-            rating: eo.rating || 4.9,
-            totalEventsCompleted: eo.completedGigs || 28,
-            totalAttendeesServed: '320.000+',
-            verified: true,
-            specialties: eo.specsOrRiders || ['Festival Musik Terbuka', 'Konser Internasional'],
-            description: eo.description || 'Penyelenggara acara resmi terdaftar di ekosistem Event Yuk.',
-            contactEmail: 'organizer@eventyuk.id',
-            phone: '+62 811-2233-4455',
-            pastHighlightEvents: ['Soundfest Archipelago 2027', 'Jakarta Creative Gathering'],
-          }));
-          setOrganizers(mapped);
-        }
+    api('/partners' + query({ type: 'EO', q: debouncedSearch, city: cityFilter }), { anonymous: true, signal: controller.signal })
+      .then((resData) => setOrganizers((resData.data || []).map((eo: any): OrganizerItem => ({
+          id: eo.id,
+          name: eo.name,
+          category: 'CONCERT',
+          city: eo.city || '',
+          avatar: eo.avatar || '/assets/crowd-festival.jpg',
+          bannerImage: '/assets/hero-concert.jpg',
+          rating: eo.rating || 0,
+          totalEventsCompleted: eo.completedGigs || 0,
+          totalAttendeesServed: '',
+          verified: Boolean(eo.verified),
+          specialties: [],
+          description: eo.description || '',
+          contactEmail: '',
+          phone: '',
+          pastHighlightEvents: [],
+        }))))
+      .catch((err) => {
+        if (err?.name !== 'AbortError' && !import.meta.env.DEV) setOrganizers([]);
       })
-      .catch(() => {})
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, [debouncedSearch, cityFilter]);
 
   const filtered = organizers.filter((eo) => {
-    const matchesSearch =
-      eo.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      eo.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      eo.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = true;
     const matchesCat = selectedCategory === 'ALL' || eo.category === selectedCategory;
     const matchesCity = selectedCity === 'ALL' || eo.city.toLowerCase().includes(selectedCity.toLowerCase());
     return matchesSearch && matchesCat && matchesCity;

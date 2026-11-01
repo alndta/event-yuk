@@ -1,5 +1,7 @@
 export interface EventItem {
   id: string;
+  /** Account id of the organizer; needed to address a proposal to them. */
+  organizerId?: string;
   title: string;
   category: 'CONCERT' | 'PENSI' | 'EXPO' | 'BAZAAR';
   organizer: {

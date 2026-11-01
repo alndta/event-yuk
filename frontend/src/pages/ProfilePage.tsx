@@ -6,13 +6,13 @@ import {
   CreditCard,
   CheckCircle2,
   AlertCircle,
-  UploadCloud,
   ArrowRight,
   Wallet,
   Clock,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { SEOHead } from '../components/SEOHead';
+import { api, ApiError } from '../lib/api';
 
 export default function ProfilePage() {
   const { user } = useAuth();
@@ -23,135 +23,100 @@ export default function ProfilePage() {
   const [successToast, setSuccessToast] = useState<string | null>(null);
 
   const [profileData, setFormData] = useState({
-    fullName: user?.fullName || 'Nusantara Live Kreasi',
-    email: user?.email || 'eo@eventyuk.id',
-    phoneWa: user?.phoneWa || '081234567890',
-    businessName: 'PT Nusantara Live Kreasi Indonesia',
-    cityRegion: 'Jakarta Selatan',
-    kycStatus: (user?.kycStatus || 'VERIFIED') as 'UNVERIFIED' | 'PENDING' | 'VERIFIED',
-    idCardNumber: '3174092801900002',
-    bankName: 'BCA (Bank Central Asia)',
-    accountNumber: '5420199281',
-    accountHolder: user?.fullName || 'Nusantara Live Kreasi',
+    fullName: user?.fullName || '',
+    email: user?.email || '',
+    phoneWa: user?.phoneWa || '',
+    businessName: user?.businessName || '',
+    cityRegion: user?.cityRegion || '',
+    kycStatus: (user?.kycStatus || 'UNVERIFIED') as 'UNVERIFIED' | 'PENDING' | 'VERIFIED',
+    idCardNumber: '',
+    bankName: 'BCA',
+    accountNumber: '',
+    accountHolder: user?.fullName || '',
   });
+  const [kycRejectReason, setKycRejectReason] = useState<string | null>(null);
 
-  const [wallet, setWallet] = useState({
-    escrowLocked: 280000000,
-    availableBal: 42500000,
-    currency: 'IDR',
-  });
+  const [wallet, setWallet] = useState({ escrowLocked: 0, availableBal: 0, currency: 'IDR' });
 
   useEffect(() => {
-    const currentUserId = user?.id || 'a0000000-0000-0000-0000-000000000001';
+    if (!user) return;
 
-    // 1. Fetch live user profile from backend
-    fetch('/api/v1/users/me', {
-      headers: { 'x-user-id': currentUserId },
-    })
-      .then((res) => res.json())
+    api('/users/me')
       .then((data) => {
-        if (data.success && data.user) {
-          const u = data.user;
-          const profiles = u.user_profiles_roles || [];
-          const activeRoleProfile =
-            profiles.find((p: any) => p.role_type === (user?.activeRole || 'EO')) || profiles[0] || {};
-          const bank = activeRoleProfile.bank_account || {};
-
-          setFormData((prev) => ({
-            ...prev,
-            fullName: u.full_name || prev.fullName,
-            email: u.email || prev.email,
-            phoneWa: u.phone_wa || prev.phoneWa,
-            kycStatus: u.kyc_status || prev.kycStatus,
-            businessName: activeRoleProfile.business_name || prev.businessName,
-            cityRegion: activeRoleProfile.city_region || prev.cityRegion,
-            bankName: bank.bank_name || prev.bankName,
-            accountNumber: bank.account_number || prev.accountNumber,
-            accountHolder: bank.account_holder || u.full_name || prev.accountHolder,
-          }));
-        }
+        const u = data.user;
+        const bank = u.bank_account || {};
+        setFormData((prev) => ({
+          ...prev,
+          fullName: u.full_name || prev.fullName,
+          email: u.email || prev.email,
+          phoneWa: u.phone_wa || '',
+          kycStatus: u.kyc_status || prev.kycStatus,
+          businessName: u.business_name || '',
+          cityRegion: u.city_region || '',
+          bankName: bank.bank_code || prev.bankName,
+          accountNumber: bank.account_number || '',
+          accountHolder: bank.account_holder || u.full_name || prev.accountHolder,
+        }));
       })
       .catch(() => {});
 
-    // 2. Fetch live wallet from backend
-    fetch('/api/v1/users/wallet', {
-      headers: { 'x-user-id': currentUserId },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && data.wallet) {
-          setWallet({
-            escrowLocked: Number(data.wallet.escrow_locked) || 0,
-            availableBal: Number(data.wallet.available_bal) || 0,
-            currency: data.wallet.currency || 'IDR',
-          });
-        }
-      })
+    api('/users/kyc')
+      .then((data) => setKycRejectReason(data.kyc?.reject_reason || null))
+      .catch(() => {});
+
+    api('/payments/wallet')
+      .then((data) =>
+        setWallet({
+          escrowLocked: Number(data.wallet.escrow_locked) || 0,
+          availableBal: Number(data.wallet.available_bal) || 0,
+          currency: data.wallet.currency || 'IDR',
+        })
+      )
       .catch(() => {});
   }, [user]);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    const currentUserId = user?.id || 'a0000000-0000-0000-0000-000000000001';
-    const currentRole = user?.activeRole || 'EO';
-
     try {
-      await fetch('/api/v1/users/profile', {
+      await api('/users/profile', {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-id': currentUserId,
-          'x-user-role': currentRole,
-        },
-        body: JSON.stringify({
+        body: {
           full_name: profileData.fullName,
-          phone_wa: profileData.phoneWa,
-          business_name: profileData.businessName,
-          city_region: profileData.cityRegion,
-        }),
+          phone_wa: profileData.phoneWa || undefined,
+          business_name: profileData.businessName || undefined,
+          city_region: profileData.cityRegion || undefined,
+        },
       });
-      setSuccessToast('Profil identitas berhasil disimpan ke database.');
-    } catch (err) {
       setSuccessToast('Profil berhasil disimpan.');
+    } catch (err) {
+      setSuccessToast(err instanceof ApiError ? err.message : 'Profil belum tersimpan.');
     } finally {
       setLoading(false);
-      setTimeout(() => setSuccessToast(null), 3000);
+      setTimeout(() => setSuccessToast(null), 3500);
     }
   };
 
+  // Submitting only asks for review. An administrator makes the decision; the account cannot verify itself.
   const handleSaveKyc = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    const currentUserId = user?.id || 'a0000000-0000-0000-0000-000000000001';
-    const currentRole = user?.activeRole || 'EO';
-
     try {
-      await fetch('/api/v1/users/profile', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-user-id': currentUserId,
-          'x-user-role': currentRole,
+      await api('/users/kyc', {
+        method: 'POST',
+        body: {
+          nik: profileData.idCardNumber,
+          bank_account: { bank_code: profileData.bankName, account_number: profileData.accountNumber, account_holder: profileData.accountHolder },
         },
-        body: JSON.stringify({
-          kyc_status: 'VERIFIED',
-          bank_account: {
-            bank_name: profileData.bankName,
-            account_number: profileData.accountNumber,
-            account_holder: profileData.accountHolder,
-          },
-        }),
       });
-      setFormData({ ...profileData, kycStatus: 'VERIFIED' });
-      setSuccessToast('Dokumen e-KYC dan rekening bank sudah diverifikasi dan disimpan.');
+      setFormData({ ...profileData, idCardNumber: '', kycStatus: 'PENDING' });
+      setKycRejectReason(null);
+      setSuccessToast('Pengajuan terkirim. Tim kami akan memeriksanya.');
     } catch (err) {
-      setSuccessToast('e-KYC tersimpan.');
+      setSuccessToast(err instanceof ApiError ? err.message : 'Pengajuan belum terkirim.');
     } finally {
       setLoading(false);
-      setTimeout(() => setSuccessToast(null), 3000);
+      setTimeout(() => setSuccessToast(null), 4500);
     }
   };
 
@@ -190,7 +155,7 @@ export default function ProfilePage() {
           ) : (
             <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-900 rounded-full text-sm font-semibold">
               <AlertCircle aria-hidden="true" className="w-4 h-4" />
-              <span>Verifikasi identitas tertunda</span>
+              <span>{profileData.kycStatus === 'PENDING' ? 'Sedang diperiksa' : 'Belum terverifikasi'}</span>
             </span>
           )}
         </div>
@@ -317,14 +282,29 @@ export default function ProfilePage() {
             <h3 className="font-extrabold text-slate-900 text-lg">Verifikasi e-KYC dan rekening penarikan</h3>
           </div>
           <p className="text-sm text-slate-500 mb-6">
-            Sesuai regulasi FR-AUTH-03, identitas KTP/NPWP dan rekening bank wajib terverifikasi sebelum dapat mencairkan dana dari Escrow.
+            Identitas dan rekening bank harus terverifikasi sebelum kamu bisa menerima dana dari Escrow.
           </p>
 
+          {profileData.kycStatus === 'VERIFIED' && (
+            <p role="status" className="rounded-lg bg-brand-forest-light px-4 py-3 text-sm font-semibold text-brand-forest-dark">Identitas dan rekeningmu sudah terverifikasi.</p>
+          )}
+          {profileData.kycStatus === 'PENDING' && (
+            <p role="status" className="rounded-lg bg-amber-100 px-4 py-3 text-sm font-semibold text-amber-900">Pengajuanmu sedang diperiksa. Biasanya selesai dalam beberapa hari kerja.</p>
+          )}
+          {kycRejectReason && profileData.kycStatus === 'UNVERIFIED' && (
+            <p role="alert" className="rounded-lg bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-800">Pengajuan sebelumnya ditolak: {kycRejectReason}. Perbaiki lalu kirim lagi.</p>
+          )}
+
+          {profileData.kycStatus === 'UNVERIFIED' && (
           <form onSubmit={handleSaveKyc} className="space-y-4 text-sm">
             <div>
               <label className="block text-sm font-semibold text-slate-800 mb-2">Nomor Induk Kependudukan (NIK atau KTP)</label>
               <input
                 type="text"
+                inputMode="numeric"
+                pattern="[0-9]{16}"
+                maxLength={16}
+                title="NIK terdiri dari 16 angka"
                 required
                 value={profileData.idCardNumber}
                 onChange={(e) => setFormData({ ...profileData, idCardNumber: e.target.value })}
@@ -332,14 +312,9 @@ export default function ProfilePage() {
               />
             </div>
 
-            <div className="border border-dashed border-slate-300 rounded-lg p-5 text-center bg-slate-50">
-              <UploadCloud className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-              <div className="font-bold text-slate-800 text-sm">Unggah foto KTP atau NPWP asli</div>
-              <div className="text-sm text-slate-400 mt-0.5">Format JPG atau PNG, maksimal 5 MB. Dokumen disimpan terenkripsi.</div>
-              <div className="mt-3 inline-block px-3 py-1 bg-white border border-slate-200 rounded-lg tabular-nums text-sm text-slate-600">
-                ktp_nusantara_live_kreasi.jpg (Terverifikasi)
-              </div>
-            </div>
+            <p className="rounded-lg bg-brand-sand px-4 py-3 text-sm text-slate-700">
+              NIK kamu hanya dipakai untuk pemeriksaan dan tidak disimpan dalam bentuk aslinya. Unggah foto KTP akan ditambahkan di tahap berikutnya.
+            </p>
 
             <div className="pt-2 border-t border-slate-100">
               <h4 className="font-bold text-slate-900 text-sm mb-3 flex items-center gap-1.5">
@@ -356,7 +331,7 @@ export default function ProfilePage() {
                     className="min-h-12 w-full px-4 rounded-lg border border-slate-300 bg-white text-base text-slate-900 focus:border-brand-navy focus:ring-2 focus:ring-brand-navy/30 focus:outline-none bg-white"
                   >
                     <option value="BCA">BCA (Bank Central Asia)</option>
-                    <option value="Mandiri">Bank Mandiri</option>
+                    <option value="MANDIRI">Bank Mandiri</option>
                     <option value="BRI">BRI (Bank Rakyat Indonesia)</option>
                     <option value="BNI">BNI (Bank Negara Indonesia)</option>
                     <option value="BSI">BSI (Bank Syariah Indonesia)</option>
@@ -393,10 +368,11 @@ export default function ProfilePage() {
                 className="min-h-12 px-7 rounded-full bg-brand-navy hover:bg-brand-navy-dark text-white font-semibold transition-colors flex items-center gap-2"
               >
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Simpan dan verifikasi e-KYC</span>
+                <span>Kirim untuk diperiksa</span>
               </button>
             </div>
           </form>
+          )}
         </div>
       )}
 

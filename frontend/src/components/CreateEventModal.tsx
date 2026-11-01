@@ -14,23 +14,22 @@ import {
   Layers,
   CheckCircle2,
 } from 'lucide-react';
-import { EventItem } from '../data/mockEvents';
-import { useAuth } from '../context/AuthContext';
+import { api, ApiError } from '../lib/api';
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  onSuccess: (newEvent: EventItem) => void;
+  onSuccess: () => void;
 }
 
 function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
   const dialogRef = useDialog(onClose);
-  const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     category: 'CONCERT' as 'CONCERT' | 'PENSI' | 'EXPO' | 'BAZAAR',
     venue: '',
-    date: '',
+    startDate: '',
+    endDate: '',
     budget: '',
     description: '',
     bannerImage: '',
@@ -42,77 +41,40 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
   });
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
-    let savedDbItem: any = null;
-
+    setError(null);
     try {
-      const payload = {
-        organizer_id: user?.id || 'a0000000-0000-0000-0000-000000000001',
-        title: formData.title,
-        event_category: formData.category,
-        venue_name: formData.venue || 'Venue Terpilih',
-        start_date: formData.date.split('-')[0].trim() || '2027-08-15',
-        end_date: formData.date.split('-')[1]?.trim() || formData.date.trim() || '2027-08-16',
-        total_budget: parseInt(formData.budget.replace(/\D/g, '')) || 350000000,
-        description: formData.description || 'Proyek acara baru sedang dalam tahap pengadaan vendor dan pendaftaran tenant.',
-        banner_image:
-          formData.bannerImage ||
-          '/assets/hero-concert.jpg',
-        allow_vendor_proposals: formData.allowVendorProposals,
-        allow_talent_proposals: formData.allowTalentProposals,
-        allow_tenant_registrations: formData.allowTenantRegistrations,
-        allow_crew_applications: formData.allowCrewApplications,
-        is_invite_only: formData.isInviteOnly,
-      };
-
-      const res = await fetch('/api/v1/events', {
+      await api('/events', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: {
+          title: formData.title,
+          event_category: formData.category,
+          venue_name: formData.venue,
+          start_date: formData.startDate,
+          end_date: formData.endDate,
+          total_budget: parseInt(formData.budget.replace(/\D/g, '')) || 0,
+          description: formData.description,
+          banner_image: formData.bannerImage || undefined,
+          allow_vendor_proposals: formData.allowVendorProposals,
+          allow_talent_proposals: formData.allowTalentProposals,
+          allow_tenant_registrations: formData.allowTenantRegistrations,
+          allow_crew_applications: formData.allowCrewApplications,
+          is_invite_only: formData.isInviteOnly,
+        },
       });
-
-      const resData = await res.json();
-      if (res.ok && resData.data) {
-        savedDbItem = resData.data;
-      }
+      onSuccess();
+      onClose();
     } catch (err) {
-      console.warn('API error, falling back locally:', err);
+      setError(err instanceof ApiError ? err.message : 'Acara belum bisa disimpan.');
+    } finally {
+      setLoading(false);
     }
-
-    const created: EventItem = {
-      id: savedDbItem?.id || ('live-' + Date.now()),
-      title: formData.title,
-      category: formData.category,
-      organizer: {
-        name: user?.fullName || 'Nusantara Live Kreasi',
-        avatar: '/assets/crew-production.jpg',
-        verified: true,
-        city: 'Indonesia',
-      },
-      venue: formData.venue || 'Venue Terpilih',
-      date: formData.date || 'Tahun 2027',
-      description: formData.description || 'Proyek acara baru sedang dalam tahap pengadaan vendor dan pendaftaran tenant.',
-      bannerImage:
-        formData.bannerImage ||
-        '/assets/hero-concert.jpg',
-      isPortfolio: false,
-      progress: {
-        stage: 'Tahap 1: Pembukaan Pengajuan Mitra',
-        vendorFilled: 20,
-        boothFilled: 0,
-        crewNeeded: 15,
-      },
-    };
-
-    onSuccess(created);
-    setLoading(false);
-    onClose();
   };
 
   return (
@@ -141,6 +103,10 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 text-sm">
+          {error && (
+            <p role="alert" className="rounded-lg bg-rose-50 px-3.5 py-2.5 text-sm font-semibold text-rose-800">{error}</p>
+          )}
+
           <div>
             <label className="block font-semibold text-slate-700 mb-1">Judul acara</label>
             <input
@@ -199,14 +165,25 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1">
                 <Calendar className="w-3.5 h-3.5 text-slate-400" /> Tanggal Pelaksanaan
               </label>
-              <input
-                type="text"
-                required
-                placeholder="Misal: 20 - 21 Agustus 2027"
-                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
-                value={formData.date}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-              />
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  type="date"
+                  required
+                  aria-label="Tanggal mulai"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                  value={formData.startDate}
+                  onChange={(e) => setFormData({ ...formData, startDate: e.target.value, endDate: formData.endDate && formData.endDate < e.target.value ? e.target.value : formData.endDate })}
+                />
+                <input
+                  type="date"
+                  required
+                  aria-label="Tanggal selesai"
+                  min={formData.startDate}
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                  value={formData.endDate}
+                  onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
+                />
+              </div>
             </div>
           </div>
 

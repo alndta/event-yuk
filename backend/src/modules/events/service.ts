@@ -1,3 +1,4 @@
+import { matchesQuery } from '../../shared/search';
 import { badRequest, conflict, forbidden, notFound } from '../../shared/errors';
 import type { IdentityApi } from '../identity';
 import type { EventDetail, EventRecord, EventRepository } from './ports';
@@ -103,13 +104,22 @@ export class EventsService {
     });
   }
 
-  async list(filter: { type?: 'portfolio' | 'live'; category?: EventRecord['category'] }) {
+  async list(filter: { type?: 'portfolio' | 'live'; category?: EventRecord['category']; q?: string; city?: string }) {
     const rows = await this.repo.list({
       portfolio: filter.type === undefined ? undefined : filter.type === 'portfolio',
       category: filter.category,
     });
     // Draft and cancelled projects are not listed publicly.
-    return this.present(rows.filter((r) => r.event.status === 'PUBLISHED' || r.event.status === 'ONGOING' || r.event.status === 'COMPLETED'));
+    const visible = rows.filter((r) => r.event.status === 'PUBLISHED' || r.event.status === 'ONGOING' || r.event.status === 'COMPLETED');
+    const organizers = new Map((await this.identity.listPublicProfiles('EO')).map((p) => [p.userId, p]));
+    const found = visible.filter((r) => {
+      const org = organizers.get(r.event.organizerId);
+      return (
+        matchesQuery(filter.q, [r.event.title, r.event.venueName, r.event.category, org?.name]) &&
+        matchesQuery(filter.city, [r.event.venueName, org?.cityRegion])
+      );
+    });
+    return this.present(found);
   }
 
   async get(id: string) {

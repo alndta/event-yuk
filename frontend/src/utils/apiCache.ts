@@ -3,6 +3,8 @@
  * Provides memory caching with Stale-While-Revalidate pattern and automatic invalidation.
  */
 
+import { authHeaders } from '../lib/api';
+
 interface CacheItem<T> {
   data: T;
   timestamp: number;
@@ -19,9 +21,11 @@ const memoryStore = new Map<string, CacheItem<any>>();
  */
 export async function cachedFetch<T = any>(
   url: string,
-  options?: RequestInit,
+  baseOptions?: RequestInit,
   ttlMs = 45000
 ): Promise<T> {
+  // Signed-in visitors send their token, so the same URL is cached separately for them.
+  const options: RequestInit = { ...baseOptions, headers: { ...authHeaders(), ...(baseOptions?.headers as Record<string, string>) } };
   // Only cache GET requests
   const method = (options?.method || 'GET').toUpperCase();
   if (method !== 'GET') {

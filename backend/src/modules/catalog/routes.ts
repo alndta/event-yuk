@@ -15,7 +15,7 @@ export function createCatalogRouter(service: CatalogService, guards: AuthGuards,
     cache.middleware(60),
     validate({ query: listPartnersQuery }),
     asyncHandler(async (req, res) => {
-      const data = await service.listPartners((req.query as { type?: never }).type);
+      const data = await service.listPartners(req.query as { type?: never; q?: string; city?: string });
       res.json({ success: true, count: data.length, data });
     })
   );

@@ -1,3 +1,4 @@
+import { api, ApiError } from '../lib/api';
 import React, { useState, useEffect, useRef } from 'react';
 import useEnter from '../hooks/useEnter';
 import { Link, useNavigate } from 'react-router-dom';
@@ -149,29 +150,13 @@ export default function RegisterPage() {
     }
 
     try {
-      const res = await fetch('/api/v1/auth/send-otp', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ identifier: formData.email, type: 'EMAIL' }),
-      });
-      const data = await res.json();
-
-      if (data.success) {
-        setStep('OTP');
-        setOtpCountdown(60);
-        setSuccessMessage(`Kode verifikasi OTP 6-digit telah dikirim ke ${formData.email}`);
-        if (data.otp_preview) {
-          setPreviewOtp(data.otp_preview);
-        }
-      } else {
-        setErrorMessage(data.error || 'Gagal mengirim kode OTP.');
-      }
-    } catch {
-      // Local fallback for offline mode
+      const data = await api('/auth/send-otp', { method: 'POST', anonymous: true, body: { email: formData.email } });
       setStep('OTP');
       setOtpCountdown(60);
-      setPreviewOtp('829104');
-      setSuccessMessage(`Kode OTP telah dikirimkan ke ${formData.email}`);
+      setSuccessMessage(`Kode verifikasi 6 angka sudah dikirim ke ${formData.email}`);
+      if (data.otp_preview) setPreviewOtp(data.otp_preview);
+    } catch (err) {
+      setErrorMessage(err instanceof ApiError ? err.message : 'Gagal mengirim kode.');
     } finally {
       setLoading(false);
     }
@@ -183,36 +168,23 @@ export default function RegisterPage() {
     setErrorMessage(null);
 
     try {
-      const res = await fetch('/api/v1/auth/verify-otp-register', {
+      await api('/auth/verify-otp-register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        anonymous: true,
+        body: {
           full_name: formData.fullName,
           email: formData.email,
-          phone_wa: formData.phoneWa,
+          phone_wa: formData.phoneWa || undefined,
           password: formData.password,
           initial_role: formData.primaryRole,
           otp_code: otpCode,
-        }),
+        },
       });
-      const data = await res.json();
-
-      if (data.success) {
-        setSuccessMessage('Pendaftaran berhasil. Membuka dashboard...');
-        await login(formData.email, formData.password);
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 800);
-      } else {
-        setErrorMessage(data.error || 'Kode OTP tidak cocok atau telah kedaluwarsa.');
-      }
-    } catch {
-      // Offline fallback
       setSuccessMessage('Pendaftaran berhasil. Membuka dashboard...');
       await login(formData.email, formData.password);
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 800);
+      setTimeout(() => navigate('/dashboard'), 800);
+    } catch (err) {
+      setErrorMessage(err instanceof ApiError ? err.message : 'Kode tidak cocok atau sudah kedaluwarsa.');
     } finally {
       setLoading(false);
     }

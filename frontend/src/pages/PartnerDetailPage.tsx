@@ -44,7 +44,7 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
     if (!id) return;
 
     setLoading(true);
-    cachedFetch(`/api/v1/users/partners/${id}`)
+    cachedFetch(`/api/v1/partners/${id}`)
       .then((resData: any) => {
         if (resData.success && resData.data) {
           setPartner(resData.data);
@@ -69,8 +69,7 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
         priceRange: partner.priceRange || 'Sesuai Kesepakatan',
         specsOrRiders: partner.specsOrRiders || [],
         description: partner.description || '',
-        completedGigs: partner.completedGigs || 45,
-        experienceYears: partner.experienceYears || 6,
+        completedGigs: partner.completedGigs || 0,
       });
     }, `Ingin mengajak ${partner.name} berkolaborasi? Masuk akun dulu agar pengajuan resmi langsung terkirim.`);
   };
@@ -94,11 +93,15 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
           addressLocality: partner.city || 'Jakarta',
           addressCountry: 'ID',
         },
-        aggregateRating: {
+        ...(partner.rating && partner.completedGigs
+          ? {
+              aggregateRating: {
           '@type': 'AggregateRating',
-          ratingValue: partner.rating || '4.9',
-          reviewCount: partner.completedGigs || '45',
-        },
+          ratingValue: partner.rating,
+          reviewCount: partner.completedGigs,
+              },
+            }
+          : {}),
       }
     : undefined;
 

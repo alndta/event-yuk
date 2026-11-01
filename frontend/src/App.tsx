@@ -1,9 +1,10 @@
+import { api, ApiError } from './lib/api';
+import { mapBackendEvent } from './utils/mapEvent';
 import { Suspense, lazy, useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { CheckCircle2 } from 'lucide-react';
 import { initialEvents, EventItem } from './data/mockEvents';
 import { PartnerItem } from './data/mockPartners';
-import { initialContracts, CollaborationContract } from './components/ContractListTab';
 
 // Auth Context & Protected Route
 import { AuthProvider, useAuth } from './context/AuthContext';
@@ -23,7 +24,6 @@ import { UserRole } from './components/RoleOnboardingModal';
 import CreateEventModal from './components/CreateEventModal';
 import UploadPortfolioModal from './components/UploadPortfolioModal';
 import ProposalModal from './components/ProposalModal';
-import ContractModal from './components/ContractModal';
 
 // Pages: the home page ships with the app, everything else loads when its route opens.
 import { HomePage } from './features/home';
@@ -83,60 +83,18 @@ function AppContent() {
     closeAuthPrompt,
   } = useAuth();
 
-  const [events, setEvents] = useState<EventItem[]>(initialEvents);
-  const [contracts, setContracts] = useState<CollaborationContract[]>(initialContracts);
+  const [events, setEvents] = useState<EventItem[]>(import.meta.env.DEV ? initialEvents : []);
   const currentRole: UserRole = user?.activeRole || 'EO';
 
   // Helper: Map Supabase database event to frontend EventItem
-  const mapBackendEvent = (ev: any): EventItem => ({
-    id: ev.id,
-    title: ev.title,
-    category: ev.event_category || 'CONCERT',
-    organizer: {
-      name: ev.organizer?.full_name || 'Nusantara Live Kreasi',
-      avatar: '/assets/crew-production.jpg',
-      verified: ev.organizer?.kyc_status === 'VERIFIED',
-      city: 'Jakarta Selatan',
-    },
-    venue: ev.venue_name || 'Plaza Barat Senayan, GBK',
-    date: ev.start_date
-      ? new Date(ev.start_date).toLocaleDateString('id-ID', {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric',
-        })
-      : 'TBA',
-    description: ev.description || '',
-    bannerImage: ev.banner_image || '/assets/hero-concert.jpg',
-    isPortfolio: Boolean(ev.is_portfolio),
-    progress: ev.is_portfolio
-      ? undefined
-      : {
-          stage: 'Tahap 2: Pengadaan Vendor & Tenant',
-          vendorFilled: Math.min(100, Math.max(35, (ev.vendor_bookings?.length || 1) * 25)),
-          boothFilled: ev.tenant_booths?.length || 16,
-          crewNeeded: ev.crew_shifts?.length || 12,
-        },
-    stats: ev.is_portfolio
-      ? {
-          attendees: `${(ev.attendee_count || 15000).toLocaleString('id-ID')} Pengunjung`,
-          budget: `Rp ${(ev.total_budget || 450000000).toLocaleString('id-ID')}`,
-          rating: 4.95,
-          aftermovieUrl: ev.aftermovie_url,
-        }
-      : undefined,
-  });
-
+  // Real data from the backend. The bundled sample events appear only in local development
+  // when the server is not running, so a production visitor never sees invented events.
   const fetchLiveEvents = () => {
-    fetch('/api/v1/events')
-      .then((res) => res.json())
-      .then((resData) => {
-        if (resData.success && Array.isArray(resData.data) && resData.data.length > 0) {
-          const mapped = resData.data.map(mapBackendEvent);
-          setEvents(mapped);
-        }
-      })
-      .catch(() => {});
+    api('/events', { anonymous: true })
+      .then((res) => setEvents((res.data || []).map(mapBackendEvent)))
+      .catch(() => {
+        if (!import.meta.env.DEV) setEvents([]);
+      });
   };
 
   useEffect(() => {
@@ -153,8 +111,6 @@ function AppContent() {
   const [proposalTargetPartner, setProposalTargetPartner] = useState<PartnerItem | null>(null);
   const [proposalMode, setProposalMode] = useState<'PARTNER_TO_EO' | 'EO_TO_PARTNER'>('PARTNER_TO_EO');
 
-  const [isContractModalOpen, setIsContractModalOpen] = useState(false);
-  const [activeContract, setActiveContract] = useState<any>(null);
 
   // Toast notification
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -211,70 +167,9 @@ function AppContent() {
     navigate(`/events/${ev.id}`);
   };
 
-  const handleProposalSubmitted = (proposalData: any) => {
-    const contractNo = `PKS/EY/${new Date().getFullYear()}/${Date.now().toString().slice(-6)}`;
-    const newContract: CollaborationContract = {
-      id: proposalData?.id || 'cnt-' + Date.now(),
-      contractNumber: contractNo,
-      partyOne: 'Nusantara Live Kreasi (EO)',
-      partyTwo: proposalTargetPartner
-        ? proposalTargetPartner.name
-        : proposalTargetEvent
-        ? `${proposalData.proposal_type} Mitra Terpilih`
-        : 'Mitra Produksi',
-      roleType: proposalData.proposal_type || 'VENDOR',
-      eventTitle: proposalTargetEvent ? proposalTargetEvent.title : 'Soundfest Archipelago 2027',
-      totalAmount: proposalData.deal_price || proposalData.offered_price || 0,
-      dpPercentage: proposalData.dp_percentage || 50,
-      scopeOfWork: proposalData.scope_of_work || 'Pengadaan teknis & penampilan panggung acara.',
-      date: new Date().toLocaleDateString('id-ID'),
-      status: 'CONTRACT_SIGNED',
-      attachedFileName: proposalData.attached_file_name || null,
-      attachedFileSize: proposalData.attached_file_size || null,
-      contractDocumentUrl: proposalData.contract_document_url || null,
-    };
-
-    setContracts([newContract, ...contracts]);
-    setActiveContract({
-      id: newContract.id,
-      contractNumber: newContract.contractNumber,
-      partyOne: newContract.partyOne,
-      partyTwo: newContract.partyTwo,
-      roleType: newContract.roleType,
-      eventTitle: newContract.eventTitle,
-      totalAmount: newContract.totalAmount,
-      dpPercentage: newContract.dpPercentage,
-      scopeOfWork: newContract.scopeOfWork,
-      date: newContract.date,
-      attachedFileName: newContract.attachedFileName,
-      attachedFileSize: newContract.attachedFileSize,
-      contractDocumentUrl: newContract.contractDocumentUrl,
-    });
-
-    setIsContractModalOpen(true);
-    showToast('Penawaran diterima. Draf Surat Perjanjian Kerjasama (PKS) digital siap ditandatangani.');
-  };
-
-  const handleSignContractAndFund = async () => {
-    if (activeContract?.id) {
-      try {
-        await fetch(`/api/v1/proposals/${activeContract.id}/fund-escrow`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ payer_id: user?.id }),
-        });
-      } catch {}
-    }
-
-    if (activeContract) {
-      setContracts((prev) =>
-        prev.map((c) =>
-          c.contractNumber === activeContract.contractNumber ? { ...c, status: 'ESCROW_FUNDED' } : c
-        )
-      );
-    }
-    setIsContractModalOpen(false);
-    showToast('PKS Digital disetujui. Dana DP berhasil diamankan di Rekening Bersama Escrow Midtrans.');
+  const handleProposalSubmitted = () => {
+    showToast('Penawaran terkirim. Pantau jawabannya di halaman Kontrak.');
+    navigate('/contracts');
   };
 
   return (
@@ -385,22 +280,21 @@ function AppContent() {
                 events={events}
                 onApplySponsorship={(event, tier, budget) => {
                   requireAuth(() => {
-                    fetch('/api/v1/proposals', {
+                    api('/proposals', {
                       method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({
+                      body: {
                         event_id: event.id,
-                        sender_id: user?.id,
-                        receiver_id: 'a0000000-0000-0000-0000-000000000001',
+                        receiver_id: event.organizerId,
                         proposal_type: 'SPONSOR',
                         direction: 'PARTNER_TO_EO',
-                        title: `Proposal Sponsorship ${tier} - ${event.title}`,
-                        offered_price: Number(budget) || 150000000,
+                        title: `Proposal sponsorship ${tier} - ${event.title}`,
+                        offered_price: Number(budget),
                         dp_percentage: 50,
-                        scope_of_work: `Kemitraan Sponsorship Paket ${tier} untuk ${event.title}.`,
-                      }),
-                    }).catch(() => {});
-                    showToast(`Proposal sponsorship paket ${tier} diajukan ke ${event.title} senilai Rp ${Number(budget).toLocaleString('id-ID')}`);
+                        scope_of_work: `Kemitraan sponsorship paket ${tier} untuk ${event.title}.`,
+                      },
+                    })
+                      .then(() => showToast(`Proposal sponsorship paket ${tier} terkirim ke ${event.title}.`))
+                      .catch((err) => showToast(err instanceof ApiError ? err.message : 'Proposal belum terkirim.'));
                   }, `Tertarik menjadi mitra brand di ${event.title}? Yuk masuk dulu untuk mengajukan paket sponsorship resmi.`);
                 }}
               />
@@ -485,22 +379,20 @@ function AppContent() {
       <CreateEventModal
         isOpen={isCreateEventModalOpen}
         onClose={() => setIsCreateEventModalOpen(false)}
-        onSuccess={(newEvent) => {
+        onSuccess={() => {
           fetchLiveEvents();
-          setEvents((prev) => [newEvent, ...prev]);
           setIsCreateEventModalOpen(false);
-          showToast(`Proyek acara baru "${newEvent.title}" berhasil dipublikasikan.`);
+          showToast("Proyek acara baru berhasil dipublikasikan.");
         }}
       />
 
       <UploadPortfolioModal
         isOpen={isUploadPortfolioModalOpen}
         onClose={() => setIsUploadPortfolioModalOpen(false)}
-        onSuccess={(newPortfolio) => {
+        onSuccess={() => {
           fetchLiveEvents();
-          setEvents((prev) => [newPortfolio, ...prev]);
           setIsUploadPortfolioModalOpen(false);
-          showToast(`Katalog rekam jejak "${newPortfolio.title}" berhasil ditambahkan ke portofolio.`);
+          showToast("Rekam jejak berhasil ditambahkan ke portofolio.");
         }}
       />
 
@@ -509,18 +401,11 @@ function AppContent() {
         event={proposalTargetEvent}
         partner={proposalTargetPartner}
         mode={proposalMode}
+        myEvents={events.filter((ev) => !ev.isPortfolio && ev.organizerId === user?.id)}
         onClose={() => setIsProposalModalOpen(false)}
         onSuccess={handleProposalSubmitted}
       />
 
-      {activeContract && (
-        <ContractModal
-          isOpen={isContractModalOpen}
-          contractData={activeContract}
-          onClose={() => setIsContractModalOpen(false)}
-          onSignAndFund={handleSignContractAndFund}
-        />
-      )}
     </div>
   );
 }

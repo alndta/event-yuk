@@ -15,7 +15,8 @@ import {
 import { mockPartners, PartnerItem } from '../data/mockPartners';
 import { PartnerCardsSkeletonList } from '../components/skeletons/PartnerCardSkeleton';
 import { SEOHead } from '../components/SEOHead';
-import { cachedFetch } from '../utils/apiCache';
+import { api, query } from '../lib/api';
+import useDebounced from '../hooks/useDebounced';
 import Avatar from '../components/Avatar';
 
 interface Props {
@@ -24,7 +25,7 @@ interface Props {
 
 export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: Props) {
   const [bands, setBands] = useState<PartnerItem[]>(() =>
-    mockPartners.filter((p) => p.type === 'TALENT')
+    import.meta.env.DEV ? mockPartners.filter((p) => p.type === 'TALENT') : []
   );
   const [loading, setLoading] = useState<boolean>(false);
   const pageRef = useRef<HTMLDivElement>(null);
@@ -33,26 +34,24 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
   const [selectedGenre, setSelectedGenre] = useState<string>('ALL');
   const [selectedCity, setSelectedCity] = useState<string>('ALL');
 
+  const debouncedSearch = useDebounced(searchTerm.trim(), 300);
+  const cityFilter = selectedCity === 'ALL' ? undefined : selectedCity;
+
+  // Search runs on the server. Without a running server, development builds fall back to the bundled samples.
   useEffect(() => {
+    const controller = new AbortController();
     setLoading(true);
-    cachedFetch('/api/v1/users/partners?type=TALENT')
-      .then((resData: any) => {
-        if (resData.success && Array.isArray(resData.data) && resData.data.length > 0) {
-          setBands(resData.data);
-        }
+    api('/partners' + query({ type: 'TALENT', q: debouncedSearch, city: cityFilter }), { anonymous: true, signal: controller.signal })
+      .then((resData) => setBands(resData.data || []))
+      .catch((err) => {
+        if (err?.name !== 'AbortError' && !import.meta.env.DEV) setBands([]);
       })
-      .catch(() => {})
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+      .finally(() => setLoading(false));
+    return () => controller.abort();
+  }, [debouncedSearch, cityFilter]);
 
   const filtered = bands.filter((b) => {
-    const matchesSearch =
-      b.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      b.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      b.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (b.genreOrCategory && b.genreOrCategory.toLowerCase().includes(searchTerm.toLowerCase()));
+    const matchesSearch = true;
     const matchesGenre =
       selectedGenre === 'ALL' || (b.genreOrCategory && b.genreOrCategory.toLowerCase().includes(selectedGenre.toLowerCase()));
     const matchesCity =

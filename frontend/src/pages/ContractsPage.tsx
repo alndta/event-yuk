@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import ContractModal from '../components/ContractModal';
 import { useAuth } from '../context/AuthContext';
+import { api, ApiError } from '../lib/api';
 import { SEOHead } from '../components/SEOHead';
 
 export interface ContractProposalItem {
@@ -33,6 +34,8 @@ export interface ContractProposalItem {
   counterDpPercentage?: number;
   counterNotes?: string;
   lastUpdatedBy?: string;
+  /** True when the other party acted last, so this user may counter or accept. */
+  myTurn?: boolean;
   attachedFileName?: string | null;
   attachedFileSize?: string | null;
   contractDocumentUrl?: string | null;
@@ -110,7 +113,7 @@ interface Props {
 
 export default function ContractsPage({ onShowToast }: Props) {
   const { user } = useAuth();
-  const [proposals, setProposals] = useState<ContractProposalItem[]>(initialProposalsData);
+  const [proposals, setProposals] = useState<ContractProposalItem[]>(import.meta.env.DEV ? initialProposalsData : []);
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -124,41 +127,41 @@ export default function ContractsPage({ onShowToast }: Props) {
   const [counterDp, setCounterDp] = useState<number>(50);
   const [counterNotes, setCounterNotes] = useState<string>('');
 
+  const [loadError, setLoadError] = useState<string | null>(null);
+
   const fetchLiveProposals = () => {
-    fetch('/api/v1/proposals')
-      .then((res) => res.json())
+    api('/proposals')
       .then((resData) => {
-        if (resData.success && Array.isArray(resData.data) && resData.data.length > 0) {
-          const mapped: ContractProposalItem[] = resData.data.map((p: any) => ({
-            id: p.id,
-            contractNumber:
-              p.contract_pks_number ||
-              `PKS/EY/${new Date(p.created_at).getFullYear()}/${p.id.slice(0, 6).toUpperCase()}`,
-            partyOne: p.sender?.full_name || 'Nusantara Live Kreasi (EO)',
-            partyTwo: p.receiver?.full_name || `${p.proposal_type} Mitra`,
-            roleType: p.proposal_type || 'VENDOR',
-            eventTitle: p.event?.title || p.title || 'Soundfest Archipelago 2027',
-            totalAmount: Number(p.deal_price || p.offered_price || 0),
-            dpPercentage: Number(p.dp_percentage || 50),
-            scopeOfWork: p.scope_of_work || 'Pengadaan teknis & penampilan panggung acara.',
-            date: new Date(p.created_at).toLocaleDateString('id-ID', {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric',
-            }),
-            status: p.status || 'SUBMITTED',
-            counterAmount: p.counter_price ? Number(p.counter_price) : undefined,
-            counterDpPercentage: p.counter_dp_percentage ? Number(p.counter_dp_percentage) : undefined,
-            counterNotes: p.counter_notes || undefined,
-            lastUpdatedBy: p.last_action_by ? 'Mitra Terverifikasi' : undefined,
-            attachedFileName: p.attached_file_name || null,
-            attachedFileSize: p.attached_file_size || null,
-            contractDocumentUrl: p.contract_document_url || null,
-          }));
-          setProposals(mapped);
-        }
+        const myId = user?.id;
+        const mapped: ContractProposalItem[] = (resData.data || []).map((p: any) => ({
+          id: p.id,
+          contractNumber: p.contract_pks_number || `PKS/EY/${new Date(p.created_at).getFullYear()}/${p.id.slice(0, 6).toUpperCase()}`,
+          partyOne: p.sender?.full_name || 'Pengirim',
+          partyTwo: p.receiver?.full_name || 'Penerima',
+          roleType: p.proposal_type,
+          eventTitle: p.event?.title || p.title,
+          totalAmount: Number(p.deal_price || p.offered_price || 0),
+          dpPercentage: Number(p.dp_percentage || 50),
+          scopeOfWork: p.scope_of_work || '',
+          date: new Date(p.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
+          status: p.status,
+          counterAmount: p.counter_price ? Number(p.counter_price) : undefined,
+          counterDpPercentage: p.counter_dp_percentage ? Number(p.counter_dp_percentage) : undefined,
+          counterNotes: p.counter_notes || undefined,
+          lastUpdatedBy: p.last_action_by === myId ? 'Kamu' : 'Pihak lain',
+          // Only the party who did not act last can counter or accept.
+          myTurn: p.last_action_by !== myId,
+          attachedFileName: p.attached_file_name || null,
+          attachedFileSize: p.attached_file_size || null,
+          contractDocumentUrl: p.contract_document_url || null,
+        }));
+        setProposals(mapped);
+        setLoadError(null);
       })
-      .catch(() => {});
+      .catch((err) => {
+        if (!import.meta.env.DEV) setProposals([]);
+        setLoadError(err instanceof ApiError ? err.message : 'Daftar kontrak belum bisa dimuat.');
+      });
   };
 
   useEffect(() => {
@@ -183,145 +186,47 @@ export default function ContractsPage({ onShowToast }: Props) {
     setCounterNotes(item.counterNotes || '');
   };
 
+  const run = async (action: () => Promise<unknown>, success: string) => {
+    try {
+      await action();
+      fetchLiveProposals();
+      onShowToast?.(success);
+      return true;
+    } catch (err) {
+      onShowToast?.(err instanceof ApiError ? err.message : 'Aksi belum berhasil. Coba lagi.');
+      return false;
+    }
+  };
+
   const handleSubmitCounter = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!counterTarget) return;
-
-    try {
-      await fetch(`/api/v1/proposals/${counterTarget.id}/counter`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          counter_price: counterPrice,
-          counter_dp_percentage: counterDp,
-          counter_notes: counterNotes,
-          user_id: user?.id,
-        }),
-      });
-    } catch {}
-
-    setProposals((prev) =>
-      prev.map((p) => {
-        if (p.id === counterTarget.id) {
-          return {
-            ...p,
-            status: 'COUNTER_OFFER',
-            counterAmount: counterPrice,
-            counterDpPercentage: counterDp,
-            counterNotes: counterNotes,
-            lastUpdatedBy: 'Kamu (Pengajuan Perubahan)',
-          };
-        }
-        return p;
-      })
+    const ok = await run(
+      () => api(`/proposals/${counterTarget.id}/counter`, { method: 'POST', body: { counter_price: counterPrice, counter_dp_percentage: counterDp, counter_notes: counterNotes || undefined } }),
+      'Penawaran balik terkirim ke mitra.'
     );
-
-    setCounterTarget(null);
-    if (onShowToast) {
-      onShowToast('Perubahan penawaran (Counter-Offer) berhasil dikirim ke mitra.');
-    }
+    if (ok) setCounterTarget(null);
   };
 
-  const handleApproveProposal = async (item: ContractProposalItem) => {
-    const finalAmount = item.counterAmount || item.totalAmount;
-    const finalDp = item.counterDpPercentage || item.dpPercentage;
+  const handleApproveProposal = (item: ContractProposalItem) =>
+    run(() => api(`/proposals/${item.id}/respond`, { method: 'POST', body: { action: 'ACCEPT' } }), `Kesepakatan disetujui. PKS untuk ${item.eventTitle} diterbitkan.`);
 
-    try {
-      await fetch(`/api/v1/proposals/${item.id}/respond`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'ACCEPT',
-          user_id: user?.id,
-        }),
-      });
-    } catch {}
-
-    setProposals((prev) =>
-      prev.map((p) => {
-        if (p.id === item.id) {
-          return {
-            ...p,
-            status: 'CONTRACT_SIGNED',
-            totalAmount: finalAmount,
-            dpPercentage: finalDp,
-            counterNotes: undefined,
-            lastUpdatedBy: 'Disepakati oleh Kedua Pihak',
-          };
-        }
-        return p;
-      })
-    );
-
-    if (onShowToast) {
-      onShowToast(`Kesepakatan disetujui! Dokumen PKS resmi diterbitkan untuk ${item.eventTitle}.`);
-    }
-  };
-
-  const handleRejectProposal = async (item: ContractProposalItem) => {
-    try {
-      await fetch(`/api/v1/proposals/${item.id}/respond`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'REJECT',
-          user_id: user?.id,
-        }),
-      });
-    } catch {}
-
-    setProposals((prev) =>
-      prev.map((p) => {
-        if (p.id === item.id) {
-          return {
-            ...p,
-            status: 'REJECTED',
-            lastUpdatedBy: 'Ditolak',
-          };
-        }
-        return p;
-      })
-    );
-
-    if (onShowToast) {
-      onShowToast(`Penawaran untuk ${item.partyTwo} ditolak.`);
-    }
-  };
+  const handleRejectProposal = (item: ContractProposalItem) =>
+    run(() => api(`/proposals/${item.id}/respond`, { method: 'POST', body: { action: 'REJECT' } }), `Penawaran untuk ${item.partyTwo} ditolak.`);
 
   const handleOpenPks = (item: ContractProposalItem) => {
     setSelectedForPks(item);
     setIsPksModalOpen(true);
   };
 
+  // Payment happens on Midtrans. The contract turns "funded" only after their confirmation reaches our server.
   const handleSignAndFund = async () => {
     if (!selectedForPks) return;
-
     try {
-      await fetch(`/api/v1/proposals/${selectedForPks.id}/fund-escrow`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          payer_id: user?.id,
-        }),
-      });
-    } catch {}
-
-    setProposals((prev) =>
-      prev.map((p) => {
-        if (p.id === selectedForPks.id) {
-          return {
-            ...p,
-            status: 'ESCROW_FUNDED',
-            lastUpdatedBy: 'Midtrans Escrow Paid',
-          };
-        }
-        return p;
-      })
-    );
-
-    setIsPksModalOpen(false);
-    if (onShowToast) {
-      onShowToast('Pembayaran DP Escrow lewat Midtrans terverifikasi. Dana terkunci di escrow.');
+      const data = await api(`/payments/proposals/${selectedForPks.id}/checkout`, { method: 'POST' });
+      window.location.href = data.redirect_url;
+    } catch (err) {
+      onShowToast?.(err instanceof ApiError ? err.message : 'Pembayaran belum bisa dimulai.');
     }
   };
 
@@ -384,6 +289,12 @@ export default function ContractsPage({ onShowToast }: Props) {
         <p className="mt-4 text-lg leading-8 text-slate-700">
           Ajukan tawaran, sesuaikan harga lewat counter-offer, pilih skema termin (70:30 atau 50:50), lalu kunci dananya di rekening bersama Escrow.
         </p>
+
+        {loadError && (
+          <p role="alert" className="mt-4 rounded-2xl bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-800">
+            {loadError}
+          </p>
+        )}
 
         {/* Search */}
         <div className="mt-5 relative">
@@ -540,21 +451,26 @@ export default function ContractsPage({ onShowToast }: Props) {
                   {/* If in SUBMITTED or COUNTER_OFFER: can Approve, Counter, or Reject */}
                   {(item.status === 'SUBMITTED' || item.status === 'COUNTER_OFFER') && (
                     <>
-                      <button
+                      {item.myTurn === false && (
+                        <p className="w-full rounded-2xl bg-brand-sand px-4 py-3 text-center text-sm font-semibold text-brand-ink">
+                          Menunggu jawaban pihak lain
+                        </p>
+                      )}
+                      {item.myTurn !== false && <button
                         onClick={() => handleApproveProposal(item)}
                         className="w-full min-h-12 px-5 rounded-full text-sm font-semibold bg-brand-navy hover:bg-brand-navy-dark text-white flex items-center justify-center gap-2 transition-colors"
                       >
                         <CheckCircle2 aria-hidden="true" className="w-5 h-5 text-brand-lime" />
                         <span>Setujui kesepakatan</span>
-                      </button>
+                      </button>}
 
-                      <button
+                      {item.myTurn !== false && <button
                         onClick={() => handleOpenCounterModal(item)}
                         className="w-full min-h-12 px-5 rounded-full text-sm font-semibold border-2 border-brand-navy/30 hover:border-brand-navy text-brand-ink flex items-center justify-center gap-2 transition-colors"
                       >
                         <RotateCcw aria-hidden="true" className="w-5 h-5" />
                         <span>Ajukan perubahan (counter)</span>
-                      </button>
+                      </button>}
 
                       <button
                         onClick={() => handleRejectProposal(item)}
