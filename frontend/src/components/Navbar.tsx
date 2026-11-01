@@ -156,7 +156,9 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
         .from(q('[data-menu-chip]'), { y: 28, autoAlpha: 0, duration: 0.8, stagger: 0.06 }, 0.72)
         .from(q('[data-menu-photo]'), { clipPath: 'inset(0% 0% 0% 100%)', duration: 1.2 }, 0.35)
         .from(q('[data-menu-photo] img'), { scale: 1.4, duration: 1.6 }, 0.35)
-        .from(q('[data-menu-account]'), { y: 36, autoAlpha: 0, duration: 0.9 }, 0.82);
+        .from(q('[data-menu-sub]'), { autoAlpha: 0, x: -16, duration: 0.7 }, 0.66)
+        .from(q('[data-menu-account]'), { autoAlpha: 0, duration: 0.6 }, 0.8)
+        .from(q('[data-menu-item]'), { y: 26, autoAlpha: 0, duration: 0.8, stagger: 0.08 }, 0.86);
       tlRef.current = tl;
       return () => {
         tlRef.current = null;
@@ -170,10 +172,10 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
     'inline-flex min-h-11 items-center gap-2 rounded-full px-5 text-base font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 ';
 
   const primary = [
-    { to: '/', label: t('nav.home'), tone: 'bg-brand-cream text-brand-navy hover:bg-white' },
-    { to: '/events', label: t('nav.events'), tone: 'bg-brand-lime text-brand-navy hover:bg-brand-lime-hover' },
-    { to: '/contracts', label: t('nav.contracts'), tone: 'bg-brand-cream text-brand-navy hover:bg-white' },
-    { to: '/panduan-role', label: t('nav.guide'), tone: 'bg-brand-lime text-brand-navy hover:bg-brand-lime-hover' },
+    { to: '/', label: t('nav.home'), tone: 'bg-brand-cream text-brand-navy' },
+    { to: '/events', label: t('nav.events'), tone: 'bg-brand-lime text-brand-navy' },
+    { to: '/contracts', label: t('nav.contracts'), tone: 'bg-brand-cream text-brand-navy' },
+    { to: '/panduan-role', label: t('nav.guide'), tone: 'bg-brand-lime text-brand-navy' },
   ];
   const partners = [
     { to: '/vendors', label: t('nav.vendors') },
@@ -308,7 +310,7 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
                   data-menu-block
                   aria-current={isHere(to) ? 'page' : undefined}
                   className={
-                    'group flex min-h-[4.5rem] items-center justify-between rounded-lg px-6 lg:flex-1 font-display text-[clamp(2rem,4.4vw,3.75rem)] font-extrabold leading-none tracking-[-0.04em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:min-h-[5.5rem] ' +
+                    'relative isolate overflow-hidden before:absolute before:inset-0 before:-z-10 before:translate-y-[101%] before:transition-transform before:duration-[650ms] before:ease-[cubic-bezier(0.16,1,0.3,1)] hover:before:translate-y-0 focus-visible:before:translate-y-0 before:bg-brand-navy hover:text-brand-lime focus-visible:text-brand-lime group flex min-h-[4.5rem] items-center justify-between rounded-lg px-6 lg:flex-1 font-display text-[clamp(2rem,4.4vw,3.75rem)] font-extrabold leading-none tracking-[-0.04em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:min-h-[5.5rem] ' +
                     tone
                   }
                 >
@@ -324,14 +326,14 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
                 </Link>
               ))}
 
-              <p className="mt-4 text-base font-semibold text-slate-300">{t('nav.partners')}</p>
+              <p data-menu-sub className="mt-4 text-base font-semibold text-slate-300">{t('nav.partners')}</p>
               <ul className="grid grid-cols-2 gap-2">
                 {partners.map(({ to, label }) => (
                   <li key={to} data-menu-chip>
                     <Link
                       to={to}
                       aria-current={isHere(to) ? 'page' : undefined}
-                      className="group flex min-h-16 items-center justify-between gap-2 rounded-lg border-2 border-white/25 px-4 font-display text-lg font-bold tracking-[-0.02em] transition-colors hover:border-brand-lime hover:text-brand-lime focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:text-xl"
+                      className="relative isolate overflow-hidden before:absolute before:inset-0 before:-z-10 before:translate-y-[101%] before:transition-transform before:duration-[650ms] before:ease-[cubic-bezier(0.16,1,0.3,1)] hover:before:translate-y-0 focus-visible:before:translate-y-0 before:bg-brand-lime group flex min-h-16 items-center justify-between gap-2 rounded-lg border-2 border-white/25 px-4 font-display text-lg font-bold tracking-[-0.02em] transition-colors hover:border-brand-lime hover:text-brand-navy focus-visible:text-brand-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:text-xl"
                     >
                       <span className="flex items-center gap-2">
                         {label}
@@ -358,13 +360,13 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
             <div data-menu-account className="space-y-3 rounded-lg bg-brand-navy-dark p-5">
               {!isAuthenticated ? (
                 <div className="grid grid-cols-2 gap-3">
-                  <Link
+                  <Link data-menu-item
                     to="/login"
                     className={pill + 'justify-center border-2 border-white/40 text-white hover:border-white focus-visible:outline-white'}
                   >
                     {t('nav.login')}
                   </Link>
-                  <Link
+                  <Link data-menu-item
                     to="/register"
                     className={pill + 'justify-center bg-brand-lime text-brand-navy hover:bg-brand-lime-hover focus-visible:outline-white'}
                   >
@@ -374,7 +376,7 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
               ) : (
                 <>
                   {!user?.activeRole && (
-                    <Link
+                    <Link data-menu-item
                       to="/onboarding-role"
                       className={pill + 'w-full justify-center bg-brand-lime text-brand-navy hover:bg-brand-lime-hover focus-visible:outline-white'}
                     >
@@ -383,7 +385,7 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
                     </Link>
                   )}
                   {user?.activeRole && (
-                    <Link
+                    <Link data-menu-item
                       to="/dashboard"
                       className={pill + 'w-full justify-center bg-brand-lime text-brand-navy hover:bg-brand-lime-hover focus-visible:outline-white'}
                     >
@@ -393,7 +395,7 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
                   )}
                   {user?.activeRole === 'EO' && (
                     <>
-                      <button
+                      <button data-menu-item
                         type="button"
                         onClick={() => {
                           forceClose();
@@ -405,7 +407,7 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
                         {t('nav.createEvent')}
                       </button>
                       {onOpenUploadPortfolio && (
-                        <button
+                        <button data-menu-item
                           type="button"
                           onClick={() => {
                             forceClose();
@@ -419,14 +421,14 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
                     </>
                   )}
                   <div className="grid grid-cols-2 gap-3">
-                    <Link
+                    <Link data-menu-item
                       to="/profile"
                       className={pill + 'justify-center border-2 border-white/40 text-white hover:border-white focus-visible:outline-white'}
                     >
                       <User aria-hidden="true" className="h-5 w-5" />
                       <span className="max-w-[7rem] truncate">{user?.fullName?.split(' ')[0] || 'Profil'}</span>
                     </Link>
-                    <button
+                    <button data-menu-item
                       type="button"
                       onClick={() => {
                         forceClose();
@@ -440,7 +442,7 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
                   </div>
                 </>
               )}
-              <button
+              <button data-menu-item
                 type="button"
                 onClick={toggleLanguage}
                 className={pill + 'w-full justify-center text-slate-200 hover:text-white focus-visible:outline-white'}

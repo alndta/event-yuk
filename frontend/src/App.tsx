@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { CheckCircle2 } from 'lucide-react';
 import { initialEvents, EventItem } from './data/mockEvents';
@@ -10,6 +10,7 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import useSmoothScroll from './hooks/useSmoothScroll';
+import { gsap, ScrollTrigger, NO_REDUCED_MOTION } from './lib/motion';
 import AuthPromptModal from './components/AuthPromptModal';
 import ScrollToTop from './components/ScrollToTop';
 
@@ -43,6 +44,34 @@ import RoleOnboardingPage from './pages/RoleOnboardingPage';
 function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
+  const firstRoute = useRef(true);
+
+  // Each new page settles into place instead of snapping in.
+  useEffect(() => {
+    if (firstRoute.current) {
+      firstRoute.current = false;
+      return;
+    }
+    const el = mainRef.current;
+    if (!el || !window.matchMedia(NO_REDUCED_MOTION).matches) return;
+    const tween = gsap.fromTo(
+      el,
+      { autoAlpha: 0, y: 36 },
+      {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.95,
+        ease: 'ey',
+        clearProps: 'transform,opacity,visibility',
+        onComplete: () => ScrollTrigger.refresh(),
+      }
+    );
+    return () => {
+      tween.kill();
+      gsap.set(el, { clearProps: 'transform,opacity,visibility' });
+    };
+  }, [location.pathname]);
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/onboarding-role';
 
   const {
@@ -267,7 +296,7 @@ function AppContent() {
       )}
 
       {/* Main Routed Content */}
-      <main className={isAuthPage ? 'flex-1 w-full' : 'flex-1 w-full px-5 sm:px-8 lg:px-12 2xl:px-16 py-6 sm:py-8'}>
+      <main ref={mainRef} className={isAuthPage ? 'flex-1 w-full' : 'flex-1 w-full px-5 sm:px-8 lg:px-12 2xl:px-16 py-6 sm:py-8'}>
         <Routes>
           {/* Public Routes (Accessible without login) */}
           <Route
