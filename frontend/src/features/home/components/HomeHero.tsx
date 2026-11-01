@@ -55,25 +55,25 @@ export default function HomeHero({ onOpenCreateEvent }: Props) {
         <svg
           aria-hidden="true"
           viewBox="0 0 800 600"
-          className="absolute -left-32 bottom-0 -z-10 h-[30rem] w-[40rem] text-brand-lime-hover lg:-left-16 lg:h-[40rem] lg:w-[54rem]"
+          className="absolute -left-24 -bottom-8 -z-10 h-[24rem] w-[34rem] text-brand-lime-hover lg:-left-10 lg:h-[30rem] lg:w-[42rem]"
         >
           <path d={BLOB} fill="currentColor" />
         </svg>
 
-        <div className="relative z-10 mx-auto max-w-[96rem] px-5 pt-10 sm:px-8 sm:pt-12 lg:min-h-[44rem] lg:px-12 lg:pb-48 lg:pt-14">
+        <div className="relative z-10 mx-auto max-w-[96rem] px-5 pt-8 sm:px-8 sm:pt-10 lg:min-h-[27rem] lg:px-12 lg:pb-24 lg:pt-10">
           <h1
             id="home-title"
-            className="font-display text-[clamp(3.2rem,10.6vw,10.8rem)] font-extrabold uppercase leading-[0.88] tracking-[-0.04em]"
+            className="font-display text-[clamp(2.9rem,7.4vw,7.25rem)] font-extrabold uppercase leading-[0.9] tracking-[-0.04em]"
           >
             <span className="block">{t('hero.title')}</span>
-            <span className="block text-white [-webkit-text-stroke:clamp(2px,0.3vw,5px)_#172D46] [paint-order:stroke_fill]">
+            <span className="block text-white [-webkit-text-stroke:clamp(2px,0.26vw,4px)_#172D46] [paint-order:stroke_fill]">
               {t('hero.titleHighlight')}
             </span>
           </h1>
 
-          <div className="relative z-30 mt-8 max-w-[34rem] lg:mt-14">
+          <div className="relative z-30 mt-6 max-w-[34rem] lg:mt-9">
             <p className="font-display text-lg font-bold leading-7">{t('hero.desc')}</p>
-            <div className="mt-6 flex flex-wrap items-center gap-3">
+            <div className="mt-5 flex flex-wrap items-center gap-3">
               <button
                 type="button"
                 onClick={onOpenCreateEvent}
@@ -92,37 +92,39 @@ export default function HomeHero({ onOpenCreateEvent }: Props) {
           </div>
         </div>
 
-        <div className="relative z-20 mx-auto -mb-8 mt-4 w-[96%] max-w-[34rem] lg:absolute lg:bottom-0 lg:right-0 lg:mx-0 lg:mb-0 lg:mt-0 lg:w-[min(56vw,54rem)] lg:max-w-none">
-          <img
-            src="/assets/event-organizer-registration-3d.png"
-            alt={t('hero.imageAlt')}
-            width={1448}
-            height={1086}
-            fetchPriority="high"
-            decoding="async"
-            draggable={false}
-            className="block w-full select-none"
-          />
+        <div className="relative z-20 mx-auto mt-8 w-[72%] max-w-[20rem] lg:absolute lg:bottom-0 lg:right-[7%] lg:mx-0 lg:mt-0 lg:w-[min(24vw,23rem)] lg:max-w-none">
+          <div className="aspect-[4/5] overflow-hidden rounded-t-[999px] bg-brand-navy-light">
+            <img
+              src="/assets/crowd-festival.jpg"
+              alt={t('hero.photoAlt')}
+              width={800}
+              height={533}
+              fetchPriority="high"
+              decoding="async"
+              draggable={false}
+              className="h-full w-full select-none object-cover"
+            />
+          </div>
 
-          <div className="absolute left-[3%] top-[30%] w-[24%] max-w-[8.5rem] -rotate-[8deg]">
+          <div className="absolute -left-[16%] top-[22%] w-[34%] max-w-[7.5rem] -rotate-[8deg]">
             <svg aria-hidden="true" viewBox="0 0 100 100" className="block w-full text-brand-navy">
               <polygon points={BURST} fill="currentColor" />
             </svg>
-            <span className="absolute inset-0 flex items-center justify-center px-2 text-center font-display text-[clamp(0.7rem,1.5vw,1.15rem)] font-extrabold uppercase leading-[1.05] text-brand-lime">
+            <span className="absolute inset-0 flex items-center justify-center px-2 text-center font-display text-[clamp(0.65rem,1.2vw,1rem)] font-extrabold uppercase leading-[1.05] text-brand-lime">
               PKS
               <br />
               digital
             </span>
           </div>
 
-          <span className="absolute right-[2%] top-[17%] rotate-[11deg] rounded-md bg-brand-navy px-3 py-1.5 font-display text-[clamp(0.7rem,1.4vw,1.05rem)] font-extrabold uppercase leading-none text-white sm:px-4 sm:py-2">
+          <span className="absolute -right-[14%] top-[10%] rotate-[11deg] rounded-md bg-brand-navy px-3 py-1.5 font-display text-[clamp(0.65rem,1.1vw,0.95rem)] font-extrabold uppercase leading-none text-white sm:px-4 sm:py-2">
             Escrow Midtrans
           </span>
 
           <svg
             aria-hidden="true"
             viewBox="0 0 100 100"
-            className="absolute right-[20%] top-[50%] w-[8%] text-white"
+            className="absolute -right-[6%] bottom-[28%] w-[14%] text-white"
           >
             <path
               d="M50 4 C54 34 66 46 96 50 C66 54 54 66 50 96 C46 66 34 54 4 50 C34 46 46 34 50 4 Z"
@@ -138,20 +140,20 @@ export default function HomeHero({ onOpenCreateEvent }: Props) {
           aria-hidden="true"
           viewBox="0 0 1440 90"
           preserveAspectRatio="none"
-          className="relative z-40 -mb-px block h-12 w-full text-brand-navy sm:h-[4.5rem]"
+          className="relative z-40 -mb-px block h-10 w-full text-brand-navy sm:h-14"
         >
           <path d={SCALLOP} fill="currentColor" />
         </svg>
       </div>
 
-      <div className="bg-brand-navy px-5 pb-14 pt-6 text-white sm:px-8 sm:pb-16 lg:px-12 lg:pb-20 2xl:px-16">
+      <div className="bg-brand-navy px-5 pb-10 pt-3 text-white sm:px-8 sm:pb-12 lg:px-12 lg:pb-14 2xl:px-16">
         <div className="mx-auto max-w-[96rem]">
-          <h2 id="event-journey-title" className="font-display text-3xl font-extrabold tracking-[-0.03em] sm:text-5xl">
+          <h2 id="event-journey-title" className="font-display text-2xl font-extrabold tracking-[-0.03em] sm:text-4xl">
             {t('hero.phase.label')}
           </h2>
           <ol
             aria-labelledby="event-journey-title"
-            className="mt-8 grid grid-cols-2 gap-x-5 gap-y-8 sm:gap-x-8 lg:grid-cols-4 lg:gap-x-10"
+            className="mt-5 grid grid-cols-2 gap-x-5 gap-y-6 sm:gap-x-8 lg:grid-cols-4 lg:gap-x-10"
           >
             {workflowSteps.map(([titleKey, descriptionKey], index) => (
               <li key={titleKey}>
