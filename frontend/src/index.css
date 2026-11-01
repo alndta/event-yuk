@@ -218,3 +218,18 @@
 .dark header[data-on-lime] :is(a, button, span, svg) { color: #172d46; }
 .dark header[data-on-lime] a.bg-brand-navy,
 .dark header[data-on-lime] a.bg-brand-navy span { color: #d7f36a; }
+
+/* Translucent variants of the light surfaces and text colors (e.g. bg-slate-50/80, text-brand-navy/70). */
+.dark [class*="bg-slate-50/"],
+.dark [class*="bg-slate-100/"],
+.dark [class*="bg-brand-cream/"],
+.dark [class*="bg-brand-sand/"],
+.dark [class*="bg-brand-lime-soft/"],
+.dark [class*="bg-brand-forest-light/"] { background-color: var(--d-surface-2); }
+.dark [class*="border-slate-200/"],
+.dark [class*="border-slate-100/"],
+.dark [class*="border-slate-300/"] { border-color: var(--d-line); }
+.dark [class*="text-brand-navy/"],
+.dark [class*="text-brand-ink/"],
+.dark [class*="text-slate-900/"],
+.dark [class*="text-slate-700/"] { color: var(--d-text-2); }

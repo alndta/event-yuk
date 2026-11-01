@@ -83,7 +83,7 @@ function AuthPromptModalInner({ isOpen, message, onClose }: Props) {
               onClick={onClose}
               className="w-full py-2 text-sm font-semibold text-slate-400 hover:text-slate-600 transition"
             >
-              Nanti saja, lihat-lihat dulu
+              {t('auth.promptLater')}
             </button>
           </div>
         </div>

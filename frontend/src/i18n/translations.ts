@@ -318,6 +318,7 @@ export const translations = {
     "dash.deleted": "dihapus dari katalog.",
     "dash.deleteFail": "Item belum terhapus.",
     "dash.confirmDelete": "Yakin mau menghapus item ini dari katalogmu?",
+    "auth.promptLater": "Nanti saja, lihat-lihat dulu",
   },
   en: {
     // Navigation
@@ -636,6 +637,7 @@ export const translations = {
     "dash.deleted": "removed from your catalog.",
     "dash.deleteFail": "Could not delete the item.",
     "dash.confirmDelete": "Remove this item from your catalog?",
+    "auth.promptLater": "Not now, just browsing",
   },
 } as const;
 
