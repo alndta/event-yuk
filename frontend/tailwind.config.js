@@ -6,7 +6,6 @@ export default {
       fontFamily: {
         sans: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         display: ['Plus Jakarta Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        warm: ['"Fraunces Variable"', 'Georgia', 'serif'],
       },
       colors: {
         brand: {

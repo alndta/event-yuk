@@ -63,8 +63,7 @@ export default function HomeHero({ onOpenCreateEvent }: Props) {
         <div className="relative z-10 mx-auto max-w-[96rem] px-5 pt-10 sm:px-8 sm:pt-12 lg:min-h-[44rem] lg:px-12 lg:pb-48 lg:pt-14">
           <h1
             id="home-title"
-            style={{ fontVariationSettings: '"SOFT" 100' }}
-            className="font-warm text-[clamp(3.4rem,11.2vw,11.5rem)] font-black uppercase leading-[0.86] tracking-[-0.02em]"
+            className="font-display text-[clamp(3.2rem,10.6vw,10.8rem)] font-extrabold uppercase leading-[0.88] tracking-[-0.04em]"
           >
             <span className="block">{t('hero.title')}</span>
             <span className="block text-white [-webkit-text-stroke:clamp(2px,0.3vw,5px)_#172D46] [paint-order:stroke_fill]">
@@ -73,7 +72,7 @@ export default function HomeHero({ onOpenCreateEvent }: Props) {
           </h1>
 
           <div className="relative z-30 mt-8 max-w-[34rem] lg:mt-14">
-            <p className="font-warm text-lg font-bold leading-7">{t('hero.desc')}</p>
+            <p className="font-display text-lg font-bold leading-7">{t('hero.desc')}</p>
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <button
                 type="button"
@@ -109,14 +108,14 @@ export default function HomeHero({ onOpenCreateEvent }: Props) {
             <svg aria-hidden="true" viewBox="0 0 100 100" className="block w-full text-brand-navy">
               <polygon points={BURST} fill="currentColor" />
             </svg>
-            <span className="absolute inset-0 flex items-center justify-center px-2 text-center font-warm text-[clamp(0.7rem,1.5vw,1.15rem)] font-black uppercase leading-[1.05] text-brand-lime">
+            <span className="absolute inset-0 flex items-center justify-center px-2 text-center font-display text-[clamp(0.7rem,1.5vw,1.15rem)] font-extrabold uppercase leading-[1.05] text-brand-lime">
               PKS
               <br />
               digital
             </span>
           </div>
 
-          <span className="absolute right-[2%] top-[17%] rotate-[11deg] rounded-md bg-brand-navy px-3 py-1.5 font-warm text-[clamp(0.7rem,1.4vw,1.05rem)] font-black uppercase leading-none text-white sm:px-4 sm:py-2">
+          <span className="absolute right-[2%] top-[17%] rotate-[11deg] rounded-md bg-brand-navy px-3 py-1.5 font-display text-[clamp(0.7rem,1.4vw,1.05rem)] font-extrabold uppercase leading-none text-white sm:px-4 sm:py-2">
             Escrow Midtrans
           </span>
 
@@ -147,7 +146,7 @@ export default function HomeHero({ onOpenCreateEvent }: Props) {
 
       <div className="bg-brand-navy px-5 pb-14 pt-6 text-white sm:px-8 sm:pb-16 lg:px-12 lg:pb-20 2xl:px-16">
         <div className="mx-auto max-w-[96rem]">
-          <h2 id="event-journey-title" className="font-warm text-3xl font-black tracking-[-0.01em] sm:text-5xl">
+          <h2 id="event-journey-title" className="font-display text-3xl font-extrabold tracking-[-0.03em] sm:text-5xl">
             {t('hero.phase.label')}
           </h2>
           <ol
