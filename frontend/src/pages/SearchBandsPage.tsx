@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import useGsapReveal from '../hooks/useGsapReveal';
 import { Link } from 'react-router-dom';
 import {
   Search,
@@ -15,6 +16,7 @@ import { mockPartners, PartnerItem } from '../data/mockPartners';
 import { PartnerCardsSkeletonList } from '../components/skeletons/PartnerCardSkeleton';
 import { SEOHead } from '../components/SEOHead';
 import { cachedFetch } from '../utils/apiCache';
+import Avatar from '../components/Avatar';
 
 interface Props {
   onProposeTalent?: (talent: PartnerItem) => void;
@@ -25,6 +27,8 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
     mockPartners.filter((p) => p.type === 'TALENT')
   );
   const [loading, setLoading] = useState<boolean>(false);
+  const pageRef = useRef<HTMLDivElement>(null);
+  useGsapReveal(pageRef, '[data-gsap-reveal]', [loading]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGenre, setSelectedGenre] = useState<string>('ALL');
   const [selectedCity, setSelectedCity] = useState<string>('ALL');
@@ -57,7 +61,7 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
   });
 
   return (
-    <div className="space-y-6 sm:space-y-8 font-sans">
+    <div ref={pageRef} className="space-y-6 sm:space-y-8 font-sans">
       <SEOHead
         title="Direktori Band, Musisi Panggung & Manajemen Artis | Event Yuk"
         description="Booking band indie, pop, jazz, dan musisi tamu profesional untuk konser dan pensi sekolah. Transparansi rate card honor manggung, kepastian riders teknis & konsumsi, bergaransi rekening bersama Escrow."
@@ -67,26 +71,27 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
 
       {/* Header */}
       <div className="max-w-3xl">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 text-purple-700 text-xs font-bold mb-3 border border-purple-200">
-          <Music className="w-3.5 h-3.5 text-purple-600" />
-          <span>Direktori Manajemen Band, Artis & Musisi Festival</span>
-        </div>
-        <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-          Cari Band & Musisi Tamu (Guest Stars)
+        <p className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-brand-lime-strong">
+          <Music aria-hidden="true" className="h-4 w-4" />
+          Direktori band, artis, dan musisi festival
+        </p>
+        <h1 data-split-title className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
+          Cari band dan musisi tamu
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 mt-1">
-          Jelajahi portofolio band indie, pop, jazz, dan musisi tamu dengan transparansi honor manggung (rate card), review teknis riders, serta kepastian kontrak digital PKS.
+        <p className="mt-4 text-lg leading-8 text-slate-700">
+          Lihat portofolio band indie, pop, jazz, dan musisi tamu lengkap dengan rate card honor, ringkasan technical rider, dan kontrak digital PKS.
         </p>
 
         {/* Search Input */}
         <div className="mt-5 relative">
-          <Search className="w-5 h-5 text-slate-400 absolute left-4 top-3.5" />
+          <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
           <input
-            type="text"
-            placeholder="Ketik nama band, musisi, genre musik, atau kota asal..."
+            type="search"
+            aria-label="Cari band atau musisi"
+            placeholder="Cari nama band, genre, atau kota asal"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-11 sm:pl-12 pr-4 py-3 bg-white rounded-2xl border border-slate-300 shadow-xs text-xs sm:text-sm focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+            className="min-h-14 w-full rounded-full border border-slate-300 bg-white pl-12 pr-5 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
           />
         </div>
       </div>
@@ -95,9 +100,9 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 mb-8">
         {/* Genre Filters */}
         <div className="flex items-center gap-2 overflow-x-auto">
-          <Filter className="w-4 h-4 text-slate-400 mr-1" />
+          <Filter aria-hidden="true" className="mr-1 h-4 w-4 shrink-0 text-slate-600" />
           {[
-            { id: 'ALL', label: 'Semua Genre' },
+            { id: 'ALL', label: 'Semua genre' },
             { id: 'Indie Rock', label: 'Indie Rock' },
             { id: 'Soul & Jazz', label: 'Soul & Jazz' },
             { id: 'Pop Folk', label: 'Pop Folk' },
@@ -106,10 +111,11 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
             <button
               key={cat.id}
               onClick={() => setSelectedGenre(cat.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+              aria-pressed={selectedGenre === cat.id}
+              className={`min-h-11 rounded-full border-2 px-5 text-sm font-semibold transition whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy ${
                 selectedGenre === cat.id
-                  ? 'bg-purple-700 text-white shadow-sm'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
+                  ? 'border-brand-navy bg-brand-navy text-white'
+                  : 'border-brand-navy/25 text-brand-ink hover:border-brand-navy'
               }`}
             >
               {cat.label}
@@ -119,13 +125,14 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
 
         {/* City Filter */}
         <div className="flex items-center gap-2">
-          <MapPin className="w-3.5 h-3.5 text-slate-400" />
+          <MapPin aria-hidden="true" className="h-4 w-4 text-slate-600" />
           <select
+            aria-label="Filter kota"
             value={selectedCity}
             onChange={(e) => setSelectedCity(e.target.value)}
-            className="bg-white border border-slate-300 text-xs font-bold rounded-xl px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#172D46]"
+            className="min-h-11 rounded-full border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
           >
-            <option value="ALL">Semua Kota</option>
+            <option value="ALL">Semua kota</option>
             <option value="Jakarta">Jakarta</option>
             <option value="Bandung">Bandung</option>
             <option value="Yogyakarta">Yogyakarta</option>
@@ -141,91 +148,93 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
         {filtered.map((band) => (
           <div
             key={band.id}
-            className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between"
+            data-gsap-reveal
+            className="ey-lift flex flex-col justify-between overflow-hidden rounded-lg bg-white"
           >
             <div className="p-6">
               {/* Header: Avatar, Name, Genre */}
               <div className="flex items-start gap-4">
-                <img
+                <Avatar
                   src={band.avatar}
-                  alt={band.name}
-                  className="w-16 h-16 rounded-2xl object-cover border border-slate-200 shadow-sm"
+                  name={band.name}
+                  decorative
+                  className="h-16 w-16 rounded-lg"
                 />
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
-                    <span className="px-2.5 py-0.5 rounded-md text-[11px] font-bold bg-purple-100 text-purple-800 border border-purple-200">
+                    <span className="rounded-full bg-brand-lime-soft px-3 py-1 text-xs font-semibold text-brand-navy">
                       {band.genreOrCategory || band.categoryLabel}
                     </span>
-                    <span className="flex items-center gap-1 text-xs font-bold text-slate-700">
-                      <Award className="w-3.5 h-3.5 text-[#5E7628]" />
+                    <span className="flex items-center gap-1 text-sm font-semibold text-slate-800">
+                      <Award aria-hidden="true" className="h-4 w-4 text-brand-forest" />
                       <span>{band.rating} / 5.0</span>
                     </span>
                   </div>
 
-                  <h3 className="text-lg font-black text-slate-900 mt-1 flex items-center gap-1.5">
+                  <h3 className="mt-1 flex items-center gap-1.5 font-display text-xl font-extrabold tracking-[-0.03em] text-brand-ink">
                     <span>{band.name}</span>
-                    <CheckCircle2 className="w-4 h-4 text-sky-500" />
+                    <CheckCircle2 aria-label="Terverifikasi" className="h-5 w-5 text-brand-forest" />
                   </h3>
-                  <div className="flex items-center gap-2 text-xs text-slate-500 mt-0.5">
-                    <MapPin className="w-3.5 h-3.5 text-[#456B39]" />
+                  <div className="mt-0.5 flex items-center gap-2 text-sm text-slate-600">
+                    <MapPin aria-hidden="true" className="h-4 w-4 text-brand-forest" />
                     <span>{band.city}</span>
                     <span>•</span>
-                    <span className="font-semibold text-slate-700">{band.completedGigs} Show Selesai</span>
+                    <span className="font-semibold text-slate-800">{band.completedGigs} show selesai</span>
                   </div>
                 </div>
               </div>
 
               {/* Bio Description */}
-              <p className="text-xs text-slate-600 mt-4 leading-relaxed line-clamp-3">
+              <p className="mt-4 line-clamp-3 text-base leading-7 text-slate-700">
                 {band.description}
               </p>
 
               {/* Rate Card Box */}
-              <div className="mt-4 p-3.5 bg-purple-50/70 rounded-2xl border border-purple-100 flex items-center justify-between">
+              <div className="mt-5 flex items-center justify-between gap-3 rounded-lg bg-brand-cream p-4">
                 <div>
-                  <div className="text-[10px] uppercase font-bold text-purple-700 tracking-wider">Perkiraan Honor Manggung (Rate Card)</div>
-                  <div className="text-sm font-black text-slate-900 mt-0.5">{band.priceRange}</div>
+                  <div className="text-sm text-slate-700">Perkiraan honor manggung (rate card)</div>
+                  <div className="mt-0.5 font-display text-lg font-extrabold tracking-[-0.02em] text-brand-ink">{band.priceRange}</div>
                 </div>
-                <span className="text-[11px] font-bold text-purple-700 bg-white px-2 py-1 rounded-lg border border-purple-200 shadow-2xs">
-                  Escrow Termin
+                <span className="shrink-0 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-brand-forest-dark">
+                  Escrow termin
                 </span>
               </div>
 
               {/* Riders Specifications */}
               <div className="mt-4 space-y-2">
-                <div className="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
-                  <FileText className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Ringkasan Technical & Hospitality Riders:</span>
+                <div className="flex items-center gap-2 text-sm font-semibold text-slate-800">
+                  <FileText aria-hidden="true" className="h-4 w-4 text-slate-600" />
+                  <span>Ringkasan technical dan hospitality rider</span>
                 </div>
-                <div className="space-y-1.5 pl-2 border-l-2 border-purple-200">
+                <ul className="space-y-1.5 border-l-2 border-brand-navy/20 pl-4">
                   {band.specsOrRiders.map((item, idx) => (
-                    <div key={idx} className="text-xs text-slate-600 leading-snug">
-                      • {item}
-                    </div>
+                    <li key={idx} className="text-sm leading-6 text-slate-700">
+                      {item}
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
 
               {/* Manager Info */}
               {band.managerContact && (
-                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center gap-2 text-xs text-slate-500">
-                  <Phone className="w-3.5 h-3.5 text-purple-600" />
-                  <span className="font-medium text-slate-700">{band.managerContact}</span>
+                <div className="mt-5 flex items-center gap-2 border-t border-slate-200 pt-4 text-sm text-slate-600">
+                  <Phone aria-hidden="true" className="h-4 w-4 text-brand-forest" />
+                  <span className="font-medium text-slate-800">{band.managerContact}</span>
                 </div>
               )}
             </div>
 
             {/* Bottom Action Footer */}
-            <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3">
-              <span className="text-[11px] text-slate-500">
-                PKS digital & termin DP 50:50 / 70:30
+            <div className="flex flex-col gap-3 border-t border-slate-200 p-5 sm:flex-row sm:items-center sm:justify-between">
+              <span className="text-sm text-slate-600">
+                PKS digital dengan termin DP 50:50 atau 70:30
               </span>
               <Link
                 to={`/bands/${band.id}`}
-                className="px-4 py-2.5 rounded-xl text-xs font-bold bg-purple-700 hover:bg-purple-800 text-white flex items-center gap-1.5 shadow-sm transition"
+                className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-brand-navy px-5 text-sm font-semibold text-white transition-colors hover:bg-brand-navy-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy"
               >
-                <span>Lihat Riders & Ajukan</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>Lihat rider dan ajukan</span>
+                <ArrowRight aria-hidden="true" className="h-4 w-4" />
               </Link>
             </div>
           </div>

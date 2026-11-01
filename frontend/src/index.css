@@ -4,7 +4,12 @@
 
 @layer base {
   html {
+    /* Lenis owns wheel scrolling on desktop; native smooth stays for everything else. */
     scroll-behavior: smooth;
+  }
+  html.lenis,
+  html.lenis body {
+    scroll-behavior: auto;
   }
   body {
     @apply bg-brand-canvas text-slate-900 antialiased font-sans;
@@ -25,21 +30,6 @@
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
-}
-
-/* Glassmorphism & Modern Card Styling */
-.glass-panel {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(226, 232, 240, 0.8);
-}
-
-.glass-panel-dark {
-  background: rgba(15, 23, 42, 0.85);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Custom Scrollbar */
@@ -77,4 +67,68 @@
   );
   background-size: 200% 100%;
   animation: shimmerWave 1.8s ease-in-out infinite;
+}
+
+/* Headline lines that rise out of a mask: give descenders room inside the clip. */
+.ey-line-mask {
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+
+/* Hamburger: two bars that trade lengths on hover. */
+.ey-bar {
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ey-menu-btn .ey-bar-a {
+  transform-origin: left center;
+}
+.ey-menu-btn .ey-bar-b {
+  transform-origin: right center;
+  transform: scaleX(0.6);
+}
+.ey-menu-btn:hover .ey-bar-a,
+.ey-menu-btn:focus-visible .ey-bar-a {
+  transform: scaleX(0.6);
+}
+.ey-menu-btn:hover .ey-bar-b,
+.ey-menu-btn:focus-visible .ey-bar-b {
+  transform: scaleX(1);
+}
+
+/* Text that rolls up to reveal a second copy on hover. */
+.ey-roll {
+  display: inline-block;
+  overflow: hidden;
+  height: 1.5em;
+  line-height: 1.5em;
+  vertical-align: middle;
+}
+.ey-roll > span {
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ey-menu-btn:hover .ey-roll > span,
+.ey-menu-btn:focus-visible .ey-roll > span {
+  transform: translateY(-100%);
+}
+
+/* Cards lift a little under the pointer; touch devices never see this. */
+@media (hover: hover) and (pointer: fine) {
+  .ey-lift {
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .ey-lift:hover {
+    transform: translateY(-6px);
+  }
+}
+
+/* Selected text stays readable on light, navy and lime surfaces alike. Kept outside
+   the Tailwind layers so nothing can out-rank it. */
+::selection {
+  background-color: #d7f36a;
+  color: #172d46;
+}
+::-moz-selection {
+  background-color: #d7f36a;
+  color: #172d46;
 }

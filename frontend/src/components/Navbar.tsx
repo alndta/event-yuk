@@ -1,26 +1,20 @@
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  Calendar,
-  PlusCircle,
-  Music,
-  Sliders,
-  Store,
-  Building2,
-  Users,
-  LogIn,
-  User,
-  LogOut,
-  Menu,
-  X,
-  Layers,
   AlertCircle,
-  ChevronDown,
+  ArrowUpRight,
   Globe,
+  Layers,
+  LogOut,
+  PlusCircle,
+  User,
+  X,
 } from 'lucide-react';
 import { UserRole } from './RoleOnboardingModal';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { gsap, NO_REDUCED_MOTION } from '../lib/motion';
+import useMagnetic from '../hooks/useMagnetic';
 
 interface Props {
   currentRole: UserRole;
@@ -29,500 +23,437 @@ interface Props {
   onOpenUploadPortfolio?: () => void;
 }
 
-export default function Navbar({
-  currentRole,
-  onOpenCreateEvent,
-  onOpenUploadPortfolio,
-}: Props) {
+// Pages whose first section is a full-bleed colour field the header sits on top of.
+const LIME_HERO_ROUTES = ['/'];
+const NAVY_HERO_ROUTES = ['/panduan-role', '/roles-guide'];
+
+export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Props) {
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
   const { language, toggleLanguage, t } = useLanguage();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [partnersOpen, setPartnersOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [menu, setMenu] = useState<'closed' | 'open' | 'closing'>('closed');
+  const mounted = menu !== 'closed';
+  const menuRef = useRef(menu);
+  menuRef.current = menu;
+  const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const btnRef = useMagnetic<HTMLButtonElement>(0.22);
+  const [scrolled, setScrolled] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
 
-  // Close dropdowns on route changes
-  useEffect(() => {
-    setPartnersOpen(false);
-    setMobileMenuOpen(false);
-  }, [location.pathname]);
+  const overlay = LIME_HERO_ROUTES.includes(location.pathname) || NAVY_HERO_ROUTES.includes(location.pathname);
+  const onNavy = NAVY_HERO_ROUTES.includes(location.pathname);
+  const solid = scrolled || menu === 'open';
+  const light = onNavy && !solid;
+  const isHome = LIME_HERO_ROUTES.includes(location.pathname);
+  // Line the logo up with the content below it on each kind of page.
+  const shellClass = isHome
+    ? 'mx-auto max-w-[96rem] px-5 sm:px-8 lg:px-12'
+    : onNavy
+      ? ''
+      : 'px-5 sm:px-8 lg:px-12 2xl:px-16';
+  const shellStyle = onNavy ? { paddingInline: 'clamp(1.25rem, 4.5vw, 5rem)' } : undefined;
 
-  // Click outside to close dropdown
-  useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setPartnersOpen(false);
-      }
+  // Open and close. The panel stays mounted while it plays backwards.
+  const openMenu = () => {
+    if (menuRef.current === 'closing') tlRef.current?.timeScale(1).play();
+    setMenu('open');
+  };
+  const closeMenu = () => {
+    if (menuRef.current === 'closed') return;
+    const tl = tlRef.current;
+    if (!tl) {
+      setMenu('closed');
+      return;
     }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  const getRoleBadge = (role: UserRole) => {
-    switch (role) {
-      case 'EO':
-        return { label: 'Event Organizer', icon: Calendar, color: 'text-brand-navy bg-brand-navy/5 border-brand-navy/15' };
-      case 'VENDOR':
-        return { label: 'Vendor Produksi', icon: Sliders, color: 'text-brand-navy bg-brand-navy/5 border-brand-navy/15' };
-      case 'TALENT':
-        return { label: 'Manajemen Band', icon: Music, color: 'text-brand-navy bg-brand-navy/5 border-brand-navy/15' };
-      case 'TENANT':
-        return { label: 'Tenant Bazaar', icon: Store, color: 'text-brand-navy bg-brand-navy/5 border-brand-navy/15' };
-      case 'SPONSOR':
-        return { label: 'Mitra Sponsor', icon: Building2, color: 'text-brand-navy bg-brand-navy/5 border-brand-navy/15' };
-      case 'CREW':
-        return { label: 'Kru Lapangan', icon: Users, color: 'text-brand-navy bg-brand-navy/5 border-brand-navy/15' };
-    }
+    setMenu('closing');
+    tl.timeScale(1.7).reverse();
+  };
+  const closeRef = useRef(closeMenu);
+  closeRef.current = closeMenu;
+  // For actions that open something else right away (a modal), skip the exit.
+  const forceClose = () => {
+    tlRef.current?.kill();
+    tlRef.current = null;
+    setMenu('closed');
   };
 
-  const activeRole = user?.activeRole || currentRole;
-  const roleInfo = activeRole ? getRoleBadge(activeRole) : null;
-  const RoleIcon = roleInfo ? roleInfo.icon : null;
+  useEffect(() => {
+    closeRef.current();
+  }, [location.pathname]);
 
-  const isPartnerActive = ['/vendors', '/bands', '/organizers', '/sponsors'].some((path) =>
-    location.pathname.startsWith(path)
-  );
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+
+  // Modal behaviour: lock page scroll, close on Escape, keep Tab inside, return focus on close.
+  useEffect(() => {
+    if (!mounted) return;
+    const previous = document.activeElement as HTMLElement | null;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    window.dispatchEvent(new CustomEvent('ey:scroll-lock', { detail: true }));
+    closeBtnRef.current?.focus();
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeRef.current();
+        return;
+      }
+      if (e.key !== 'Tab' || !dialogRef.current) return;
+      const nodes = Array.from(
+        dialogRef.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled])')
+      );
+      if (nodes.length === 0) return;
+      const first = nodes[0];
+      const last = nodes[nodes.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = overflow;
+      window.dispatchEvent(new CustomEvent('ey:scroll-lock', { detail: false }));
+      document.removeEventListener('keydown', onKey);
+      previous?.focus?.();
+    };
+  }, [mounted]);
+
+  // Entrance: a circle grows out of the Menu button, then the blocks rise in
+  // turn, labels slide up out of their masks, arrows spin in, and the photo
+  // opens from the right. Built before paint so nothing flashes.
+  useLayoutEffect(() => {
+    if (!mounted) return;
+    const root = dialogRef.current;
+    if (!root) return;
+    const mm = gsap.matchMedia();
+    mm.add(NO_REDUCED_MOTION, () => {
+      const q = gsap.utils.selector(root);
+      const b = btnRef.current?.getBoundingClientRect();
+      const cx = b ? b.left + b.width / 2 : window.innerWidth - 60;
+      const cy = b ? b.top + b.height / 2 : 36;
+      const radius = Math.hypot(Math.max(cx, window.innerWidth - cx), Math.max(cy, window.innerHeight - cy));
+
+      const tl = gsap.timeline({ defaults: { ease: 'ey' }, onReverseComplete: () => setMenu('closed') });
+      tl.fromTo(
+        root,
+        { clipPath: `circle(0px at ${cx}px ${cy}px)` },
+        { clipPath: `circle(${radius}px at ${cx}px ${cy}px)`, duration: 1.05, ease: 'power3.inOut' },
+        0
+      )
+        .from(q('[data-menu-top]'), { autoAlpha: 0, y: -18, duration: 0.7 }, 0.45)
+        .from(q('[data-menu-block]'), { yPercent: 110, duration: 1.05, stagger: 0.08 }, 0.28)
+        .from(q('[data-menu-label]'), { yPercent: 105, duration: 0.95, stagger: 0.08 }, 0.42)
+        .from(q('[data-menu-arrow]'), { scale: 0, rotate: -90, duration: 0.8, ease: 'back.out(2)', stagger: 0.08 }, 0.66)
+        .from(q('[data-menu-chip]'), { y: 28, autoAlpha: 0, duration: 0.8, stagger: 0.06 }, 0.72)
+        .from(q('[data-menu-photo]'), { clipPath: 'inset(0% 0% 0% 100%)', duration: 1.2 }, 0.35)
+        .from(q('[data-menu-photo] img'), { scale: 1.4, duration: 1.6 }, 0.35)
+        .from(q('[data-menu-sub]'), { autoAlpha: 0, x: -16, duration: 0.7 }, 0.66)
+        .from(q('[data-menu-account]'), { autoAlpha: 0, duration: 0.6 }, 0.8)
+        .from(q('[data-menu-item]'), { y: 26, autoAlpha: 0, duration: 0.8, stagger: 0.08 }, 0.86);
+      tlRef.current = tl;
+      return () => {
+        tlRef.current = null;
+      };
+    });
+    return () => mm.revert();
+  }, [mounted]);
+
+  const textTone = light ? 'text-white' : 'text-brand-navy';
+  const pill =
+    'inline-flex min-h-11 items-center gap-2 rounded-full px-5 text-base font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 ';
+
+  const primary = [
+    { to: '/', label: t('nav.home'), tone: 'bg-brand-cream text-brand-navy' },
+    { to: '/events', label: t('nav.events'), tone: 'bg-brand-lime text-brand-navy' },
+    { to: '/contracts', label: t('nav.contracts'), tone: 'bg-brand-cream text-brand-navy' },
+    { to: '/panduan-role', label: t('nav.guide'), tone: 'bg-brand-lime text-brand-navy' },
+  ];
+  const partners = [
+    { to: '/vendors', label: t('nav.vendors') },
+    { to: '/bands', label: t('nav.bands') },
+    { to: '/organizers', label: t('nav.organizers') },
+    { to: '/sponsors', label: t('nav.sponsors') },
+  ];
+  const isHere = (to: string) => (to === '/' ? location.pathname === '/' : location.pathname.startsWith(to));
 
   return (
-    <header className="sticky top-0 z-40 bg-white font-sans">
-      <div className="w-full px-5 sm:px-8 lg:px-12 2xl:px-16">
-        <div className="h-16 flex items-center justify-between gap-3">
-          {/* 1. Brand Logo */}
-          <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
-            <img
-              src="/logo-event-yuk.png"
-              alt="Event Yuk Logo"
-              className="h-9 w-auto object-contain transition-transform group-hover:scale-[1.02]"
-            />
-            <div className="flex flex-col">
-              <span className="font-bold text-xl tracking-tight text-brand-navy leading-none">
-                Event Yuk
-              </span>
-              <span className="mt-1 text-[13px] font-medium leading-none text-slate-600">
-                Ekosistem Industri Acara
-              </span>
-            </div>
+    <>
+      <header
+        className={
+          'sticky top-0 z-40 h-16 font-sans transition-colors duration-200 ' +
+          (overlay ? '-mb-16 ' : '') +
+          (solid ? 'bg-brand-canvas/90 backdrop-blur ' : 'bg-transparent ') +
+          (solid ? 'border-b border-brand-navy/10 ' : 'border-b border-transparent ')
+        }
+      >
+        <div
+          style={shellStyle}
+          className={'flex h-full w-full items-center justify-between gap-3 ' + shellClass}
+        >
+          <Link
+            to="/"
+            className={'flex shrink-0 items-center gap-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-current ' + textTone}
+          >
+            <img src="/logo-event-yuk.png" alt="" className="h-9 w-auto object-contain" />
+            <span className="font-display text-xl font-extrabold leading-none tracking-[-0.03em]">Event Yuk</span>
           </Link>
 
-          {/* 2. Main Desktop Navigation Links (Compact & Non-overflowing) */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
-            <Link
-              to="/"
-              className={`px-3 py-2 text-sm font-semibold transition whitespace-nowrap ${
-                location.pathname === '/'
-                  ? 'text-brand-navy underline decoration-2 underline-offset-[1.35rem]'
-                  : 'text-slate-700 hover:text-brand-navy'
-              }`}
-            >
-              {t('nav.home')}
-            </Link>
-
-            <Link
-              to="/events"
-              className={`px-3 py-2 text-sm font-semibold transition whitespace-nowrap ${
-                location.pathname.startsWith('/events')
-                  ? 'text-brand-navy underline decoration-2 underline-offset-[1.35rem]'
-                  : 'text-slate-700 hover:text-brand-navy'
-              }`}
-            >
-              {t('nav.events')}
-            </Link>
-
-            {/* Dropdown: Direktori Mitra (Consolidates Vendor, Band, EO, Sponsor) */}
-            <div
-              ref={dropdownRef}
-              className="relative"
-              onMouseEnter={() => setPartnersOpen(true)}
-              onMouseLeave={() => setPartnersOpen(false)}
-            >
-              <button
-                type="button"
-                onClick={() => setPartnersOpen(!partnersOpen)}
-                className={`px-3 py-2 text-sm font-semibold transition flex items-center gap-1.5 whitespace-nowrap cursor-pointer ${
-                  isPartnerActive
-                    ? 'text-brand-navy underline decoration-2 underline-offset-[1.35rem]'
-                    : 'text-slate-700 hover:text-brand-navy'
-                }`}
-              >
-                <span>{t('nav.partners')}</span>
-                <ChevronDown
-                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                    partnersOpen ? 'rotate-180' : ''
-                  }`}
-                />
-              </button>
-
-              {partnersOpen && (
-                <div className="absolute top-full left-0 z-50 mt-2 w-64 rounded-xl border border-slate-200 bg-white py-2 shadow-lg animate-fadeIn">
-                  <Link
-                    to="/vendors"
-                    className="flex items-center gap-3 px-3.5 py-3 text-sm text-slate-700 transition hover:bg-brand-canvas hover:text-brand-navy"
-                  >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center text-brand-navy">
-                      <Sliders className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-900">{t('nav.vendors')}</p>
-                      <p className="text-xs font-normal text-slate-600">Sound, Stage, Lighting, LED</p>
-                    </div>
-                  </Link>
-
-                  <Link
-                    to="/bands"
-                    className="flex items-center gap-3 px-3.5 py-3 text-sm text-slate-700 transition hover:bg-brand-canvas hover:text-brand-navy"
-                  >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center text-brand-navy">
-                      <Music className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-900">{t('nav.bands')}</p>
-                      <p className="text-xs font-normal text-slate-600">Indie Bands, Soloists, MCs</p>
-                    </div>
-                  </Link>
-
-                  <Link
-                    to="/organizers"
-                    className="flex items-center gap-3 px-3.5 py-3 text-sm text-slate-700 transition hover:bg-brand-canvas hover:text-brand-navy"
-                  >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center text-brand-navy">
-                      <Calendar className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-900">{t('nav.organizers')}</p>
-                      <p className="text-xs font-normal text-slate-600">Concert & Festival Promoters</p>
-                    </div>
-                  </Link>
-
-                  <Link
-                    to="/sponsors"
-                    className="flex items-center gap-3 px-3.5 py-3 text-sm text-slate-700 transition hover:bg-brand-canvas hover:text-brand-navy"
-                  >
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center text-brand-navy">
-                      <Building2 className="w-4 h-4" />
-                    </div>
-                    <div>
-                      <p className="font-bold text-slate-900">{t('nav.sponsors')}</p>
-                      <p className="text-xs font-normal text-slate-600">Brand Partnerships & ROI</p>
-                    </div>
-                  </Link>
-                </div>
-              )}
-            </div>
-
-            <Link
-              to="/contracts"
-              className={`px-3 py-2 text-sm font-semibold transition whitespace-nowrap ${
-                location.pathname === '/contracts'
-                  ? 'text-brand-navy underline decoration-2 underline-offset-[1.35rem]'
-                  : 'text-slate-700 hover:text-brand-navy'
-              }`}
-            >
-              {t('nav.contracts')}
-            </Link>
-
-            <Link
-              to="/panduan-role"
-              className={`px-3 py-2 text-sm font-semibold transition whitespace-nowrap ${
-                location.pathname === '/panduan-role'
-                  ? 'text-brand-navy underline decoration-2 underline-offset-[1.35rem]'
-                  : 'text-slate-700 hover:text-brand-navy'
-              }`}
-            >
-              {t('nav.guide')}
-            </Link>
-          </nav>
-
-          {/* 3. Right Action Area */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
-            {/* Language Selector Toggle */}
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               type="button"
               onClick={toggleLanguage}
-              className="inline-flex min-h-10 items-center gap-1.5 px-2 text-sm font-semibold text-slate-700 transition hover:text-brand-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
+              className={'inline-flex min-h-11 items-center gap-1.5 px-2 text-sm font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-current ' + textTone}
               title={language === 'id' ? 'Switch to English' : 'Ganti ke Bahasa Indonesia'}
+              aria-label={language === 'id' ? 'Switch to English' : 'Ganti ke Bahasa Indonesia'}
             >
-              <Globe className="w-3.5 h-3.5 text-[#172D46]" />
-              <span className="text-[11px] font-black uppercase text-slate-900">{language.toUpperCase()}</span>
+              <Globe aria-hidden="true" className="h-4 w-4" />
+              {language.toUpperCase()}
             </button>
 
-            {isAuthenticated ? (
-              <>
-                {/* When User has NO role: Solid button */}
-                {!user?.activeRole && (
-                  <Link
-                    to="/onboarding-role"
-                    className="inline-flex min-h-10 items-center gap-1.5 bg-brand-navy px-3 text-sm font-semibold text-white transition-colors hover:bg-brand-navy-dark whitespace-nowrap"
-                  >
-                    <AlertCircle className="w-3.5 h-3.5" />
-                    <span>{t('nav.completeRole')}</span>
-                  </Link>
-                )}
-
-                {/* When User has Role: Show Role Badge */}
-                {user?.activeRole && roleInfo && RoleIcon && (
-                  <div
-                    className={`hidden xl:flex min-h-9 items-center gap-1.5 border px-3 text-sm font-medium whitespace-nowrap ${roleInfo.color}`}
-                    title="Peran Tetap Akun Anda"
-                  >
-                    <RoleIcon className="w-3.5 h-3.5 shrink-0" />
-                    <span>{roleInfo.label}</span>
-                  </div>
-                )}
-
-                {/* Primary CTA + Buat Event (EO only) */}
-                {user?.activeRole === 'EO' && (
-                  <button
-                    onClick={onOpenCreateEvent}
-                    className="inline-flex min-h-10 items-center gap-1.5 bg-brand-forest px-3 text-sm font-semibold text-white transition-colors hover:bg-brand-forest-dark whitespace-nowrap cursor-pointer"
-                  >
-                    <PlusCircle className="w-3.5 h-3.5" />
-                    <span>{t('nav.createEvent')}</span>
-                  </button>
-                )}
-
-                {/* Dashboard Button */}
-                {user?.activeRole && (
-                  <Link
-                    to="/dashboard"
-                    className={`px-3 py-1.5 text-xs font-bold rounded-xl transition flex items-center gap-1.5 whitespace-nowrap ${
-                      user.activeRole === 'EO'
-                        ? 'hidden sm:flex border border-slate-300 text-slate-700 hover:border-brand-navy hover:text-brand-navy'
-                        : 'bg-brand-navy text-white hover:bg-brand-navy-dark'
-                    }`}
-                    title="Buka Ruang Kerja & Kelola Dagangan"
-                  >
-                    <Layers className="w-3.5 h-3.5" />
-                    <span>{t('nav.dashboard')}</span>
-                  </Link>
-                )}
-
-                {/* Profile Shortcut */}
-                <Link
-                  to="/profile"
-                    className="inline-flex min-h-10 items-center gap-1.5 border border-slate-300 px-2.5 text-sm font-semibold text-slate-700 transition hover:border-brand-navy hover:text-brand-navy whitespace-nowrap"
-                  title="Profil Akun & e-KYC"
-                >
-                  <User className="w-3.5 h-3.5 text-slate-500" />
-                  <span className="hidden md:inline truncate max-w-[80px]">
-                    {user?.fullName?.split(' ')[0] || 'Profil'}
-                  </span>
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" title="Akun Aktif" />
-                </Link>
-
-                {/* Logout Button */}
-                <button
-                  onClick={logout}
-                  className="inline-flex h-10 w-10 items-center justify-center text-slate-500 transition hover:text-brand-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
-                  title="Keluar Akun"
-                >
-                  <LogOut className="w-4 h-4" />
-                </button>
-              </>
-            ) : (
-              <div className="hidden items-center gap-2 sm:flex">
-                <Link
-                  to="/login"
-                  className="inline-flex min-h-10 items-center gap-1.5 border border-slate-300 px-3 text-sm font-semibold text-slate-700 transition hover:border-brand-navy hover:text-brand-navy"
-                >
-                  <LogIn className="w-3.5 h-3.5" />
-                  <span>{t('nav.login')}</span>
-                </Link>
-
-                <Link
-                  to="/register"
-                  className="inline-flex min-h-10 items-center gap-1.5 bg-brand-lime px-3.5 text-sm font-semibold text-brand-ink transition-colors hover:bg-brand-lime-hover"
-                >
-                  <span>{t('nav.register')}</span>
-                </Link>
-              </div>
+            {!isAuthenticated && (
+              <Link
+                to="/register"
+                className={
+                  pill +
+                  'hidden sm:inline-flex ' +
+                  (light
+                    ? 'bg-brand-lime text-brand-navy hover:bg-brand-lime-hover focus-visible:outline-white'
+                    : 'bg-brand-navy text-brand-lime hover:bg-brand-navy-dark focus-visible:outline-brand-navy')
+                }
+              >
+                {t('nav.register')}
+              </Link>
             )}
 
-            {/* Mobile Hamburger Menu Button */}
+            {isAuthenticated && user?.activeRole && (
+              <Link
+                to="/dashboard"
+                className={
+                  pill +
+                  'hidden sm:inline-flex ' +
+                  (light
+                    ? 'bg-brand-lime text-brand-navy hover:bg-brand-lime-hover focus-visible:outline-white'
+                    : 'bg-brand-navy text-brand-lime hover:bg-brand-navy-dark focus-visible:outline-brand-navy')
+                }
+              >
+                <Layers aria-hidden="true" className="h-4 w-4" />
+                {t('nav.dashboard')}
+              </Link>
+            )}
+
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden inline-flex h-10 w-10 items-center justify-center text-slate-700 transition hover:bg-brand-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
-              aria-label={mobileMenuOpen ? 'Tutup menu' : 'Buka menu'}
-              aria-expanded={mobileMenuOpen}
+              ref={btnRef}
+              type="button"
+              onClick={openMenu}
+              aria-haspopup="dialog"
+              aria-expanded={menu === 'open'}
+              className={
+                pill +
+                'ey-menu-btn border-2 ' +
+                (light
+                  ? 'border-white text-white hover:bg-white hover:text-brand-navy focus-visible:outline-white'
+                  : 'border-brand-navy text-brand-navy hover:bg-brand-navy hover:text-brand-lime focus-visible:outline-brand-navy')
+              }
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              <span aria-hidden="true" className="relative block h-3 w-5">
+                <span className="ey-bar ey-bar-a absolute left-0 top-0 h-0.5 w-full rounded-full bg-current" />
+                <span className="ey-bar ey-bar-b absolute bottom-0 left-0 h-0.5 w-full rounded-full bg-current" />
+              </span>
+              <span className="ey-roll">
+                <span>Menu</span>
+                <span aria-hidden="true">Menu</span>
+              </span>
             </button>
           </div>
         </div>
+      </header>
 
-        {/* 4. Responsive Mobile Dropdown Drawer */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-slate-200 py-3 space-y-1 animate-fadeIn">
-            {/* Mobile Language Toggle */}
-            <div className="px-4 py-2 flex items-center justify-between border-b border-slate-100 mb-2">
-              <span className="text-xs font-bold text-slate-500">Bahasa / Language</span>
-              <button
+      {mounted && (
+        <div
+          ref={dialogRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menu utama"
+          className="fixed inset-0 !mt-0 z-50 flex flex-col overflow-y-auto bg-brand-navy font-sans text-white"
+        >
+          <div data-menu-top className="mx-auto flex w-full max-w-[96rem] items-center justify-between px-5 py-3 sm:px-8 lg:px-12">
+            <Link to="/" className="flex items-center gap-2.5 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-lime">
+              <img src="/logo-event-yuk.png" alt="" className="h-9 w-auto rounded-md bg-white p-1 object-contain" />
+              <span className="font-display text-xl font-extrabold leading-none tracking-[-0.03em]">Event Yuk</span>
+            </Link>
+            <button
+              ref={closeBtnRef}
+              type="button"
+              onClick={closeMenu}
+              className={pill + 'bg-brand-lime text-brand-navy hover:bg-brand-lime-hover focus-visible:outline-white'}
+            >
+              <X aria-hidden="true" className="h-5 w-5" />
+              Tutup
+            </button>
+          </div>
+
+          <div className="mx-auto grid w-full max-w-[96rem] flex-1 grid-cols-1 gap-x-8 gap-y-6 px-5 pb-8 pt-2 sm:px-8 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)] lg:grid-rows-[minmax(0,1fr)_auto] lg:px-12">
+            <nav aria-label="Menu utama" className="flex flex-col gap-2 lg:row-span-2">
+              {primary.map(({ to, label, tone }) => (
+                <Link
+                  key={to}
+                  to={to}
+                  data-menu-block
+                  aria-current={isHere(to) ? 'page' : undefined}
+                  className={
+                    'relative isolate overflow-hidden before:absolute before:inset-0 before:-z-10 before:translate-y-[101%] before:transition-transform before:duration-[650ms] before:ease-[cubic-bezier(0.16,1,0.3,1)] hover:before:translate-y-0 focus-visible:before:translate-y-0 before:bg-brand-navy hover:text-brand-lime focus-visible:text-brand-lime group flex min-h-[4.5rem] items-center justify-between rounded-lg px-6 lg:flex-1 font-display text-[clamp(2rem,4.4vw,3.75rem)] font-extrabold leading-none tracking-[-0.04em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:min-h-[5.5rem] ' +
+                    tone
+                  }
+                >
+                  <span className="flex items-center gap-4 overflow-hidden py-[0.12em]">
+                    <span data-menu-label className="block">
+                      {label}
+                    </span>
+                    {isHere(to) && <span aria-hidden="true" className="h-3 w-3 rounded-full bg-brand-navy" />}
+                  </span>
+                  <span data-menu-arrow className="shrink-0">
+                    <ArrowUpRight aria-hidden="true" className="h-8 w-8 transition-transform duration-500 group-hover:-translate-y-1 group-hover:translate-x-1 sm:h-10 sm:w-10" />
+                  </span>
+                </Link>
+              ))}
+
+              <p data-menu-sub className="mt-4 text-base font-semibold text-slate-300">{t('nav.partners')}</p>
+              <ul className="grid grid-cols-2 gap-2">
+                {partners.map(({ to, label }) => (
+                  <li key={to} data-menu-chip>
+                    <Link
+                      to={to}
+                      aria-current={isHere(to) ? 'page' : undefined}
+                      className="relative isolate overflow-hidden before:absolute before:inset-0 before:-z-10 before:translate-y-[101%] before:transition-transform before:duration-[650ms] before:ease-[cubic-bezier(0.16,1,0.3,1)] hover:before:translate-y-0 focus-visible:before:translate-y-0 before:bg-brand-lime group flex min-h-16 items-center justify-between gap-2 rounded-lg border-2 border-white/25 px-4 font-display text-lg font-bold tracking-[-0.02em] transition-colors hover:border-brand-lime hover:text-brand-navy focus-visible:text-brand-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white sm:text-xl"
+                    >
+                      <span className="flex items-center gap-2">
+                        {label}
+                        {isHere(to) && <span aria-hidden="true" className="h-2.5 w-2.5 rounded-full bg-brand-lime" />}
+                      </span>
+                      <ArrowUpRight aria-hidden="true" className="h-5 w-5 shrink-0" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+
+            <div data-menu-photo className="relative hidden min-h-[14rem] overflow-hidden rounded-lg bg-brand-navy-light lg:block">
+              <img
+                src="/assets/hero-concert.jpg"
+                alt=""
+                width={1200}
+                height={800}
+                decoding="async"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            </div>
+
+            <div data-menu-account className="space-y-3 rounded-lg bg-brand-navy-dark p-5">
+              {!isAuthenticated ? (
+                <div className="grid grid-cols-2 gap-3">
+                  <Link data-menu-item
+                    to="/login"
+                    className={pill + 'justify-center border-2 border-white/40 text-white hover:border-white focus-visible:outline-white'}
+                  >
+                    {t('nav.login')}
+                  </Link>
+                  <Link data-menu-item
+                    to="/register"
+                    className={pill + 'justify-center bg-brand-lime text-brand-navy hover:bg-brand-lime-hover focus-visible:outline-white'}
+                  >
+                    {t('nav.register')}
+                  </Link>
+                </div>
+              ) : (
+                <>
+                  {!user?.activeRole && (
+                    <Link data-menu-item
+                      to="/onboarding-role"
+                      className={pill + 'w-full justify-center bg-brand-lime text-brand-navy hover:bg-brand-lime-hover focus-visible:outline-white'}
+                    >
+                      <AlertCircle aria-hidden="true" className="h-5 w-5" />
+                      {t('nav.completeRole')}
+                    </Link>
+                  )}
+                  {user?.activeRole && (
+                    <Link data-menu-item
+                      to="/dashboard"
+                      className={pill + 'w-full justify-center bg-brand-lime text-brand-navy hover:bg-brand-lime-hover focus-visible:outline-white'}
+                    >
+                      <Layers aria-hidden="true" className="h-5 w-5" />
+                      {t('nav.dashboard')}
+                    </Link>
+                  )}
+                  {user?.activeRole === 'EO' && (
+                    <>
+                      <button data-menu-item
+                        type="button"
+                        onClick={() => {
+                          forceClose();
+                          onOpenCreateEvent();
+                        }}
+                        className={pill + 'w-full justify-center border-2 border-white/40 text-white hover:border-white focus-visible:outline-white'}
+                      >
+                        <PlusCircle aria-hidden="true" className="h-5 w-5" />
+                        {t('nav.createEvent')}
+                      </button>
+                      {onOpenUploadPortfolio && (
+                        <button data-menu-item
+                          type="button"
+                          onClick={() => {
+                            forceClose();
+                            onOpenUploadPortfolio();
+                          }}
+                          className={pill + 'w-full justify-center text-slate-200 hover:text-white focus-visible:outline-white'}
+                        >
+                          Unggah portofolio acara
+                        </button>
+                      )}
+                    </>
+                  )}
+                  <div className="grid grid-cols-2 gap-3">
+                    <Link data-menu-item
+                      to="/profile"
+                      className={pill + 'justify-center border-2 border-white/40 text-white hover:border-white focus-visible:outline-white'}
+                    >
+                      <User aria-hidden="true" className="h-5 w-5" />
+                      <span className="max-w-[7rem] truncate">{user?.fullName?.split(' ')[0] || 'Profil'}</span>
+                    </Link>
+                    <button data-menu-item
+                      type="button"
+                      onClick={() => {
+                        forceClose();
+                        logout();
+                      }}
+                      className={pill + 'justify-center border-2 border-white/40 text-white hover:border-white focus-visible:outline-white'}
+                    >
+                      <LogOut aria-hidden="true" className="h-5 w-5" />
+                      Keluar
+                    </button>
+                  </div>
+                </>
+              )}
+              <button data-menu-item
                 type="button"
                 onClick={toggleLanguage}
-                className="inline-flex min-h-10 items-center gap-1.5 px-2 text-sm font-semibold text-slate-700"
+                className={pill + 'w-full justify-center text-slate-200 hover:text-white focus-visible:outline-white'}
               >
-                <Globe className="w-3.5 h-3.5 text-[#172D46]" />
-                <span className="font-extrabold uppercase">{language === 'id' ? 'ID (Bahasa Indonesia)' : 'EN (English)'}</span>
+                <Globe aria-hidden="true" className="h-5 w-5" />
+                {language === 'id' ? 'Bahasa Indonesia' : 'English'}
               </button>
             </div>
-
-            <Link
-              to="/"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`block min-h-11 px-4 py-2 text-sm font-semibold transition ${
-                location.pathname === '/' ? 'bg-brand-canvas text-brand-navy' : 'text-slate-700 hover:bg-brand-canvas'
-              }`}
-            >
-              {t('nav.home')}
-            </Link>
-
-            <Link
-              to="/events"
-              onClick={() => setMobileMenuOpen(false)}
-              className={`block min-h-11 px-4 py-2 text-sm font-semibold transition ${
-                location.pathname.startsWith('/events') ? 'bg-brand-canvas text-brand-navy' : 'text-slate-700 hover:bg-brand-canvas'
-              }`}
-            >
-              {t('nav.events')}
-            </Link>
-
-            {/* Mobile Mitra Links */}
-            <div className="my-2 space-y-1 py-2">
-              <span className="block px-4 pt-1 text-sm font-semibold text-slate-500">
-                {t('nav.partners')}
-              </span>
-              <Link
-                to="/vendors"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-2 py-1.5 text-xs font-bold text-slate-700 hover:text-[#172D46]"
-              >
-                {t('nav.vendors')}
-              </Link>
-              <Link
-                to="/bands"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-2 py-1.5 text-xs font-bold text-slate-700 hover:text-[#172D46]"
-              >
-                {t('nav.bands')}
-              </Link>
-              <Link
-                to="/organizers"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-2 py-1.5 text-xs font-bold text-slate-700 hover:text-[#172D46]"
-              >
-                {t('nav.organizers')}
-              </Link>
-              <Link
-                to="/sponsors"
-                onClick={() => setMobileMenuOpen(false)}
-                className="block px-2 py-1.5 text-xs font-bold text-slate-700 hover:text-[#172D46]"
-              >
-                {t('nav.sponsors')}
-              </Link>
-            </div>
-
-            <Link
-              to="/contracts"
-              onClick={() => setMobileMenuOpen(false)}
-                className={`block min-h-11 px-4 py-2 text-sm font-semibold transition ${
-                location.pathname === '/contracts' ? 'bg-brand-canvas text-brand-navy' : 'text-slate-700 hover:bg-brand-canvas'
-              }`}
-            >
-              {t('nav.contracts')}
-            </Link>
-
-            <Link
-              to="/panduan-role"
-              onClick={() => setMobileMenuOpen(false)}
-                className={`block min-h-11 px-4 py-2 text-sm font-semibold transition ${
-                location.pathname === '/panduan-role' ? 'bg-brand-canvas text-brand-navy' : 'text-slate-700 hover:bg-brand-canvas'
-              }`}
-            >
-              {t('nav.guide')}
-            </Link>
-
-            {!isAuthenticated && (
-              <div className="mt-2 grid grid-cols-2 gap-2 border-t border-slate-200 px-4 pt-3 sm:hidden">
-                <Link
-                  to="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="inline-flex min-h-11 items-center justify-center border border-slate-300 px-4 text-sm font-semibold text-slate-700"
-                >
-                  {t('nav.login')}
-                </Link>
-                <Link
-                  to="/register"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="inline-flex min-h-11 items-center justify-center bg-brand-lime px-4 text-sm font-semibold text-brand-ink"
-                >
-                  {t('nav.register')}
-                </Link>
-              </div>
-            )}
-
-            {isAuthenticated && (
-              <div className="pt-2 border-t border-slate-100 space-y-2 px-1">
-                {!user?.activeRole && (
-                  <Link
-                    to="/onboarding-role"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex min-h-11 w-full items-center justify-center gap-1.5 bg-brand-navy px-4 py-2.5 text-sm font-semibold text-white"
-                  >
-                    <AlertCircle className="w-3.5 h-3.5" />
-                    <span>Lengkapi Peran Akun</span>
-                  </Link>
-                )}
-
-                {user?.activeRole && (
-                  <Link
-                    to="/dashboard"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex min-h-11 w-full items-center justify-center gap-1.5 bg-brand-navy px-4 py-2.5 text-sm font-semibold text-white"
-                  >
-                    <Layers className="w-3.5 h-3.5" />
-                    <span>Buka Dashboard</span>
-                  </Link>
-                )}
-
-                {user?.activeRole === 'EO' && (
-                  <>
-                    <button
-                      onClick={() => {
-                        setMobileMenuOpen(false);
-                        onOpenCreateEvent();
-                      }}
-                      className="flex min-h-11 w-full items-center justify-center gap-1.5 bg-brand-forest px-4 py-2.5 text-sm font-semibold text-white"
-                    >
-                      <PlusCircle className="w-3.5 h-3.5" />
-                      <span>+ Buat Event Baru</span>
-                    </button>
-
-                    {onOpenUploadPortfolio && (
-                      <button
-                        onClick={() => {
-                          setMobileMenuOpen(false);
-                          onOpenUploadPortfolio();
-                        }}
-                      className="flex min-h-11 w-full items-center justify-center gap-1.5 px-4 py-2 text-sm font-semibold text-brand-navy"
-                      >
-                        <span>+ Unggah Portofolio Acara</span>
-                      </button>
-                    )}
-                  </>
-                )}
-
-                <Link
-                  to="/profile"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex min-h-11 w-full items-center justify-center gap-1.5 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-brand-canvas"
-                >
-                  <User className="w-3.5 h-3.5" />
-                  <span>Profil Akun ({user?.fullName || 'Pengguna'})</span>
-                </Link>
-              </div>
-            )}
           </div>
-        )}
-      </div>
-    </header>
+        </div>
+      )}
+    </>
   );
 }

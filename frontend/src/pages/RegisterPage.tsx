@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import useEnter from '../hooks/useEnter';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Mail,
@@ -30,6 +31,8 @@ export default function RegisterPage() {
   const { login, signInWithGoogle } = useAuth();
 
   const [step, setStep] = useState<'SELECT_ROLE' | 'FORM' | 'OTP'>('SELECT_ROLE');
+  const stepRef = useRef<HTMLElement>(null);
+  useEnter(stepRef, step);
   const [formData, setFormData] = useState({
     fullName: '',
     businessName: '',
@@ -74,8 +77,8 @@ export default function RegisterPage() {
       badge: 'Penyelenggara Acara',
       desc: 'Buka proyek acara, kelola pagu anggaran, kurasi kaveling booth, dan buka shift kru lapangan.',
       icon: Calendar,
-      color: 'bg-sky-50 text-[#172D46]',
-      borderColor: 'border-[#172D46]',
+      color: 'bg-brand-lime-soft text-brand-navy',
+      borderColor: 'border-brand-navy',
       features: ['Kendali Pagu Anggaran', 'Kurasi Kaveling Booth', 'Negosiasi Termin Fleksibel'],
     },
     {
@@ -84,8 +87,8 @@ export default function RegisterPage() {
       badge: 'Penyedia Alat',
       desc: 'Pajang katalog Sound System, Tata Lampu, Rigging Panggung, LED Screen, dan Genset.',
       icon: Sliders,
-      color: 'bg-indigo-50 text-indigo-700',
-      borderColor: 'border-indigo-600',
+      color: 'bg-brand-lime-soft text-brand-navy',
+      borderColor: 'border-brand-navy',
       features: ['Garansi DP 50% di Escrow', 'Smart Calendar Otomatis', 'Klaim Pelunasan via BAST'],
     },
     {
@@ -94,8 +97,8 @@ export default function RegisterPage() {
       badge: 'Artis & Talenta',
       desc: 'Kelola jadwal manggung festival/pensi, tentukan rate card honor, dan kunci technical riders.',
       icon: Music,
-      color: 'bg-purple-50 text-purple-700',
-      borderColor: 'border-purple-600',
+      color: 'bg-brand-lime-soft text-brand-navy',
+      borderColor: 'border-brand-navy',
       features: ['Rate Card Transparan', 'Hospitality Riders Terkunci', 'PKS Sah Anti-Cancel'],
     },
     {
@@ -104,8 +107,8 @@ export default function RegisterPage() {
       badge: 'Penyewa Kaveling',
       desc: 'Pilih nomor kaveling denah festival, upload foto menu untuk kurasi, dan peroleh Exhibitor Pass.',
       icon: Store,
-      color: 'bg-emerald-50 text-emerald-700',
-      borderColor: 'border-emerald-600',
+      color: 'bg-brand-lime-soft text-brand-navy',
+      borderColor: 'border-brand-navy',
       features: ['Denah Interaktif Akurat', 'Seleksi Kurasi Terbuka', 'Faktur Resmi Sewa Booth'],
     },
     {
@@ -114,8 +117,8 @@ export default function RegisterPage() {
       badge: 'Brand & Agensi',
       desc: 'Akses data demografi audiens terverifikasi, beli paket aktivasi berjenjang, dan amankan hak eksklusif.',
       icon: Building2,
-      color: 'bg-amber-50 text-amber-800',
-      borderColor: 'border-amber-600',
+      color: 'bg-brand-lime-soft text-brand-navy',
+      borderColor: 'border-brand-navy',
       features: ['Database Audiens Riil', 'Paket Aktivasi Eksklusif', 'Laporan Tayang & Audit'],
     },
     {
@@ -124,8 +127,8 @@ export default function RegisterPage() {
       badge: 'Tenaga Kerja Lepas',
       desc: 'Lamar lowongan shift harian anti-bentrok jam kerja, lakukan presensi QR GPS, dan honor instan.',
       icon: Users,
-      color: 'bg-rose-50 text-rose-700',
-      borderColor: 'border-rose-600',
+      color: 'bg-brand-lime-soft text-brand-navy',
+      borderColor: 'border-brand-navy',
       features: ['Shift Anti-Bentrok Jadwal', 'Absensi QR GPS Geofencing', 'Honor Cair Otomatis'],
     },
   ];
@@ -195,7 +198,7 @@ export default function RegisterPage() {
       const data = await res.json();
 
       if (data.success) {
-        setSuccessMessage('Pendaftaran akun berhasil! Mengalihkan ke Dashboard...');
+        setSuccessMessage('Pendaftaran berhasil. Membuka dashboard...');
         await login(formData.email, formData.password);
         setTimeout(() => {
           navigate('/dashboard');
@@ -205,7 +208,7 @@ export default function RegisterPage() {
       }
     } catch {
       // Offline fallback
-      setSuccessMessage('Pendaftaran akun berhasil! Mengalihkan ke Dashboard...');
+      setSuccessMessage('Pendaftaran berhasil. Membuka dashboard...');
       await login(formData.email, formData.password);
       setTimeout(() => {
         navigate('/dashboard');
@@ -218,7 +221,7 @@ export default function RegisterPage() {
   const activeRoleDetail = rolesCatalog.find((r) => r.id === formData.primaryRole)!;
 
   return (
-    <div className="min-h-screen w-full bg-slate-50 flex flex-col justify-between font-sans">
+    <div className="min-h-screen w-full bg-brand-canvas flex flex-col justify-between font-sans">
       <SEOHead
         title="Daftar Akun Mitra Baru | Event Yuk"
         description="Daftar akun ekosistem acara Event Yuk untuk Event Organizer, Vendor Peralatan, Band Musisi, Tenant Bazaar, Sponsor Brand, atau Kru Lapangan."
@@ -239,7 +242,7 @@ export default function RegisterPage() {
             <div className="hidden sm:block h-5 w-px bg-slate-200" />
             <Link
               to="/"
-              className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition"
+              className="hidden sm:inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-slate-900 transition"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               <span>Beranda</span>
@@ -249,45 +252,45 @@ export default function RegisterPage() {
           {/* Stepper Pills */}
           <div className="flex items-center gap-1 sm:gap-2">
             <div
-              className={`px-3 py-1 rounded-full text-[11px] font-bold flex items-center gap-1.5 transition ${
+              className={`px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-2 transition ${
                 step === 'SELECT_ROLE'
                   ? 'bg-[#172D46] text-white shadow-xs'
                   : 'bg-emerald-100 text-emerald-800'
               }`}
             >
-              <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[10px]">
+              <span className="h-5 w-5 rounded-full bg-white/20 flex items-center justify-center text-xs">
                 1
               </span>
-              <span className="hidden sm:inline">Pilih Peran</span>
+              <span className="hidden sm:inline">Pilih peran</span>
             </div>
 
             <span className="text-slate-300 font-bold text-xs">→</span>
 
             <div
-              className={`px-3 py-1 rounded-full text-[11px] font-bold flex items-center gap-1.5 transition ${
+              className={`px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-2 transition ${
                 step === 'FORM'
                   ? 'bg-[#172D46] text-white shadow-xs'
                   : step === 'OTP'
                   ? 'bg-emerald-100 text-emerald-800'
-                  : 'bg-slate-100 text-slate-500'
+                  : 'bg-slate-100 text-slate-600'
               }`}
             >
-              <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[10px]">
+              <span className="h-5 w-5 rounded-full bg-white/20 flex items-center justify-center text-xs">
                 2
               </span>
-              <span className="hidden sm:inline">Data Akun</span>
+              <span className="hidden sm:inline">Data akun</span>
             </div>
 
             <span className="text-slate-300 font-bold text-xs">→</span>
 
             <div
-              className={`px-3 py-1 rounded-full text-[11px] font-bold flex items-center gap-1.5 transition ${
+              className={`px-3 py-1.5 rounded-full text-sm font-semibold flex items-center gap-2 transition ${
                 step === 'OTP'
                   ? 'bg-[#172D46] text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-500'
+                  : 'bg-slate-100 text-slate-600'
               }`}
             >
-              <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[10px]">
+              <span className="h-5 w-5 rounded-full bg-white/20 flex items-center justify-center text-xs">
                 3
               </span>
               <span className="hidden sm:inline">Verifikasi OTP</span>
@@ -295,9 +298,9 @@ export default function RegisterPage() {
           </div>
 
           {/* Login Link */}
-          <div className="text-xs text-slate-500 font-medium">
-            <span className="hidden md:inline">Sudah memiliki akun? </span>
-            <Link to="/login" className="font-extrabold text-[#456B39] hover:underline">
+          <div className="text-sm text-slate-600">
+            <span className="hidden md:inline">Sudah punya akun? </span>
+            <Link to="/login" className="font-semibold text-brand-navy underline underline-offset-4">
               Masuk
             </Link>
           </div>
@@ -305,17 +308,17 @@ export default function RegisterPage() {
       </header>
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12">
+      <main ref={stepRef} className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12">
         {/* Error / Success Notifications */}
         {errorMessage && (
-          <div className="max-w-2xl mx-auto mb-6 p-4 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-700 font-semibold flex items-center gap-2.5">
+          <div className="max-w-2xl mx-auto mb-6 p-4 rounded-lg bg-rose-50 border border-rose-300 text-sm text-rose-800 font-medium flex items-center gap-2.5" role="alert">
             <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
             <span>{errorMessage}</span>
           </div>
         )}
 
         {successMessage && (
-          <div className="max-w-2xl mx-auto mb-6 p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-800 font-semibold flex items-center gap-2.5">
+          <div className="max-w-2xl mx-auto mb-6 p-4 rounded-lg bg-emerald-50 border border-emerald-300 text-sm text-emerald-900 font-medium flex items-center gap-2.5" role="status">
             <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>{successMessage}</span>
           </div>
@@ -325,15 +328,15 @@ export default function RegisterPage() {
         {step === 'SELECT_ROLE' && (
           <div className="space-y-8 animate-fadeIn">
             <div className="text-center max-w-2xl mx-auto space-y-3">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#172D46]/10 text-[#172D46] text-xs font-bold border border-[#172D46]/20">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-lime-soft text-brand-navy text-sm font-semibold border border-brand-navy/15">
                 <Layers className="w-3.5 h-3.5 text-[#172D46]" />
-                <span>Langkah 1 dari 3: Pilih 1 Peran Tetap Akun</span>
+                <span>Langkah 1 dari 3: pilih satu peran</span>
               </div>
-              <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-                Bagaimana Anda Terlibat dalam Acara?
+              <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-[-0.03em]">
+                Kamu terlibat di acara sebagai apa?
               </h2>
-              <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
-                Di Event Yuk, setiap akun memiliki <strong>1 peran resmi permanen</strong> demi kepastian hukum dokumen PKS dan rekening bersama Escrow.
+              <p className="text-base text-slate-600 leading-7">
+                Setiap akun punya satu peran tetap, supaya dokumen PKS dan rekening bersama Escrow punya dasar hukum yang jelas.
               </p>
 
               {/* Fast Google Auth Option */}
@@ -343,7 +346,7 @@ export default function RegisterPage() {
                   onClick={async () => {
                     await signInWithGoogle();
                   }}
-                  className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 font-bold text-xs transition flex items-center justify-center gap-2.5 shadow-xs mx-auto"
+                  className="w-full sm:w-auto min-h-12 px-6 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-semibold text-base transition flex items-center justify-center gap-3 mx-auto"
                 >
                   <svg className="w-4 h-4" viewBox="0 0 24 24">
                     <path
@@ -363,11 +366,11 @@ export default function RegisterPage() {
                       d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                     />
                   </svg>
-                  <span>Daftar Lebih Cepat dengan Akun Google</span>
+                  <span>Daftar lebih cepat dengan Google</span>
                 </button>
                 <div className="flex items-center gap-3 my-4 max-w-md mx-auto">
                   <div className="flex-1 h-px bg-slate-200" />
-                  <span className="text-[11px] text-slate-400 font-bold uppercase tracking-wider">atau daftar via email & OTP</span>
+                  <span className="text-sm text-slate-600">atau daftar lewat email dan OTP</span>
                   <div className="flex-1 h-px bg-slate-200" />
                 </div>
               </div>
@@ -381,37 +384,46 @@ export default function RegisterPage() {
                 return (
                   <div
                     key={role.id}
+                    role="button"
+                    tabIndex={0}
+                    aria-pressed={isSelected}
                     onClick={() => handleSelectRole(role.id)}
-                    className={`cursor-pointer rounded-3xl p-6 transition-all duration-200 flex flex-col justify-between border-2 ${
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleSelectRole(role.id);
+                      }
+                    }}
+                    className={`cursor-pointer rounded-xl p-6 transition-all duration-200 flex flex-col justify-between border-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy ${
                       isSelected
-                        ? `${role.borderColor} bg-white shadow-xl ring-2 ring-[#172D46]/20 -translate-y-1`
+                        ? `${role.borderColor} bg-white shadow-xl ring-2 ring-brand-navy/20`
                         : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-md'
                     }`}
                   >
                     <div>
                       <div className="flex items-center justify-between mb-4">
-                        <div className={`p-3 rounded-2xl ${role.color} border border-slate-100`}>
+                        <div className={`p-3 rounded-lg ${role.color}`}>
                           <IconComponent className="w-6 h-6" />
                         </div>
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">
+                          <span className="text-xs font-semibold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-full">
                             {role.badge}
                           </span>
                           {isSelected && (
-                            <div className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center">
+                            <div className="w-6 h-6 rounded-full bg-brand-navy text-white flex items-center justify-center">
                               <CheckCircle2 className="w-3.5 h-3.5" />
                             </div>
                           )}
                         </div>
                       </div>
 
-                      <h3 className="font-extrabold text-base text-slate-900">{role.name}</h3>
-                      <p className="text-xs text-slate-600 mt-2 leading-relaxed">{role.desc}</p>
+                      <h3 className="font-display font-bold text-xl tracking-[-0.02em] text-slate-950">{role.name}</h3>
+                      <p className="text-base text-slate-600 mt-2 leading-7">{role.desc}</p>
 
                       <div className="mt-4 pt-3 border-t border-slate-100 space-y-1.5">
                         {role.features.map((feat, idx) => (
-                          <div key={idx} className="flex items-center gap-2 text-[11px] text-slate-600 font-medium">
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                          <div key={idx} className="flex items-center gap-2 text-sm text-slate-700">
+                            <CheckCircle2 aria-hidden="true" className="w-4 h-4 text-brand-forest shrink-0" />
                             <span>{feat}</span>
                           </div>
                         ))}
@@ -420,13 +432,13 @@ export default function RegisterPage() {
 
                     <div className="mt-5 pt-3 border-t border-slate-100">
                       <div
-                        className={`w-full py-2.5 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition ${
+                        className={`w-full min-h-11 rounded-lg font-semibold text-sm flex items-center justify-center gap-1.5 transition ${
                           isSelected
-                            ? 'bg-[#172D46] text-white'
-                            : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                            ? 'bg-brand-navy text-white'
+                            : 'bg-slate-100 text-slate-800 hover:bg-slate-200'
                         }`}
                       >
-                        <span>{isSelected ? 'Peran Terpilih' : 'Pilih Peran Ini'}</span>
+                        <span>{isSelected ? 'Peran terpilih' : 'Pilih peran ini'}</span>
                       </div>
                     </div>
                   </div>
@@ -439,10 +451,10 @@ export default function RegisterPage() {
               <button
                 type="button"
                 onClick={() => setStep('FORM')}
-                className="px-8 py-3.5 rounded-2xl bg-gradient-to-r from-[#456B39] to-[#5E7628] hover:from-[#2F5232] hover:to-[#3F531D] text-white font-black text-xs sm:text-sm shadow-xl shadow-[#456B39]/30 transition transform hover:-translate-y-0.5 flex items-center gap-2"
+                className="min-h-12 px-8 rounded-lg bg-brand-navy hover:bg-brand-navy-dark text-white font-semibold text-base transition-colors flex items-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy"
               >
-                <span>Lanjutkan ke Data Akun</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>Lanjut ke data akun</span>
+                <ArrowRight aria-hidden="true" className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -450,112 +462,112 @@ export default function RegisterPage() {
 
         {/* STEP 2: ACCOUNT DETAILS & CREDENTIALS */}
         {step === 'FORM' && (
-          <div className="max-w-2xl mx-auto space-y-6 animate-fadeIn">
+          <div className="max-w-2xl mx-auto space-y-6">
             {/* Header */}
             <div>
               <button
                 type="button"
                 onClick={() => setStep('SELECT_ROLE')}
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition mb-3"
+                className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-slate-900 transition mb-3"
               >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Ubah Pilihan Peran</span>
+                <ArrowLeft aria-hidden="true" className="h-4 w-4" />
+                <span>Ubah pilihan peran</span>
               </button>
-              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                Lengkapi Data Penanggung Jawab
+              <h2 className="font-display text-3xl font-extrabold tracking-[-0.03em] text-brand-ink sm:text-4xl">
+                Lengkapi data penanggung jawab
               </h2>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                Data ini digunakan untuk penerbitan dokumen PKS resmi dan otentikasi akun Anda.
+              <p className="mt-2 text-base leading-7 text-slate-600">
+                Data ini digunakan untuk penerbitan dokumen PKS resmi dan otentikasi akunmu.
               </p>
             </div>
 
             {/* Active Role Card Reminder */}
-            <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3 rounded-lg bg-white p-4">
               <div className="flex items-center gap-3">
-                <div className={`p-2.5 rounded-xl ${activeRoleDetail.color}`}>
-                  <activeRoleDetail.icon className="w-5 h-5" />
+                <div className={`rounded-lg p-2.5 ${activeRoleDetail.color}`}>
+                  <activeRoleDetail.icon aria-hidden="true" className="h-5 w-5" />
                 </div>
                 <div>
-                  <div className="text-[10px] uppercase font-bold text-slate-400">Peran Akun Utama</div>
-                  <div className="font-extrabold text-sm text-slate-900">{activeRoleDetail.name}</div>
+                  <div className="text-sm text-slate-600">Peran akun utama</div>
+                  <div className="font-display text-lg font-extrabold text-brand-ink">{activeRoleDetail.name}</div>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setStep('SELECT_ROLE')}
-                className="text-xs font-bold text-[#456B39] hover:underline"
+                className="min-h-11 shrink-0 text-sm font-semibold text-brand-navy underline underline-offset-4"
               >
-                Ganti Peran
+                Ganti peran
               </button>
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSendOtp} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4 text-xs font-sans">
+            <form onSubmit={handleSendOtp} className="space-y-5 rounded-lg bg-white p-6 font-sans sm:p-8">
               <div>
-                <label className="block font-bold text-slate-700 mb-1.5">
-                  Nama Lengkap Penanggung Jawab / Pimpinan
+                <label htmlFor="reg-fullName" className="mb-2 block text-sm font-semibold text-slate-800">
+                  Nama lengkap penanggung jawab atau pimpinan
                 </label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+                  <User aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
                   <input
                     type="text"
                     required
-                    placeholder="Contoh: Raden Satria Pamungkas"
+                    id="reg-fullName" autoComplete="name" placeholder="Contoh: Raden Satria Pamungkas"
                     value={formData.fullName}
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-300 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                    className="min-h-12 w-full rounded-lg border border-slate-300 bg-white pl-11 pr-4 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1.5">
-                  Nama Entitas / Perusahaan / Nama Panggung
+                <label htmlFor="reg-business" className="mb-2 block text-sm font-semibold text-slate-800">
+                  Nama entitas, perusahaan, atau nama panggung
                 </label>
                 <div className="relative">
-                  <Building2 className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+                  <Building2 aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
                   <input
                     type="text"
                     required
-                    placeholder="Contoh: Kreasi Panggung Nusantara / Senja Di Batavia"
+                    id="reg-business" autoComplete="organization" placeholder="Contoh: Kreasi Panggung Nusantara / Senja Di Batavia"
                     value={formData.businessName}
                     onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                    className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-300 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                    className="min-h-12 w-full rounded-lg border border-slate-300 bg-white pl-11 pr-4 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1.5">
-                    Alamat Email Aktif
+                  <label htmlFor="reg-email" className="mb-2 block text-sm font-semibold text-slate-800">
+                    Email aktif
                   </label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+                    <Mail aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
                     <input
                       type="email"
                       required
-                      placeholder="kontak@perusahaan.id"
+                      id="reg-email" autoComplete="email" placeholder="kontak@perusahaan.id"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-300 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                      className="min-h-12 w-full rounded-lg border border-slate-300 bg-white pl-11 pr-4 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1.5">
-                    Nomor Telepon / WhatsApp Aktif
+                  <label htmlFor="reg-phone" className="mb-2 block text-sm font-semibold text-slate-800">
+                    Nomor telepon atau WhatsApp aktif
                   </label>
                   <div className="relative">
-                    <Phone className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+                    <Phone aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
                     <input
                       type="tel"
                       required
-                      placeholder="081234567890"
+                      id="reg-phone" autoComplete="tel" placeholder="081234567890"
                       value={formData.phoneWa}
                       onChange={(e) => setFormData({ ...formData, phoneWa: e.target.value })}
-                      className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-300 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                      className="min-h-12 w-full rounded-lg border border-slate-300 bg-white pl-11 pr-4 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
                     />
                   </div>
                 </div>
@@ -563,42 +575,43 @@ export default function RegisterPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1.5">
-                    Kata Sandi Akun
+                  <label htmlFor="reg-password" className="mb-2 block text-sm font-semibold text-slate-800">
+                    Kata sandi akun
                   </label>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+                    <Lock aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
-                      placeholder="Minimal 8 karakter"
+                      id="reg-password" autoComplete="new-password" placeholder="Minimal 8 karakter"
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="w-full pl-11 pr-11 py-3 rounded-2xl border border-slate-300 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                      className="min-h-12 w-full rounded-lg border border-slate-300 bg-white pl-11 pr-12 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-3.5 text-slate-400 hover:text-slate-600 transition"
+                      aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                      className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-slate-600 hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-navy"
                     >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showPassword ? <EyeOff aria-hidden="true" className="h-5 w-5" /> : <Eye aria-hidden="true" className="h-5 w-5" />}
                     </button>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1.5">
-                    Konfirmasi Kata Sandi
+                  <label htmlFor="reg-confirm" className="mb-2 block text-sm font-semibold text-slate-800">
+                    Konfirmasi kata sandi
                   </label>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+                    <Lock aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
-                      placeholder="Ulangi kata sandi"
+                      id="reg-confirm" autoComplete="new-password" placeholder="Ulangi kata sandi"
                       value={formData.confirmPassword}
                       onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                      className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-300 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                      className="min-h-12 w-full rounded-lg border border-slate-300 bg-white pl-11 pr-4 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
                     />
                   </div>
                 </div>
@@ -611,10 +624,10 @@ export default function RegisterPage() {
                   id="agreeTerms"
                   checked={formData.agreeTerms}
                   onChange={(e) => setFormData({ ...formData, agreeTerms: e.target.checked })}
-                  className="w-4 h-4 rounded border-slate-300 text-[#172D46] focus:ring-[#172D46] mt-0.5"
+                  className="mt-1 h-5 w-5 rounded border-slate-400 text-brand-navy focus:ring-brand-navy"
                 />
-                <label htmlFor="agreeTerms" className="text-slate-600 leading-snug cursor-pointer text-xs">
-                  Saya menyetujui <span className="text-[#172D46] font-bold hover:underline">Syarat & Ketentuan Layanan</span> serta klausul otomatisasi <span className="text-[#172D46] font-bold hover:underline">Rekening Bersama Escrow & PKS Digital</span> Event Yuk.
+                <label htmlFor="agreeTerms" className="cursor-pointer text-base leading-7 text-slate-700">
+                  Saya menyetujui <span className="font-semibold text-brand-navy underline underline-offset-4">Syarat dan Ketentuan Layanan</span> serta klausul otomatisasi <span className="font-semibold text-brand-navy underline underline-offset-4">Rekening Bersama Escrow dan PKS Digital</span> Event Yuk.
                 </label>
               </div>
 
@@ -623,7 +636,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setStep('SELECT_ROLE')}
-                  className="px-5 py-3 rounded-2xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-50 transition"
+                  className="min-h-12 rounded-full border-2 border-brand-navy/30 px-6 text-base font-semibold text-brand-ink transition hover:border-brand-navy"
                 >
                   Kembali
                 </button>
@@ -631,17 +644,17 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={loading || !formData.agreeTerms}
-                  className="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[#172D46] to-[#0F263B] hover:from-[#0F263B] hover:to-[#0B1F31] text-white font-extrabold text-xs sm:text-sm shadow-md transition flex items-center gap-2 disabled:opacity-50"
+                  className="inline-flex min-h-12 items-center gap-2 rounded-full bg-brand-navy px-7 text-base font-semibold text-white transition-colors hover:bg-brand-navy-dark disabled:opacity-50"
                 >
                   {loading ? (
                     <>
-                      <RotateCw className="w-4 h-4 animate-spin" />
+                      <RotateCw aria-hidden="true" className="h-5 w-5 animate-spin" />
                       <span>Mengirim OTP...</span>
                     </>
                   ) : (
                     <>
-                      <KeyRound className="w-4 h-4" />
-                      <span>Kirim Kode OTP Verifikasi</span>
+                      <KeyRound aria-hidden="true" className="h-5 w-5" />
+                      <span>Kirim kode OTP</span>
                     </>
                   )}
                 </button>
@@ -652,56 +665,59 @@ export default function RegisterPage() {
 
         {/* STEP 3: OTP VERIFICATION */}
         {step === 'OTP' && (
-          <div className="max-w-md mx-auto space-y-6 animate-fadeIn">
+          <div className="max-w-md mx-auto space-y-6">
             <div className="text-center">
-              <div className="w-14 h-14 rounded-3xl bg-[#172D46]/10 text-[#172D46] mx-auto flex items-center justify-center mb-4 border border-[#172D46]/20">
-                <KeyRound className="w-7 h-7" />
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-brand-lime text-brand-navy">
+                <KeyRound aria-hidden="true" className="h-7 w-7" />
               </div>
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-                Verifikasi Kode OTP
+              <h2 className="font-display text-3xl font-extrabold tracking-[-0.03em] text-brand-ink">
+                Verifikasi kode OTP
               </h2>
-              <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                Masukkan 6-digit kode verifikasi yang telah dikirimkan ke email{' '}
-                <strong className="text-slate-800">{formData.email}</strong>.
+              <p className="mt-2 text-base leading-7 text-slate-600">
+                Masukkan kode verifikasi 6 digit yang dikirim ke email{' '}
+                <strong className="text-brand-ink">{formData.email}</strong>.
               </p>
             </div>
 
             {previewOtp && (
-              <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-center justify-between">
-                <span>Kode Verifikasi:</span>
-                <span className="font-mono font-black text-base tracking-widest text-[#456B39]">
+              <div className="flex items-center justify-between rounded-lg bg-brand-lime-soft p-4 text-base text-brand-ink">
+                <span>Kode verifikasi</span>
+                <span className="font-mono text-xl font-bold tracking-widest text-brand-navy">
                   {previewOtp}
                 </span>
               </div>
             )}
 
-            <form onSubmit={handleVerifyOtp} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-5 text-xs font-sans">
+            <form onSubmit={handleVerifyOtp} className="space-y-5 rounded-lg bg-white p-6 font-sans sm:p-8">
               <div>
-                <label className="block font-bold text-slate-700 text-center mb-2">
-                  Kode Verifikasi 6-Digit
+                <label htmlFor="reg-otp" className="mb-2 block text-center text-sm font-semibold text-slate-800">
+                  Kode verifikasi 6 digit
                 </label>
                 <input
+                  id="reg-otp"
                   type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
                   maxLength={6}
                   required
                   placeholder="------"
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                  className="w-full py-4 text-center font-mono font-black text-2xl tracking-[0.5em] rounded-2xl border-2 border-slate-300 focus:border-[#172D46] focus:ring-2 focus:ring-[#172D46]/20 focus:outline-none transition text-slate-900"
+                  className="min-h-16 w-full rounded-lg border-2 border-slate-300 bg-white text-center font-mono text-3xl font-bold tracking-[0.5em] text-slate-900 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
                 />
               </div>
 
               {/* Timer & Resend */}
-              <div className="text-center text-xs text-slate-500">
+              <div className="text-center text-base text-slate-600">
                 {otpCountdown > 0 ? (
-                  <span>Kirim ulang kode dalam <strong className="text-[#172D46] font-mono">{otpCountdown} detik</strong></span>
+                  <span>Kirim ulang kode dalam <strong className="font-mono text-brand-navy">{otpCountdown} detik</strong></span>
                 ) : (
                   <button
                     type="button"
                     onClick={handleSendOtp}
-                    className="font-bold text-[#456B39] hover:underline"
+                    className="min-h-11 font-semibold text-brand-navy underline underline-offset-4"
                   >
-                    Kirim Ulang Kode OTP Sekarang
+                    Kirim ulang kode OTP
                   </button>
                 )}
               </div>
@@ -711,17 +727,17 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={loading || otpCode.length < 6}
-                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-extrabold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-brand-navy text-base font-semibold text-white transition-colors hover:bg-brand-navy-dark disabled:opacity-50"
                 >
                   {loading ? (
                     <>
-                      <RotateCw className="w-4 h-4 animate-spin" />
-                      <span>Memverifikasi Akun...</span>
+                      <RotateCw aria-hidden="true" className="h-5 w-5 animate-spin" />
+                      <span>Memverifikasi...</span>
                     </>
                   ) : (
                     <>
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Verifikasi & Masuk Otomatis</span>
+                      <CheckCircle2 aria-hidden="true" className="h-5 w-5" />
+                      <span>Verifikasi dan masuk</span>
                     </>
                   )}
                 </button>
@@ -729,9 +745,9 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setStep('FORM')}
-                  className="w-full py-2.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition"
+                  className="min-h-11 w-full text-base font-semibold text-slate-600 hover:text-slate-950"
                 >
-                  Kembali ke Data Akun
+                  Kembali ke data akun
                 </button>
               </div>
             </form>
@@ -740,11 +756,11 @@ export default function RegisterPage() {
       </main>
 
       {/* Footer Note */}
-      <footer className="w-full py-5 border-t border-slate-200/80 bg-white text-center text-[11px] text-slate-400">
+      <footer className="w-full py-5 border-t border-slate-200/80 bg-white text-center text-sm text-slate-600">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Sistem Pendaftaran Resmi Ekosistem Kolaborasi Acara Event Yuk</span>
+            <span>Pendaftaran resmi Event Yuk</span>
           </div>
           <div>© {new Date().getFullYear()} Event Yuk. Seluruh data terenkripsi dan terlindungi.</div>
         </div>

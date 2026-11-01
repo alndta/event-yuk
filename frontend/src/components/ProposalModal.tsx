@@ -1,3 +1,4 @@
+import useDialog from '../hooks/useDialog';
 import React, { useState, useRef } from 'react';
 import {
   X,
@@ -25,7 +26,7 @@ interface Props {
   onSuccess: (proposalData: any) => void;
 }
 
-export default function ProposalModal({
+function ProposalModalInner({
   isOpen,
   event,
   partner,
@@ -33,6 +34,7 @@ export default function ProposalModal({
   onClose,
   onSuccess,
 }: Props) {
+  const dialogRef = useDialog(onClose);
   const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
@@ -141,25 +143,25 @@ export default function ProposalModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white rounded-3xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
+    <div ref={dialogRef} className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-950/65 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-white rounded-lg max-w-xl w-full border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header */}
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#172D46]/10 text-[#172D46] text-[11px] font-bold mb-1 border border-[#172D46]/20">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#172D46]/10 text-[#172D46] text-sm font-bold mb-1 border border-[#172D46]/20">
               <Handshake className="w-3.5 h-3.5 text-[#172D46]" />
               {mode === 'PARTNER_TO_EO' ? 'Pengajuan Penawaran Mitra ke Acara' : 'Undangan Resmi EO ke Mitra'}
             </div>
             <h3 className="font-extrabold text-slate-900 text-xl tracking-tight">
               {mode === 'PARTNER_TO_EO' ? 'Ajukan Proposal & Penawaran Biaya' : 'Kirim Undangan Kerjasama Resmi'}
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-sm text-slate-500 mt-0.5">
               Ditujukan untuk: <strong className="text-slate-800">{targetTitle}</strong>
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-xl transition"
+            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-lg transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -170,13 +172,13 @@ export default function ProposalModal({
           {/* Judul */}
           <div>
             <label className="block font-semibold text-slate-700 mb-1">
-              Judul Penawaran / Pekerjaan
+              Judul penawaran atau pekerjaan
             </label>
             <input
               type="text"
               required
               placeholder="Contoh: Paket Panggung & Rigging 12x10m / Guest Star Penampilan 45 Menit"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none text-slate-800 font-medium"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none text-slate-800 font-medium"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             />
@@ -187,13 +189,13 @@ export default function ProposalModal({
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1">
                 <DollarSign className="w-3.5 h-3.5 text-slate-400" />
-                <span>Nominal Kesepakatan (Rp)</span>
+                <span>Nominal kesepakatan (Rp)</span>
               </label>
               <input
                 type="text"
                 required
                 placeholder="Misal: 35.000.000"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none text-slate-800 font-medium font-mono"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none text-slate-800 font-medium tabular-nums"
                 value={formData.offeredPrice}
                 onChange={(e) => setFormData({ ...formData, offeredPrice: e.target.value })}
               />
@@ -204,7 +206,7 @@ export default function ProposalModal({
                 <span>Skema Termin DP Escrow</span>
               </label>
               <select
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none bg-white text-slate-800 font-medium"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none bg-white text-slate-800 font-medium"
                 value={formData.dpPercentage}
                 onChange={(e) => setFormData({ ...formData, dpPercentage: e.target.value })}
               >
@@ -220,12 +222,12 @@ export default function ProposalModal({
           {/* Scope of Work */}
           <div>
             <label className="block font-semibold text-slate-700 mb-1">
-              Lingkup Kerja (Scope of Work)
+              Lingkup kerja
             </label>
             <textarea
               rows={2}
               placeholder="Jelaskan ruang lingkup pekerjaan, jadwal loading/soundcheck, dan deliverables..."
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none text-slate-800"
+              className="w-full px-3.5 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none text-slate-800"
               value={formData.scopeOfWork}
               onChange={(e) => setFormData({ ...formData, scopeOfWork: e.target.value })}
             />
@@ -234,12 +236,12 @@ export default function ProposalModal({
           {/* Riders or Specs */}
           <div>
             <label className="block font-semibold text-slate-700 mb-1">
-              Rincian Spesifikasi Teknis / Riders
+              Spesifikasi teknis dan rider
             </label>
             <textarea
               rows={2}
               placeholder="Contoh: Daya 40kVA, Line Array 12 Box, Microphone Wireless Shure, Ruang Tunggu Ber-AC..."
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none font-mono text-xs text-slate-800"
+              className="w-full px-3.5 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none tabular-nums text-sm text-slate-800"
               value={formData.ridersOrSpecs}
               onChange={(e) => setFormData({ ...formData, ridersOrSpecs: e.target.value })}
             />
@@ -247,14 +249,14 @@ export default function ProposalModal({
 
           {/* Format PKS: Generated vs Custom File Upload (.doc, .pdf) */}
           <div className="pt-2">
-            <label className="block font-bold text-slate-800 text-xs mb-2">
+            <label className="block font-bold text-slate-800 text-sm mb-2">
               Pilihan Dokumen Perjanjian Kerjasama (PKS / MoU)
             </label>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 mb-3">
               <button
                 type="button"
                 onClick={() => setContractDocMode('GENERATED')}
-                className={`p-3 rounded-2xl border text-left flex items-start gap-2.5 transition ${
+                className={`p-3 rounded-lg border text-left flex items-start gap-2.5 transition ${
                   contractDocMode === 'GENERATED'
                     ? 'border-[#172D46] bg-[#172D46]/5 ring-1 ring-[#172D46]'
                     : 'border-slate-200 bg-white hover:bg-slate-50'
@@ -272,11 +274,11 @@ export default function ProposalModal({
                   )}
                 </div>
                 <div>
-                  <div className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                  <div className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
                     <FileText className="w-3.5 h-3.5 text-[#172D46]" />
                     <span>Draf PKS Digital Otomatis</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">
+                  <p className="text-sm text-slate-500 mt-0.5 leading-snug">
                     Sistem menerbitkan pasal baku perlindungan hukum dan termin otomatis.
                   </p>
                 </div>
@@ -285,7 +287,7 @@ export default function ProposalModal({
               <button
                 type="button"
                 onClick={() => setContractDocMode('UPLOAD_CUSTOM')}
-                className={`p-3 rounded-2xl border text-left flex items-start gap-2.5 transition ${
+                className={`p-3 rounded-lg border text-left flex items-start gap-2.5 transition ${
                   contractDocMode === 'UPLOAD_CUSTOM'
                     ? 'border-[#5E7628] bg-[#5E7628]/5 ring-1 ring-[#5E7628]'
                     : 'border-slate-200 bg-white hover:bg-slate-50'
@@ -303,12 +305,12 @@ export default function ProposalModal({
                   )}
                 </div>
                 <div>
-                  <div className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                  <div className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
                     <UploadCloud className="w-3.5 h-3.5 text-[#5E7628]" />
-                    <span>Unggah Berkas Mandiri (.pdf / .doc)</span>
+                    <span>Unggah berkas sendiri (.pdf atau .doc)</span>
                   </div>
-                  <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">
-                    Gunakan draf kontrak khusus dari legal internal perusahaan Anda.
+                  <p className="text-sm text-slate-500 mt-0.5 leading-snug">
+                    Gunakan draf kontrak khusus dari legal internal perusahaan kamu.
                   </p>
                 </div>
               </button>
@@ -316,7 +318,7 @@ export default function ProposalModal({
 
             {/* Custom Upload Dropzone */}
             {contractDocMode === 'UPLOAD_CUSTOM' && (
-              <div className="p-4 rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50/70 hover:bg-slate-100/50 transition">
+              <div className="p-4 rounded-lg border-2 border-dashed border-slate-300 bg-slate-50/70 hover:bg-slate-100/50 transition">
                 <input
                   type="file"
                   ref={fileInputRef}
@@ -331,35 +333,35 @@ export default function ProposalModal({
                     htmlFor="custom-pks-upload"
                     className="flex flex-col items-center justify-center cursor-pointer py-3 text-center"
                   >
-                    <div className="p-2.5 rounded-2xl bg-white text-[#5E7628] shadow-sm border border-slate-200 mb-2">
+                    <div className="p-2.5 rounded-lg bg-white text-[#5E7628] border border-slate-200 mb-2">
                       <UploadCloud className="w-5 h-5" />
                     </div>
-                    <span className="font-bold text-xs text-slate-800">
+                    <span className="font-bold text-sm text-slate-800">
                       Klik untuk memilih berkas atau seret berkas ke sini
                     </span>
-                    <span className="text-[11px] text-slate-500 mt-0.5">
-                      Mendukung format: .PDF, .DOC, .DOCX (Maksimal 15 MB)
+                    <span className="text-sm text-slate-500 mt-0.5">
+                      Format .PDF, .DOC, atau .DOCX, maksimal 15 MB
                     </span>
                   </label>
                 ) : (
                   <div className="space-y-2">
-                    <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-200">
+                    <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-slate-200">
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div className="p-2 rounded-lg bg-orange-50 text-[#5E7628] border border-orange-200 shrink-0">
                           <Paperclip className="w-4 h-4" />
                         </div>
                         <div className="min-w-0">
-                          <p className="text-xs font-bold text-slate-800 truncate">
+                          <p className="text-sm font-bold text-slate-800 truncate">
                             {uploadedFile.name}
                           </p>
-                          <p className="text-[10px] text-slate-500 font-mono">
+                          <p className="text-sm text-slate-500 tabular-nums">
                             {uploadedFile.size} • Format .{uploadedFile.type.toUpperCase()}
                           </p>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-2 shrink-0">
-                        <div className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                        <div className="flex items-center gap-1 text-sm font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                           <CheckCircle2 className="w-3 h-3" />
                           <span>Siap</span>
                         </div>
@@ -389,12 +391,12 @@ export default function ProposalModal({
           </div>
 
           {/* Legal Escrow Notice */}
-          <div className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-1.5">
+          <div className="p-3.5 bg-slate-50 rounded-lg border border-slate-200 text-sm space-y-1.5">
             <div className="font-bold text-slate-800 flex items-center gap-1.5">
               <FileCheck className="w-4 h-4 text-[#172D46]" />
-              <span>Jaminan Kepastian Hukum & Escrow</span>
+              <span>Kepastian hukum dan Escrow</span>
             </div>
-            <p className="text-slate-600 leading-relaxed text-[11px]">
+            <p className="text-slate-600 leading-relaxed text-sm">
               {contractDocMode === 'UPLOAD_CUSTOM' && uploadedFile
                 ? `Berkas lampiran "${uploadedFile.name}" akan dijadikan dokumen acuan utama dan diikat ke rekening bersama Escrow Midtrans setelah disetujui kedua belah pihak.`
                 : 'Setelah kedua pihak menyepakati harga dan riders, sistem akan menerbitkan draf PKS resmi dan mengunci pembayaran ke dalam buku besar Escrow Rekening Bersama.'}
@@ -406,14 +408,14 @@ export default function ProposalModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl font-medium transition text-xs"
+              className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg font-medium transition text-sm"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={loading || (contractDocMode === 'UPLOAD_CUSTOM' && !uploadedFile)}
-              className="px-5 py-2.5 bg-gradient-to-r from-[#172D46] to-[#0F263B] hover:from-[#0F263B] hover:to-[#0B1F31] text-white rounded-xl font-bold shadow-md hover:shadow-lg transition flex items-center gap-2 text-xs disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 min-h-12 text-white rounded-full font-bold transition flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed bg-brand-navy hover:bg-brand-navy-dark transition-colors"
             >
               <Send className="w-3.5 h-3.5" />
               <span>{loading ? 'Mengirim...' : 'Kirim Penawaran & Kunci PKS'}</span>
@@ -423,4 +425,9 @@ export default function ProposalModal({
       </div>
     </div>
   );
+}
+
+export default function ProposalModal(props: Props) {
+  if (!props.isOpen) return null;
+  return <ProposalModalInner {...props} />;
 }

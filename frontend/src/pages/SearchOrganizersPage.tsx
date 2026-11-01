@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import useGsapReveal from '../hooks/useGsapReveal';
 import { Link } from 'react-router-dom';
 import {
   Search,
@@ -14,6 +15,7 @@ import { mockOrganizers, OrganizerItem } from '../data/mockOrganizers';
 import { PartnerCardsSkeletonList } from '../components/skeletons/PartnerCardSkeleton';
 import { SEOHead } from '../components/SEOHead';
 import { cachedFetch } from '../utils/apiCache';
+import Avatar from '../components/Avatar';
 
 interface Props {
   onInviteOrganizer?: (organizer: OrganizerItem) => void;
@@ -22,6 +24,8 @@ interface Props {
 export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrganizer }: Props) {
   const [organizers, setOrganizers] = useState<OrganizerItem[]>(mockOrganizers);
   const [loading, setLoading] = useState<boolean>(false);
+  const pageRef = useRef<HTMLDivElement>(null);
+  useGsapReveal(pageRef, '[data-gsap-reveal]', [loading]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedCity, setSelectedCity] = useState<string>('ALL');
@@ -68,7 +72,7 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
   });
 
   return (
-    <div className="space-y-6 sm:space-y-8 font-sans">
+    <div ref={pageRef} className="space-y-6 sm:space-y-8 font-sans">
       <SEOHead
         title="Direktori Event Organizer & Promotor Terverifikasi | Event Yuk"
         description="Daftar promotor dan event organizer berlisensi resmi di Indonesia dengan rekam jejak terverifikasi e-KYC. Akses pagu anggaran acara, peluang kemitraan vendor, audisi musisi, dan rekrutmen kru."
@@ -78,26 +82,27 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
 
       {/* Page Header */}
       <div className="max-w-3xl">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#172D46]/10 text-[#172D46] text-xs font-bold mb-3 border border-[#172D46]/20">
-          <Calendar className="w-3.5 h-3.5 text-[#172D46]" />
-          <span>Direktori Promotor & Event Organizer Resmi</span>
-        </div>
-        <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-          Cari & Eksplorasi Event Organizer
+        <p className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-brand-lime-strong">
+          <Calendar aria-hidden="true" className="h-4 w-4" />
+          Direktori promotor dan event organizer
+        </p>
+        <h1 data-split-title className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
+          Cari event organizer yang cocok
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 mt-1">
-          Temukan penyelenggara acara musik festival, pensi sekolah, dan pameran terverifikasi dengan rekam jejak terbukti, transparansi pagu anggaran, serta ulasan ekosistem.
+        <p className="mt-4 text-lg leading-8 text-slate-700">
+          Penyelenggara festival musik, pensi sekolah, dan pameran dengan rekam jejak, pagu anggaran, dan ulasan yang bisa kamu lihat sebelum menghubungi.
         </p>
 
         {/* Search Bar */}
         <div className="mt-5 relative">
-          <Search className="w-5 h-5 text-slate-400 absolute left-4 top-3.5" />
+          <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
           <input
-            type="text"
-            placeholder="Ketik nama EO, kota, spesialisasi festival, pensi, atau pameran..."
+            type="search"
+            aria-label="Cari event organizer"
+            placeholder="Cari nama EO, kota, atau jenis acara"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-11 sm:pl-12 pr-4 py-3 bg-white rounded-2xl border border-slate-300 shadow-xs text-xs sm:text-sm focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+            className="min-h-14 w-full rounded-full border border-slate-300 bg-white pl-12 pr-5 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
           />
         </div>
       </div>
@@ -105,21 +110,22 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
       {/* Filter Row */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-200 mb-8">
         <div className="flex items-center gap-2 overflow-x-auto">
-          <Filter className="w-4 h-4 text-slate-400 mr-1" />
+          <Filter aria-hidden="true" className="mr-1 h-4 w-4 shrink-0 text-slate-600" />
           {[
-            { id: 'ALL', label: 'Semua Kategori' },
-            { id: 'CONCERT', label: 'Festival Musik' },
-            { id: 'PENSI', label: 'Pensi Sekolah' },
-            { id: 'EXPO', label: 'Pameran & Bazaar' },
+            { id: 'ALL', label: 'Semua kategori' },
+            { id: 'CONCERT', label: 'Festival musik' },
+            { id: 'PENSI', label: 'Pensi sekolah' },
+            { id: 'EXPO', label: 'Pameran dan bazaar' },
             { id: 'CORPORATE', label: 'Corporate MICE' },
           ].map((cat) => (
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+              aria-pressed={selectedCategory === cat.id}
+              className={`min-h-11 rounded-full border-2 px-5 text-sm font-semibold transition whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy ${
                 selectedCategory === cat.id
-                  ? 'bg-[#172D46] text-white shadow-sm'
-                  : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
+                  ? 'border-brand-navy bg-brand-navy text-white'
+                  : 'border-brand-navy/25 text-brand-ink hover:border-brand-navy'
               }`}
             >
               {cat.label}
@@ -129,13 +135,14 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
 
         {/* City Filter */}
         <div className="flex items-center gap-2">
-          <MapPin className="w-3.5 h-3.5 text-slate-400" />
+          <MapPin aria-hidden="true" className="h-4 w-4 text-slate-600" />
           <select
+            aria-label="Filter kota"
             value={selectedCity}
             onChange={(e) => setSelectedCity(e.target.value)}
-            className="bg-white border border-slate-300 text-xs font-bold rounded-xl px-3 py-2 text-slate-700 focus:outline-none focus:ring-2 focus:ring-[#172D46]"
+            className="min-h-11 rounded-full border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
           >
-            <option value="ALL">Semua Kota</option>
+            <option value="ALL">Semua kota</option>
             <option value="Jakarta">Jakarta</option>
             <option value="Bandung">Bandung</option>
             <option value="Surabaya">Surabaya</option>
@@ -152,18 +159,20 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
         {filtered.map((eo) => (
           <div
             key={eo.id}
-            className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:shadow-md transition flex flex-col"
+            data-gsap-reveal
+            className="ey-lift flex flex-col overflow-hidden rounded-lg bg-white"
           >
             {/* Banner Top */}
-            <div className="h-32 relative bg-slate-900 overflow-hidden">
+            <div className="relative h-36 overflow-hidden bg-brand-navy-light">
               <img
                 src={eo.bannerImage}
-                alt={eo.name}
-                className="w-full h-full object-cover opacity-60"
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className="h-full w-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent" />
-              <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 bg-white/90 backdrop-blur-md rounded-full text-xs font-bold text-slate-800 shadow-sm">
-                <Award className="w-3.5 h-3.5 text-[#5E7628]" />
+              <div className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-sm font-semibold text-brand-ink">
+                <Award aria-hidden="true" className="h-4 w-4 text-brand-forest" />
                 <span>Rating {eo.rating} / 5.0</span>
               </div>
             </div>
@@ -171,55 +180,56 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
             {/* Content & Avatar */}
             <div className="p-6 pt-0 flex-1 flex flex-col -mt-8 relative">
               <div className="flex items-start justify-between">
-                <img
+                <Avatar
                   src={eo.avatar}
-                  alt={eo.name}
-                  className="w-16 h-16 rounded-2xl object-cover border-4 border-white shadow-md bg-white"
+                  name={eo.name}
+                  decorative
+                  className="h-16 w-16 rounded-lg border-4 border-white bg-white"
                 />
                 {eo.verified && (
-                  <span className="mt-9 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sky-50 text-sky-700 border border-sky-200">
-                    <CheckCircle2 className="w-3 h-3 text-sky-600" />
-                    <span>e-KYC Terverifikasi</span>
+                  <span className="mt-10 inline-flex items-center gap-1.5 rounded-full bg-brand-forest-light px-3 py-1 text-xs font-semibold text-brand-forest-dark">
+                    <CheckCircle2 aria-hidden="true" className="h-4 w-4" />
+                    <span>e-KYC terverifikasi</span>
                   </span>
                 )}
               </div>
 
               <div className="mt-3">
-                <h3 className="text-lg font-black text-slate-900 flex items-center gap-1.5">
+                <h3 className="flex items-center gap-1.5 font-display text-xl font-extrabold tracking-[-0.03em] text-brand-ink">
                   <span>{eo.name}</span>
                 </h3>
-                <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
-                  <span className="flex items-center gap-1 font-semibold text-slate-700">
-                    <MapPin className="w-3.5 h-3.5 text-[#456B39]" />
+                <div className="mt-1 flex items-center gap-2 text-sm text-slate-600">
+                  <span className="flex items-center gap-1 font-semibold text-slate-800">
+                    <MapPin aria-hidden="true" className="h-4 w-4 text-brand-forest" />
                     <span>{eo.city}</span>
                   </span>
-                  <span>•</span>
-                  <span className="text-[#172D46] font-bold">{eo.category}</span>
+                  <span aria-hidden="true">•</span>
+                  <span className="font-semibold text-brand-navy">{eo.category}</span>
                 </div>
               </div>
 
-              <p className="text-xs text-slate-600 mt-3 leading-relaxed">
+              <p className="mt-3 text-base leading-7 text-slate-700">
                 {eo.description}
               </p>
 
               {/* Stats Bar */}
-              <div className="grid grid-cols-2 gap-3 mt-4 py-3 px-4 bg-slate-50 rounded-2xl border border-slate-100 text-xs">
+              <dl className="mt-5 grid grid-cols-2 gap-4 rounded-lg bg-brand-cream p-4">
                 <div>
-                  <div className="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Proyek Selesai</div>
-                  <div className="font-black text-slate-900 text-sm mt-0.5">{eo.totalEventsCompleted} Acara Sukses</div>
+                  <dt className="text-sm text-slate-700">Proyek selesai</dt>
+                  <dd className="mt-0.5 font-display text-lg font-extrabold tracking-[-0.02em] text-brand-ink">{eo.totalEventsCompleted} acara sukses</dd>
                 </div>
                 <div>
-                  <div className="text-slate-400 text-[10px] uppercase font-bold tracking-wider">Total Audiens</div>
-                  <div className="font-black text-[#172D46] text-sm mt-0.5">{eo.totalAttendeesServed} Pengunjung</div>
+                  <dt className="text-sm text-slate-700">Total audiens</dt>
+                  <dd className="mt-0.5 font-display text-lg font-extrabold tracking-[-0.02em] text-brand-ink">{eo.totalAttendeesServed} pengunjung</dd>
                 </div>
-              </div>
+              </dl>
 
               {/* Specialties Tags */}
-              <div className="mt-4 flex flex-wrap gap-1.5">
+              <div className="mt-4 flex flex-wrap gap-2">
                 {eo.specialties.map((spec, idx) => (
                   <span
                     key={idx}
-                    className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-slate-100 text-slate-700 border border-slate-200"
+                    className="rounded-full bg-brand-lime-soft px-3 py-1 text-sm font-medium text-brand-navy"
                   >
                     {spec}
                   </span>
@@ -227,28 +237,26 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
               </div>
 
               {/* Highlight Projects */}
-              <div className="mt-4 text-xs text-slate-500 border-t border-slate-100 pt-3">
-                <div className="text-[10px] uppercase font-bold text-slate-400 mb-1 tracking-wider">Portofolio Unggulan:</div>
-                <div className="flex flex-wrap gap-1 text-slate-700 font-medium">
+              <div className="mt-5 border-t border-slate-200 pt-4">
+                <p className="text-sm font-semibold text-slate-800">Portofolio unggulan</p>
+                <p className="mt-1 text-sm leading-6 text-slate-700">
                   {eo.pastHighlightEvents.join(' • ')}
-                </div>
+                </p>
               </div>
 
               {/* Contact & Invite Action */}
-              <div className="mt-5 pt-4 border-t border-slate-100 flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3 text-xs text-slate-500">
-                  <span className="flex items-center gap-1">
-                    <Mail className="w-3.5 h-3.5 text-slate-400" />
-                    <span className="truncate max-w-[140px]">{eo.contactEmail}</span>
-                  </span>
+              <div className="mt-5 flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex min-w-0 items-center gap-2 text-sm text-slate-600">
+                  <Mail aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-600" />
+                  <span className="truncate">{eo.contactEmail}</span>
                 </div>
 
                 <Link
                   to={`/organizers/${eo.id}`}
-                  className="px-4 py-2 rounded-xl text-xs font-bold bg-[#172D46] hover:bg-[#0F263B] text-white flex items-center gap-1.5 shadow-sm transition"
+                  className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-brand-navy px-5 text-sm font-semibold text-white transition-colors hover:bg-brand-navy-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy"
                 >
-                  <span>Lihat Rekam Jejak</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <span>Lihat rekam jejak</span>
+                  <ArrowRight aria-hidden="true" className="h-4 w-4" />
                 </Link>
               </div>
             </div>

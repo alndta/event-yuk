@@ -1,3 +1,4 @@
+import useDialog from '../hooks/useDialog';
 import React, { useState } from 'react';
 import { X, UploadCloud, Film, Users, DollarSign, Calendar, MapPin, FileCheck } from 'lucide-react';
 import { EventItem } from '../data/mockEvents';
@@ -9,7 +10,8 @@ interface Props {
   onSuccess: (newEvent: EventItem) => void;
 }
 
-export default function UploadPortfolioModal({ isOpen, onClose, onSuccess }: Props) {
+function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
+  const dialogRef = useDialog(onClose);
   const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
@@ -95,17 +97,17 @@ export default function UploadPortfolioModal({ isOpen, onClose, onSuccess }: Pro
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+    <div ref={dialogRef} className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-white rounded-lg max-w-xl w-full border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-amber-50 to-orange-50/50">
+        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-brand-lime-soft">
           <div className="flex items-center gap-2">
             <span className="p-2 rounded-lg bg-amber-500/10 text-amber-600 font-bold">
               <FileCheck className="w-5 h-5 text-amber-600" />
             </span>
             <div>
-              <h3 className="font-extrabold text-slate-900 text-lg">Upload Portofolio Acara Sukses</h3>
-              <p className="text-xs text-slate-500">Tampilkan rekam jejak event yang pernah Anda laksanakan ke dalam katalog publik</p>
+              <h3 className="font-extrabold text-slate-900 text-lg">Unggah portofolio acara</h3>
+              <p className="text-sm text-slate-500">Tampilkan rekam jejak event yang pernah kamu laksanakan ke dalam katalog publik</p>
             </div>
           </div>
           <button
@@ -119,7 +121,7 @@ export default function UploadPortfolioModal({ isOpen, onClose, onSuccess }: Pro
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 text-sm">
           <div>
-            <label className="block font-semibold text-slate-700 mb-1">Nama Acara / Event</label>
+            <label className="block font-semibold text-slate-700 mb-1">Nama acara</label>
             <input
               type="text"
               required
@@ -140,12 +142,12 @@ export default function UploadPortfolioModal({ isOpen, onClose, onSuccess }: Pro
               >
                 <option value="CONCERT">Konser Musik</option>
                 <option value="PENSI">Pentas Seni (Pensi)</option>
-                <option value="BAZAAR">Festival Kuliner & Bazaar</option>
+                <option value="BAZAAR">Festival kuliner dan bazaar</option>
                 <option value="EXPO">Pameran / Expo</option>
               </select>
             </div>
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Nama Tim / EO Anda</label>
+              <label className="block font-semibold text-slate-700 mb-1">Nama tim atau EO</label>
               <input
                 type="text"
                 placeholder="Nama Organisasi / EO"
@@ -186,27 +188,27 @@ export default function UploadPortfolioModal({ isOpen, onClose, onSuccess }: Pro
           </div>
 
           {/* Stats Bar */}
-          <div className="grid grid-cols-2 gap-3 bg-amber-50/50 p-3 rounded-xl border border-amber-200/60">
+          <div className="grid grid-cols-2 gap-3 bg-amber-50/50 p-3 rounded-lg border border-amber-200/60">
             <div>
-              <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1 text-xs">
-                <Users className="w-3.5 h-3.5 text-amber-600" /> Total Penonton / Pengunjung
+              <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1 text-sm">
+                <Users className="w-3.5 h-3.5 text-amber-600" /> Total penonton atau pengunjung
               </label>
               <input
                 type="text"
                 placeholder="Misal: 10.000"
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white text-xs"
+                className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white text-sm"
                 value={formData.attendees}
                 onChange={(e) => setFormData({ ...formData, attendees: e.target.value })}
               />
             </div>
             <div>
-              <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1 text-xs">
-                <DollarSign className="w-3.5 h-3.5 text-amber-600" /> Estimasi Total Produksi
+              <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1 text-sm">
+                <DollarSign className="w-3.5 h-3.5 text-amber-600" /> Estimasi biaya produksi
               </label>
               <input
                 type="text"
                 placeholder="Misal: 450.000.000"
-                className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white text-xs"
+                className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white text-sm"
                 value={formData.budget}
                 onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
               />
@@ -214,7 +216,7 @@ export default function UploadPortfolioModal({ isOpen, onClose, onSuccess }: Pro
           </div>
 
           <div>
-            <label className="block font-semibold text-slate-700 mb-1">Cerita Singkat & Keberhasilan Acara</label>
+            <label className="block font-semibold text-slate-700 mb-1">Cerita singkat dan hasil acara</label>
             <textarea
               rows={3}
               placeholder="Ceritakan keseruan artis pengisi, kepuasan tenant, dan kelancaran produksi..."
@@ -227,7 +229,7 @@ export default function UploadPortfolioModal({ isOpen, onClose, onSuccess }: Pro
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1">
-                <UploadCloud className="w-3.5 h-3.5 text-slate-400" /> URL Foto Dokumentasi
+                <UploadCloud className="w-3.5 h-3.5 text-slate-400" /> URL foto dokumentasi
               </label>
               <input
                 type="url"
@@ -239,7 +241,7 @@ export default function UploadPortfolioModal({ isOpen, onClose, onSuccess }: Pro
             </div>
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1">
-                <Film className="w-3.5 h-3.5 text-slate-400" /> Link Video Aftermovie
+                <Film className="w-3.5 h-3.5 text-slate-400" /> Tautan video aftermovie
               </label>
               <input
                 type="url"
@@ -263,7 +265,7 @@ export default function UploadPortfolioModal({ isOpen, onClose, onSuccess }: Pro
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white rounded-lg font-bold shadow-md hover:shadow-lg transition flex items-center gap-2"
+              className="px-5 min-h-12 text-white rounded-full font-bold transition flex items-center gap-2 bg-brand-navy hover:bg-brand-navy-dark transition-colors"
             >
               {loading ? 'Menyimpan...' : 'Tayangkan ke Katalog'}
             </button>
@@ -272,4 +274,9 @@ export default function UploadPortfolioModal({ isOpen, onClose, onSuccess }: Pro
       </div>
     </div>
   );
+}
+
+export default function UploadPortfolioModal(props: Props) {
+  if (!props.isOpen) return null;
+  return <UploadPortfolioModalInner {...props} />;
 }

@@ -1,3 +1,4 @@
+import useDialog from '../hooks/useDialog';
 import { useState } from 'react';
 import {
   X,
@@ -30,7 +31,8 @@ interface Props {
   onSignAndFund: () => void;
 }
 
-export default function ContractModal({ isOpen, contractData, onClose, onSignAndFund }: Props) {
+function ContractModalInner({ isOpen, contractData, onClose, onSignAndFund }: Props) {
+  const dialogRef = useDialog(onClose);
   const [downloadSuccess, setDownloadSuccess] = useState(false);
 
   if (!isOpen) return null;
@@ -58,16 +60,16 @@ export default function ContractModal({ isOpen, contractData, onClose, onSignAnd
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
+    <div ref={dialogRef} className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-white rounded-lg max-w-2xl w-full border border-slate-200 overflow-hidden flex flex-col max-h-[92vh]">
         {/* Header */}
         <div className="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-xl bg-[#172D46]/10 text-[#172D46] border border-[#172D46]/20">
+            <div className="p-2 rounded-lg bg-[#172D46]/10 text-[#172D46] border border-[#172D46]/20">
               <FileCheck className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-[11px] font-mono text-slate-500 font-semibold">
+              <div className="text-sm tabular-nums text-slate-500 font-semibold">
                 No. Registrasi: {contractData.contractNumber}
               </div>
               <h3 className="font-extrabold text-slate-900 text-lg tracking-tight">
@@ -77,29 +79,29 @@ export default function ContractModal({ isOpen, contractData, onClose, onSignAnd
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-xl transition"
+            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-lg transition"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Paper Container */}
-        <div className="p-6 overflow-y-auto space-y-5 text-xs text-slate-700 font-sans leading-relaxed">
+        <div className="p-6 overflow-y-auto space-y-5 text-sm text-slate-700 font-sans leading-relaxed">
           {/* Custom File Attachment Banner (If user uploaded their own .pdf / .doc) */}
           {contractData.attachedFileName && (
-            <div className="p-4 bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-transparent rounded-2xl border border-amber-300/60 flex items-center justify-between">
+            <div className="p-4 rounded-lg border border-amber-300/60 flex items-center justify-between bg-brand-lime-soft">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="p-2.5 rounded-xl bg-white shadow-sm border border-amber-200 text-[#5E7628] shrink-0">
+                <div className="p-2.5 rounded-lg bg-white border border-amber-200 text-[#5E7628] shrink-0">
                   <Paperclip className="w-5 h-5" />
                 </div>
                 <div className="min-w-0">
-                  <div className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-[#5E7628]">
-                    <span>Dokumen Kontrak Mandiri Terlampir</span>
+                  <div className="inline-flex items-center gap-1 text-sm font-bold text-[#5E7628]">
+                    <span>Dokumen kontrak mandiri terlampir</span>
                   </div>
-                  <p className="font-bold text-slate-900 text-xs truncate">
+                  <p className="font-bold text-slate-900 text-sm truncate">
                     {contractData.attachedFileName}
                   </p>
-                  <p className="text-[11px] text-slate-500">
+                  <p className="text-sm text-slate-500">
                     {contractData.attachedFileSize || '2.4 MB'} • Format Dokumen Resmi
                   </p>
                 </div>
@@ -108,7 +110,7 @@ export default function ContractModal({ isOpen, contractData, onClose, onSignAnd
               <button
                 type="button"
                 onClick={() => handleSimulateDownload(contractData.attachedFileName || 'dokumen-pks.pdf')}
-                className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-xs flex items-center gap-1.5 shadow-sm hover:shadow transition shrink-0"
+                className="px-3.5 py-2 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-sm flex items-center gap-1.5 hover:shadow transition shrink-0"
               >
                 <Download className="w-3.5 h-3.5 text-[#172D46]" />
                 <span>{downloadSuccess ? 'Tersimpan' : 'Unduh Berkas'}</span>
@@ -118,41 +120,41 @@ export default function ContractModal({ isOpen, contractData, onClose, onSignAnd
 
           {/* Letterhead */}
           <div className="text-center border-b-2 border-slate-900 pb-4">
-            <div className="font-extrabold text-base tracking-wider text-slate-900 uppercase">
+            <div className="font-extrabold text-base text-slate-900">
               PERJANJIAN KERJASAMA PENGADAAN & PENAMPILAN ACARA
             </div>
-            <div className="text-xs text-slate-600 mt-0.5">
+            <div className="text-sm text-slate-600 mt-0.5">
               PLATFORM EKOSISTEM EVENT-YUK DENGAN PROTEKSI REKENING BERSAMA ESCROW
             </div>
-            <div className="text-[11px] font-mono text-slate-500 mt-1">
+            <div className="text-sm tabular-nums text-slate-500 mt-1">
               Nomor: {contractData.contractNumber} • Tanggal: {contractData.date}
             </div>
           </div>
 
           {/* Parties */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
             <div>
-              <span className="font-bold text-slate-900 block text-[11px] uppercase tracking-wider mb-1">
+              <span className="font-bold text-slate-900 block text-sm mb-1">
                 PIHAK PERTAMA (EVENT ORGANIZER)
               </span>
               <div className="font-bold text-slate-800 text-sm">{contractData.partyOne}</div>
-              <div className="text-slate-500 text-[11px]">
+              <div className="text-slate-500 text-sm">
                 Penyelenggara Acara: <strong>{contractData.eventTitle}</strong>
               </div>
             </div>
             <div>
-              <span className="font-bold text-slate-900 block text-[11px] uppercase tracking-wider mb-1">
+              <span className="font-bold text-slate-900 block text-sm mb-1">
                 PIHAK KEDUA ({contractData.roleType})
               </span>
               <div className="font-bold text-slate-800 text-sm">{contractData.partyTwo}</div>
-              <div className="text-slate-500 text-[11px]">Mitra Terverifikasi Platform Event Yuk</div>
+              <div className="text-slate-500 text-sm">Mitra Terverifikasi Platform Event Yuk</div>
             </div>
           </div>
 
           {/* Clauses */}
           <div className="space-y-3.5">
             <div>
-              <div className="font-bold text-slate-900 text-xs mb-1">
+              <div className="font-bold text-slate-900 text-sm mb-1">
                 Pasal 1: Lingkup Kesepakatan & Pekerjaan
               </div>
               <p className="text-slate-600">
@@ -163,19 +165,19 @@ export default function ContractModal({ isOpen, contractData, onClose, onSignAnd
             </div>
 
             <div>
-              <div className="font-bold text-slate-900 text-xs mb-1">
+              <div className="font-bold text-slate-900 text-sm mb-1">
                 Pasal 2: Nilai Kontrak & Termin Pembayaran Escrow
               </div>
-              <div className="bg-slate-100 p-3.5 rounded-xl border border-slate-200 font-mono space-y-1.5">
-                <div className="flex justify-between font-bold text-slate-900 text-xs">
+              <div className="bg-slate-100 p-3.5 rounded-lg border border-slate-200 tabular-nums space-y-1.5">
+                <div className="flex justify-between font-bold text-slate-900 text-sm">
                   <span>Total Nilai Kontrak (Net):</span>
                   <span>Rp {contractData.totalAmount.toLocaleString('id-ID')}</span>
                 </div>
-                <div className="flex justify-between text-slate-600 text-[11px]">
+                <div className="flex justify-between text-slate-600 text-sm">
                   <span>Termin 1 (DP {contractData.dpPercentage}% saat H-7 / Loading Alat):</span>
                   <span>Rp {dpAmount.toLocaleString('id-ID')}</span>
                 </div>
-                <div className="flex justify-between text-slate-600 text-[11px]">
+                <div className="flex justify-between text-slate-600 text-sm">
                   <span>Termin 2 (Pelunasan 100% pasca BAST Digital 2x24 Jam):</span>
                   <span>Rp {settlementAmount.toLocaleString('id-ID')}</span>
                 </div>
@@ -183,7 +185,7 @@ export default function ContractModal({ isOpen, contractData, onClose, onSignAnd
             </div>
 
             <div>
-              <div className="font-bold text-slate-900 text-xs mb-1 flex items-center gap-1.5">
+              <div className="font-bold text-slate-900 text-sm mb-1 flex items-center gap-1.5">
                 <Lock className="w-3.5 h-3.5 text-[#172D46]" />
                 <span>Pasal 3: Jaminan Rekening Bersama (Escrow) & Arbitrase</span>
               </div>
@@ -195,19 +197,19 @@ export default function ContractModal({ isOpen, contractData, onClose, onSignAnd
 
           {/* Signatures Stamp Area */}
           <div className="pt-4 border-t border-slate-200 grid grid-cols-2 gap-6 text-center">
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-              <div className="text-[11px] text-slate-500 font-semibold mb-5">Pihak Pertama (EO)</div>
-              <div className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full font-bold text-[10px]">
+            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
+              <div className="text-sm text-slate-500 font-semibold mb-5">Pihak Pertama (EO)</div>
+              <div className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full font-bold text-sm">
                 <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Tervalidasi Digital
               </div>
               <div className="font-bold text-slate-800 mt-2">{contractData.partyOne}</div>
             </div>
 
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-              <div className="text-[11px] text-slate-500 font-semibold mb-5">
+            <div className="p-3 bg-slate-50 rounded-lg border border-slate-200">
+              <div className="text-sm text-slate-500 font-semibold mb-5">
                 Pihak Kedua ({contractData.roleType})
               </div>
-              <div className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full font-bold text-[10px]">
+              <div className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-800 rounded-full font-bold text-sm">
                 <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Tervalidasi Digital
               </div>
               <div className="font-bold text-slate-800 mt-2">{contractData.partyTwo}</div>
@@ -220,7 +222,7 @@ export default function ContractModal({ isOpen, contractData, onClose, onSignAnd
           <div className="flex items-center gap-2">
             <button
               onClick={() => window.print()}
-              className="px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-xl transition flex items-center gap-1.5"
+              className="px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-lg transition flex items-center gap-1.5"
             >
               <Printer className="w-3.5 h-3.5" />
               <span>Cetak PKS</span>
@@ -228,10 +230,10 @@ export default function ContractModal({ isOpen, contractData, onClose, onSignAnd
             {contractData.attachedFileName && (
               <button
                 onClick={() => handleSimulateDownload(contractData.attachedFileName || 'berkas-pks.pdf')}
-                className="px-3 py-2 text-xs font-semibold text-[#172D46] hover:bg-[#172D46]/10 rounded-xl transition flex items-center gap-1.5"
+                className="px-3 py-2 text-sm font-semibold text-[#172D46] hover:bg-[#172D46]/10 rounded-lg transition flex items-center gap-1.5"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Unduh Berkas Lampiran</span>
+                <span>Unduh berkas lampiran</span>
               </button>
             )}
           </div>
@@ -239,20 +241,25 @@ export default function ContractModal({ isOpen, contractData, onClose, onSignAnd
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
-              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-200 rounded-xl transition"
+              className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-lg transition"
             >
               Tutup
             </button>
             <button
               onClick={onSignAndFund}
-              className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white rounded-xl font-bold text-xs shadow-md hover:shadow-lg transition flex items-center gap-2"
+              className="px-5 min-h-12 text-white rounded-full font-bold text-sm transition flex items-center gap-2 bg-brand-navy hover:bg-brand-navy-dark transition-colors"
             >
               <ShieldCheck className="w-4 h-4" />
-              <span>Tandatangani & Lanjutkan Escrow Midtrans</span>
+              <span>Tanda tangani dan lanjut ke Escrow Midtrans</span>
             </button>
           </div>
         </div>
       </div>
     </div>
   );
+}
+
+export default function ContractModal(props: Props) {
+  if (!props.isOpen) return null;
+  return <ContractModalInner {...props} />;
 }

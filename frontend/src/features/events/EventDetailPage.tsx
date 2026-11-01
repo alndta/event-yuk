@@ -1,3 +1,4 @@
+import Dialog from '../../components/Dialog';
 import { useState, useEffect, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import {
@@ -22,6 +23,9 @@ import { SEOHead } from '../../components/SEOHead';
 import { DetailSkeleton } from '../../components/skeletons/DetailSkeleton';
 import { cachedFetch } from '../../utils/apiCache';
 import useGsapReveal from '../../hooks/useGsapReveal';
+import useEnter from '../../hooks/useEnter';
+import Avatar from '../../components/Avatar';
+import { categoryLabels } from '../../components/events/EventCardLive';
 
 interface Props {
   events?: EventItem[];
@@ -39,6 +43,8 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
   const [booths, setBooths] = useState<any[]>([]);
   const [crewShifts, setCrewShifts] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'overview' | 'booths' | 'crew' | 'sponsorship'>('overview');
+  const tabsRef = useRef<HTMLDivElement>(null);
+  useEnter(tabsRef, activeTab);
 
   // Interactive Booth registration modal
   const [selectedBooth, setSelectedBooth] = useState<any | null>(null);
@@ -223,7 +229,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
       )}
 
       {/* Top Banner Hero */}
-      <section data-gsap-reveal aria-labelledby="event-detail-title" className="relative overflow-hidden rounded-[2rem] bg-brand-ink shadow-sm ring-1 ring-slate-900/5">
+      <section data-gsap-reveal aria-labelledby="event-detail-title" className="relative overflow-hidden rounded-lg bg-brand-ink">
         <div className="relative min-h-[400px] sm:min-h-[480px]">
           <img
             src={event.bannerImage || '/assets/hero-concert.jpg'}
@@ -238,23 +244,23 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
           <div className="absolute inset-x-4 top-4 flex flex-wrap items-center justify-between gap-2 sm:inset-x-6 sm:top-6">
             <div className="flex flex-wrap items-center gap-2">
-              <span className={'inline-flex min-h-9 items-center gap-2 rounded-full px-3.5 text-xs font-semibold text-white shadow-sm ' + (event.isPortfolio ? 'bg-slate-700' : 'bg-brand-navy')}>
+              <span className={'inline-flex min-h-9 items-center gap-2 rounded-full px-3.5 text-sm font-semibold text-white shadow-sm ' + (event.isPortfolio ? 'bg-slate-700' : 'bg-brand-navy')}>
                 <span aria-hidden="true" className={'h-2 w-2 rounded-full ' + (event.isPortfolio ? 'bg-slate-300' : 'bg-emerald-200')} />
                 {event.isPortfolio ? 'Sudah terlaksana' : 'Membuka kolaborasi'}
               </span>
-              <span className="inline-flex min-h-9 items-center rounded-full bg-white/95 px-3.5 text-xs font-semibold text-slate-900 shadow-sm">
-                {event.category}
+              <span className="inline-flex min-h-9 items-center rounded-full bg-white/95 px-3.5 text-sm font-semibold text-slate-900 shadow-sm">
+                {categoryLabels[event.category]?.label ?? event.category}
               </span>
             </div>
-            <span className="inline-flex min-h-9 items-center gap-2 rounded-full border border-white/30 bg-brand-ink/60 px-3.5 text-xs font-semibold text-white backdrop-blur">
+            <span className="inline-flex min-h-9 items-center gap-2 rounded-full border border-white/30 bg-brand-ink/60 px-3.5 text-sm font-semibold text-white backdrop-blur">
               <ShieldCheck aria-hidden="true" className="h-4 w-4 text-brand-lime" />
               Pembayaran via Escrow Midtrans
             </span>
           </div>
 
           <div className="absolute inset-x-5 bottom-6 text-white sm:inset-x-8 sm:bottom-8">
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-brand-lime">Detail acara</p>
-            <h1 id="event-detail-title" className="mt-3 max-w-4xl font-display text-4xl font-bold leading-[1.08] tracking-[-0.035em] drop-shadow-sm sm:text-5xl lg:text-6xl">
+            <p className="text-sm font-semibold text-brand-lime">Detail acara</p>
+            <h1 id="event-detail-title" className="mt-3 max-w-4xl font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] sm:text-5xl lg:text-6xl">
               {event.title}
             </h1>
             <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-white/85">
@@ -284,21 +290,22 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
       {/* Main Grid: Detail + Action Sidebar */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3 lg:gap-8">
         {/* Left Column (2 Cols) */}
-        <div className="space-y-6 lg:col-span-2">
+        <div ref={tabsRef} className="space-y-6 lg:col-span-2">
           {/* Organizer Box */}
-          <div data-gsap-reveal className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm">
+          <div data-gsap-reveal className="flex flex-wrap items-center justify-between gap-4 rounded-lg bg-white p-5">
             <div className="flex items-center gap-3">
-              <img
-                src={event.organizer?.avatar || '/assets/crew-production.jpg'}
-                alt={event.organizer?.name || 'Promotor'}
-                className="h-12 w-12 rounded-full border border-slate-200 object-cover"
+              <Avatar
+                src={event.organizer?.avatar}
+                name={event.organizer?.name || 'Promotor'}
+                decorative
+                className="h-12 w-12 rounded-full"
               />
               <div>
                 <div className="flex items-center gap-1.5 text-sm font-bold text-slate-900">
                   <span>{event.organizer?.name || 'Promotor Event Yuk'}</span>
                   {event.organizer?.verified && <CheckCircle2 aria-label="Organizer terverifikasi" className="h-4 w-4 text-brand-navy" />}
                 </div>
-                <div className="mt-1 text-xs text-slate-500">
+                <div className="mt-1 text-sm text-slate-500">
                   {event.organizer?.city || 'Jakarta'}{event.organizer?.verified ? ' · Organizer terverifikasi' : ' · Penyelenggara acara'}
                 </div>
               </div>
@@ -306,9 +313,9 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
             <Link
               to="/organizers"
-              className="inline-flex min-h-10 items-center rounded-full border border-slate-300 px-4 text-xs font-semibold text-slate-700 transition hover:border-brand-navy/40 hover:bg-brand-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
+              className="inline-flex min-h-10 items-center rounded-full border border-slate-300 px-4 text-sm font-semibold text-slate-700 transition hover:border-brand-navy/40 hover:bg-brand-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
             >
-              Lihat Rekam Jejak
+              Lihat rekam jejak
             </Link>
           </div>
 
@@ -321,7 +328,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                 activeTab === 'overview' ? 'bg-brand-navy text-white shadow-sm' : 'text-slate-600 hover:bg-white hover:text-slate-900'
               }`}
             >
-              Ikhtisar & Kebutuhan
+              Ikhtisar dan kebutuhan
             </button>
             <button
               onClick={() => setActiveTab('booths')}
@@ -330,7 +337,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                 activeTab === 'booths' ? 'bg-brand-navy text-white shadow-sm' : 'text-slate-600 hover:bg-white hover:text-slate-900'
               }`}
             >
-              Denah Kaveling Booth ({displayBooths.length} Unit)
+              Denah kaveling booth ({displayBooths.length} unit)
             </button>
             <button
               onClick={() => setActiveTab('crew')}
@@ -339,7 +346,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                 activeTab === 'crew' ? 'bg-brand-navy text-white shadow-sm' : 'text-slate-600 hover:bg-white hover:text-slate-900'
               }`}
             >
-              Lowongan Kru Shift ({displayShifts.length} Posisi)
+              Lowongan kru shift ({displayShifts.length} posisi)
             </button>
             <button
               onClick={() => setActiveTab('sponsorship')}
@@ -348,15 +355,15 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                 activeTab === 'sponsorship' ? 'bg-brand-navy text-white shadow-sm' : 'text-slate-600 hover:bg-white hover:text-slate-900'
               }`}
             >
-              Paket Sponsorship
+              Paket sponsorship
             </button>
           </div>
 
           {/* Tab 1: Overview */}
           {activeTab === 'overview' && (
-            <div data-gsap-reveal className="space-y-5 rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
+            <div data-enter className="space-y-5 rounded-lg bg-white p-6 sm:p-8">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-navy">Tentang acara</p>
+                <p className="text-sm font-semibold text-brand-lime-strong">Tentang acara</p>
                 <h2 className="mt-2 font-display text-2xl font-bold tracking-[-0.025em] text-slate-950">Ikhtisar acara</h2>
                 <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
                   {event.description || 'Penyelenggara belum menambahkan deskripsi untuk acara ini.'}
@@ -367,24 +374,24 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                 <h3 className="text-sm font-bold text-slate-900">Jelajahi peluang kolaborasi</h3>
                 <p className="mt-1 text-sm leading-6 text-slate-500">Pilih jalur yang sesuai dengan layanan atau minatmu.</p>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <button onClick={() => onOpenProposal(event, 'VENDOR')} className="group flex min-h-[84px] items-center gap-3 rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-navy/40 hover:bg-brand-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy">
+                  <button onClick={() => onOpenProposal(event, 'VENDOR')} className="group flex min-h-[84px] items-center gap-3 rounded-lg bg-brand-cream p-4 text-left transition hover:bg-brand-lime-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy">
                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-navy/10 text-brand-navy"><Sliders aria-hidden="true" className="h-5 w-5" /></span>
-                    <span className="min-w-0"><span className="block text-sm font-bold text-slate-900">Layanan vendor</span><span className="mt-1 block text-xs leading-5 text-slate-500">Kirim penawaran kebutuhan produksi</span></span>
+                    <span className="min-w-0"><span className="block text-sm font-bold text-slate-900">Layanan vendor</span><span className="mt-1 block text-sm leading-5 text-slate-500">Kirim penawaran kebutuhan produksi</span></span>
                     <ArrowRight aria-hidden="true" className="ml-auto h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-brand-navy" />
                   </button>
-                  <button onClick={() => onOpenProposal(event, 'TALENT')} className="group flex min-h-[84px] items-center gap-3 rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-navy/40 hover:bg-brand-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy">
+                  <button onClick={() => onOpenProposal(event, 'TALENT')} className="group flex min-h-[84px] items-center gap-3 rounded-lg bg-brand-cream p-4 text-left transition hover:bg-brand-lime-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy">
                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-forest/10 text-brand-forest"><Music aria-hidden="true" className="h-5 w-5" /></span>
-                    <span className="min-w-0"><span className="block text-sm font-bold text-slate-900">Talent & performer</span><span className="mt-1 block text-xs leading-5 text-slate-500">Ajukan profil atau proposal tampil</span></span>
+                    <span className="min-w-0"><span className="block text-sm font-bold text-slate-900">Talent & performer</span><span className="mt-1 block text-sm leading-5 text-slate-500">Ajukan profil atau proposal tampil</span></span>
                     <ArrowRight aria-hidden="true" className="ml-auto h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-brand-navy" />
                   </button>
-                  <button onClick={() => setActiveTab('booths')} className="group flex min-h-[84px] items-center gap-3 rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-navy/40 hover:bg-brand-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy">
+                  <button onClick={() => setActiveTab('booths')} className="group flex min-h-[84px] items-center gap-3 rounded-lg bg-brand-cream p-4 text-left transition hover:bg-brand-lime-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy">
                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-lime/15 text-amber-800"><Store aria-hidden="true" className="h-5 w-5" /></span>
-                    <span className="min-w-0"><span className="block text-sm font-bold text-slate-900">Tenant & booth</span><span className="mt-1 block text-xs leading-5 text-slate-500">Lihat kaveling yang tersedia</span></span>
+                    <span className="min-w-0"><span className="block text-sm font-bold text-slate-900">Tenant & booth</span><span className="mt-1 block text-sm leading-5 text-slate-500">Lihat kaveling yang tersedia</span></span>
                     <ArrowRight aria-hidden="true" className="ml-auto h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-brand-navy" />
                   </button>
-                  <button onClick={() => setActiveTab('crew')} className="group flex min-h-[84px] items-center gap-3 rounded-2xl border border-slate-200 p-4 text-left transition hover:border-brand-navy/40 hover:bg-brand-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy">
+                  <button onClick={() => setActiveTab('crew')} className="group flex min-h-[84px] items-center gap-3 rounded-lg bg-brand-cream p-4 text-left transition hover:bg-brand-lime-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy">
                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700"><Users aria-hidden="true" className="h-5 w-5" /></span>
-                    <span className="min-w-0"><span className="block text-sm font-bold text-slate-900">Crew acara</span><span className="mt-1 block text-xs leading-5 text-slate-500">Lihat posisi dan jadwal shift</span></span>
+                    <span className="min-w-0"><span className="block text-sm font-bold text-slate-900">Crew acara</span><span className="mt-1 block text-sm leading-5 text-slate-500">Lihat posisi dan jadwal shift</span></span>
                     <ArrowRight aria-hidden="true" className="ml-auto h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-brand-navy" />
                   </button>
                 </div>
@@ -394,11 +401,11 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
           {/* Tab 2: Booths */}
           {activeTab === 'booths' && (
-            <div className="space-y-4">
-              <div className="rounded-2xl border border-brand-navy/15 bg-brand-navy/5 p-5 text-sm">
+            <div data-enter className="space-y-4">
+              <div className="rounded-lg bg-brand-lime-soft p-5 text-sm">
                 <div className="mb-1 flex items-center gap-2 font-bold text-slate-900">
                   <Store aria-hidden="true" className="h-4 w-4 text-brand-navy" />
-                  <span>Kaveling Booth Pameran & Bazaar Kuliner</span>
+                  <span>Kaveling booth pameran dan bazaar kuliner</span>
                 </div>
                 <p className="text-sm leading-6 text-slate-600">
                   Lihat detail ukuran dan biaya setiap kaveling. Pendaftaran akan diteruskan ke penyelenggara untuk ditinjau.
@@ -407,18 +414,18 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {displayBooths.map((booth) => (
-                  <div key={booth.id} className="flex flex-col justify-between space-y-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                  <div key={booth.id} className="flex flex-col justify-between space-y-4 rounded-lg bg-white p-5 transition hover:-translate-y-0.5 hover:shadow-md">
                     <div>
                       <div className="flex justify-between items-center mb-1">
-                        <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-800 font-mono">
+                        <span className="px-2.5 py-0.5 rounded-full text-sm font-bold bg-slate-100 text-slate-800 font-mono">
                           {booth.booth_code}
                         </span>
-                        <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-bold ${booth.is_occupied ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                        <span className={`px-2.5 py-0.5 rounded-full text-sm font-bold ${booth.is_occupied ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'}`}>
                           {booth.is_occupied ? 'Terisi' : 'Tersedia'}
                         </span>
                       </div>
                       <div className="font-bold text-slate-900 text-sm">Kategori: {booth.booth_category}</div>
-                      <div className="text-xs text-slate-500">Ukuran: {booth.size_dimension || '3x3 meter'}</div>
+                      <div className="text-sm text-slate-500">Ukuran: {booth.size_dimension || '3x3 meter'}</div>
                       <div className="text-base font-extrabold text-slate-900 font-mono mt-2">
                         Rp {Number(booth.rental_price).toLocaleString('id-ID')}
                       </div>
@@ -429,7 +436,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                         onClick={() => setSelectedBooth(booth)}
                           className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-brand-navy px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-navy/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
                       >
-                        Daftar Sewa Kaveling Ini
+                        Daftar sewa kaveling ini
                       </button>
                     )}
                   </div>
@@ -440,11 +447,11 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
           {/* Tab 3: Crew Shifts */}
           {activeTab === 'crew' && (
-            <div className="space-y-4">
-              <div className="rounded-2xl border border-brand-lime/30 bg-brand-lime/10 p-5 text-sm">
+            <div data-enter className="space-y-4">
+              <div className="rounded-lg bg-brand-lime-soft p-5 text-sm">
                 <div className="mb-1 flex items-center gap-2 font-bold text-slate-900">
                   <Briefcase aria-hidden="true" className="h-4 w-4 text-amber-800" />
-                  <span>Papan Rekrutmen Kru Shift Acara</span>
+                  <span>Lowongan kru shift acara</span>
                 </div>
                 <p className="text-sm leading-6 text-slate-600">
                   Tinjau peran, jadwal, dan honor sebelum mengirim lamaran. Detail berikut mengikuti informasi yang dicantumkan penyelenggara.
@@ -453,15 +460,15 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
               <div className="space-y-3">
                 {displayShifts.map((shift) => (
-                  <div key={shift.id} className="flex flex-col justify-between gap-4 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm transition hover:shadow-md sm:flex-row sm:items-center">
+                  <div key={shift.id} className="flex flex-col justify-between gap-4 rounded-lg bg-white p-5 transition hover:shadow-md sm:flex-row sm:items-center">
                     <div>
                       <div className="flex flex-wrap items-center gap-2 text-sm font-bold text-slate-900">
                         <span>{shift.role_title === 'LO' ? 'Liaison Officer (LO) Artis' : shift.role_title === 'USHER' ? 'Usher & Tiketing Pintu Masuk' : shift.role_title === 'STAGEHAND' ? 'Stagehand & Kru Lapangan' : shift.role_title}</span>
-                        <span className="rounded-full bg-brand-lime/20 px-2.5 py-1 text-[11px] font-semibold text-amber-900">
+                        <span className="rounded-full bg-brand-lime/20 px-2.5 py-1 text-sm font-semibold text-amber-900">
                           {shift.role_title}
                         </span>
                       </div>
-                      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-slate-500">
+                      <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-500">
                         <span className="flex items-center gap-1.5"><Clock aria-hidden="true" className="h-3.5 w-3.5" /> Shift acara: {shift.shift_date}</span>
                         <span className="flex items-center gap-1.5"><Users aria-hidden="true" className="h-3.5 w-3.5" /> Kuota: {shift.headcount_req} personil</span>
                       </div>
@@ -474,7 +481,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                       onClick={() => handleApplyShift(shift)}
                       className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-brand-ink px-5 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
                     >
-                      Lamar Shift Ini
+                      Lamar shift ini
                     </button>
                   </div>
                 ))}
@@ -484,9 +491,9 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
           {/* Tab 4: Sponsorship Packages */}
           {activeTab === 'sponsorship' && (
-            <div className="space-y-4">
-              <div data-gsap-reveal className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
-                <span className="inline-flex items-center gap-2 rounded-full bg-brand-navy/10 px-3 py-1.5 text-xs font-semibold text-brand-navy">
+            <div data-enter className="space-y-4">
+              <div data-gsap-reveal className="rounded-lg bg-white p-6 sm:p-8">
+                <span className="inline-flex items-center gap-2 rounded-full bg-brand-navy/10 px-3 py-1.5 text-sm font-semibold text-brand-navy">
                   <Building2 aria-hidden="true" className="h-4 w-4" /> Kemitraan brand
                 </span>
                 <h2 className="mt-4 font-display text-2xl font-bold tracking-[-0.025em] text-slate-950">Diskusikan sponsorship acara</h2>
@@ -506,9 +513,9 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
         {/* Right Action Sidebar */}
         <div className="space-y-4 lg:sticky lg:top-24 lg:self-start">
-          <div data-gsap-reveal className="space-y-4 rounded-3xl border border-slate-200/80 bg-white p-6 shadow-sm">
+          <div data-gsap-reveal className="space-y-4 rounded-lg bg-white p-6">
             <div>
-              <p className="text-xs font-bold uppercase tracking-[0.14em] text-brand-navy">Peluang kolaborasi</p>
+              <p className="text-sm font-semibold text-brand-lime-strong">Peluang kolaborasi</p>
               <h2 className="mt-2 font-display text-xl font-bold tracking-[-0.02em] text-slate-950">Terlibat di acara ini</h2>
             </div>
             <p className="text-sm leading-6 text-slate-600">
@@ -517,7 +524,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
             <button
               onClick={() => onOpenProposal(event, 'VENDOR')}
-              className="flex min-h-12 w-full items-center justify-between gap-3 rounded-2xl bg-brand-forest px-4 text-left text-sm font-semibold text-white shadow-sm transition hover:bg-brand-forest-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-forest"
+              className="flex min-h-12 w-full items-center justify-between gap-3 rounded-full bg-brand-navy px-5 text-left text-sm font-semibold text-white transition hover:bg-brand-navy-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
             >
               <div className="flex items-center gap-2">
                 <Sliders aria-hidden="true" className="h-4 w-4 shrink-0" />
@@ -528,7 +535,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
             <button
               onClick={() => onOpenProposal(event, 'TALENT')}
-              className="flex min-h-12 w-full items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 text-left text-sm font-semibold text-slate-800 transition hover:border-brand-navy/40 hover:bg-brand-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
+              className="flex min-h-12 w-full items-center justify-between gap-3 rounded-full border-2 border-brand-navy/25 bg-transparent px-5 text-left text-sm font-semibold text-brand-ink transition hover:border-brand-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
             >
               <div className="flex items-center gap-2">
                 <Music aria-hidden="true" className="h-4 w-4 shrink-0 text-brand-forest" />
@@ -539,7 +546,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
             <button
               onClick={() => setActiveTab('booths')}
-              className="flex min-h-12 w-full items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 text-left text-sm font-semibold text-slate-800 transition hover:border-brand-navy/40 hover:bg-brand-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
+              className="flex min-h-12 w-full items-center justify-between gap-3 rounded-full border-2 border-brand-navy/25 bg-transparent px-5 text-left text-sm font-semibold text-brand-ink transition hover:border-brand-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
             >
               <div className="flex items-center gap-2">
                 <Store aria-hidden="true" className="h-4 w-4 shrink-0 text-brand-navy" />
@@ -550,7 +557,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
             <button
               onClick={() => setActiveTab('crew')}
-              className="flex min-h-12 w-full items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white px-4 text-left text-sm font-semibold text-slate-800 transition hover:border-brand-navy/40 hover:bg-brand-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
+              className="flex min-h-12 w-full items-center justify-between gap-3 rounded-full border-2 border-brand-navy/25 bg-transparent px-5 text-left text-sm font-semibold text-brand-ink transition hover:border-brand-navy focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
             >
               <div className="flex items-center gap-2">
                 <Users aria-hidden="true" className="h-4 w-4 shrink-0 text-amber-800" />
@@ -564,8 +571,8 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
       {/* Modal Booth Registration */}
       {selectedBooth && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
-          <div role="dialog" aria-modal="true" aria-labelledby="booth-dialog-title" className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl">
+        <Dialog onClose={() => setSelectedBooth(null)} label="Daftar booth">
+          <div role="dialog" aria-modal="true" aria-labelledby="booth-dialog-title" className="w-full max-w-md rounded-lg bg-white p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-4">
               <h2 id="booth-dialog-title" className="font-display text-lg font-bold tracking-[-0.02em] text-slate-950">
                 Pendaftaran Kaveling Booth: {selectedBooth.booth_code}
@@ -581,8 +588,8 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
             <form onSubmit={handleRegisterBooth} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Nama Brand / Usaha Tenant
+                <label className="block text-sm font-bold text-slate-700 mb-1">
+                  Nama brand atau usaha tenant
                 </label>
                 <input
                   type="text"
@@ -595,7 +602,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                 />
               </div>
 
-              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs space-y-1">
+              <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-sm space-y-1">
                 <div className="flex justify-between">
                   <span className="text-slate-500">Kategori Booth:</span>
                   <span className="font-bold text-slate-900">{selectedBooth.booth_category}</span>
@@ -630,7 +637,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
               </div>
             </form>
           </div>
-        </div>
+        </Dialog>
       )}
     </div>
   );

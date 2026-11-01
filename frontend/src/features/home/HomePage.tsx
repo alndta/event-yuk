@@ -13,6 +13,9 @@ import HomeRoleSection from './components/HomeRoleSection';
 import HowItWorksSection from './components/HowItWorksSection';
 import HomeDiscoverySections from './components/HomeDiscoverySections';
 import HomeCallToAction from './components/HomeCallToAction';
+import HomeFaqSection from './components/HomeFaqSection';
+import HomeMarquee from './components/HomeMarquee';
+import Band from './components/Band';
 import useGsapReveal from '../../hooks/useGsapReveal';
 
 interface Props {
@@ -68,17 +71,23 @@ export default function HomePage({
         ]}
       />
 
-      <div ref={pageRef} className="space-y-24 pb-20 sm:space-y-32 sm:pb-28">
+      <div ref={pageRef} className="-mb-[6.5rem] sm:-mb-28">
 
+      <HomeHero
+        featuredEvent={visibleEvents.find((event) => !event.isPortfolio)}
+        onOpenCreateEvent={onOpenCreateEvent}
+      />
+      {user && (
+        <Band tone="bg-brand-cream" className="!py-8 sm:!py-10">
       {user && !user.activeRole && (
-        <div className="flex flex-col gap-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+        <div className="flex flex-col gap-4 rounded-lg bg-brand-lime p-6 text-brand-navy sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="font-semibold text-amber-950">{t('nav.completeRole')}</p>
-            <p className="mt-1 text-sm leading-6 text-amber-900">{t('home.rolePrompt')}</p>
+            <p className="font-semibold text-brand-navy">{t('nav.completeRole')}</p>
+            <p className="mt-1 text-sm leading-6 text-brand-navy">{t('home.rolePrompt')}</p>
           </div>
           <Link
             to="/onboarding-role"
-            className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-amber-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-amber-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-800"
+            className="inline-flex min-h-11 items-center justify-center gap-2 min-h-12 rounded-full bg-brand-navy px-6 text-base font-semibold text-brand-lime transition-colors hover:bg-brand-navy-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy"
           >
             {t('home.chooseRole')}
           </Link>
@@ -93,10 +102,9 @@ export default function HomePage({
         />
       )}
 
-      <HomeHero
-        featuredEvent={visibleEvents.find((event) => !event.isPortfolio)}
-        onOpenCreateEvent={onOpenCreateEvent}
-      />
+        </Band>
+      )}
+
       <HomeDiscoverySections
         events={visibleEvents}
         partners={partners}
@@ -104,7 +112,9 @@ export default function HomePage({
         onViewDetails={onViewDetails}
       />
       <HomeRoleSection onOpenCreateEvent={onOpenCreateEvent} />
+      <HomeMarquee />
       <HowItWorksSection />
+      <HomeFaqSection />
       <HomeCallToAction onOpenCreateEvent={onOpenCreateEvent} />
       </div>
     </>

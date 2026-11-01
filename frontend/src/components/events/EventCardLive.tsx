@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { EventItem } from '../../data/mockEvents';
 import { useLanguage } from '../../context/LanguageContext';
+import Avatar from '../Avatar';
 
 interface Props {
   event: EventItem;
@@ -20,7 +21,7 @@ export const categoryLabels: Record<string, { label: string; color: string }> = 
   CONCERT: { label: 'Konser Musik', color: 'text-brand-navy' },
   PENSI: { label: 'Pensi Sekolah', color: 'text-brand-navy' },
   BAZAAR: { label: 'Bazaar & Kuliner', color: 'text-brand-navy' },
-  EXPO: { label: 'Pameran & Expo', color: 'text-brand-navy' },
+  EXPO: { label: 'Pameran dan expo', color: 'text-brand-navy' },
 };
 
 const categoryKeyById = {
@@ -43,7 +44,7 @@ export default function EventCardLive({ event, onSelectAction }: Props) {
   ];
 
   return (
-    <article data-gsap-reveal className="group flex h-full flex-col overflow-hidden rounded-2xl bg-white">
+    <article data-gsap-reveal className="ey-lift group flex h-full flex-col overflow-hidden rounded-2xl bg-white">
       <Link
         to={'/events/' + event.id}
         aria-label={t('eventCard.details') + ': ' + event.title}
@@ -87,14 +88,11 @@ export default function EventCardLive({ event, onSelectAction }: Props) {
         </div>
 
         <div className="mt-4 flex min-w-0 items-center gap-3">
-          <img
+          <Avatar
             src={event.organizer.avatar}
-            alt=""
-            width={36}
-            height={36}
-            loading="lazy"
-            decoding="async"
-            className="h-9 w-9 shrink-0 rounded-full object-cover"
+            name={event.organizer.name}
+            decorative
+            className="h-9 w-9 rounded-full"
           />
           <div className="min-w-0">
             <p className="flex items-center gap-1.5 truncate text-sm font-semibold text-slate-900">
@@ -122,12 +120,16 @@ export default function EventCardLive({ event, onSelectAction }: Props) {
                 {completion}% {t('eventCard.filled')}
               </span>
             </div>
-            <progress
-              value={completion}
-              max={100}
+            <div
+              role="progressbar"
+              aria-valuenow={completion}
+              aria-valuemin={0}
+              aria-valuemax={100}
               aria-label={t('eventCard.progressLabel') + ': ' + completion + '%'}
-              className="mt-3 block h-1.5 w-full accent-brand-navy"
-            />
+              className="mt-3 h-2 w-full overflow-hidden rounded-full bg-brand-sand"
+            >
+              <div data-gsap-bar className="h-full rounded-full bg-brand-navy" style={{ width: completion + '%' }} />
+            </div>
             <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-600">
               <span>{t('eventCard.boothCount')}: <strong className="font-semibold text-slate-950">{event.progress.boothFilled}</strong></span>
               <span>{t('eventCard.crewCount')}: <strong className="font-semibold text-slate-950">{event.progress.crewNeeded}</strong></span>

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { Suspense, lazy, useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { CheckCircle2 } from 'lucide-react';
 import { initialEvents, EventItem } from './data/mockEvents';
@@ -9,6 +9,8 @@ import { initialContracts, CollaborationContract } from './components/ContractLi
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import useSmoothScroll from './hooks/useSmoothScroll';
+import { gsap, ScrollTrigger, NO_REDUCED_MOTION } from './lib/motion';
 import AuthPromptModal from './components/AuthPromptModal';
 import ScrollToTop from './components/ScrollToTop';
 
@@ -23,25 +25,54 @@ import UploadPortfolioModal from './components/UploadPortfolioModal';
 import ProposalModal from './components/ProposalModal';
 import ContractModal from './components/ContractModal';
 
-// Pages
+// Pages: the home page ships with the app, everything else loads when its route opens.
 import { HomePage } from './features/home';
-import { EventDetailPage, SearchEventsPage } from './features/events';
-import SearchOrganizersPage from './pages/SearchOrganizersPage';
-import SearchBandsPage from './pages/SearchBandsPage';
-import SearchVendorsPage from './pages/SearchVendorsPage';
-import PartnerDetailPage from './pages/PartnerDetailPage';
-import SponsorHubPage from './pages/SponsorHubPage';
-import ContractsPage from './pages/ContractsPage';
-import ProfilePage from './pages/ProfilePage';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import RolesGuidePage from './pages/RolesGuidePage';
-import DashboardPage from './pages/DashboardPage';
-import RoleOnboardingPage from './pages/RoleOnboardingPage';
+const SearchEventsPage = lazy(() => import('./features/events/SearchEventsPage'));
+const EventDetailPage = lazy(() => import('./features/events/EventDetailPage'));
+const SearchOrganizersPage = lazy(() => import('./pages/SearchOrganizersPage'));
+const SearchBandsPage = lazy(() => import('./pages/SearchBandsPage'));
+const SearchVendorsPage = lazy(() => import('./pages/SearchVendorsPage'));
+const PartnerDetailPage = lazy(() => import('./pages/PartnerDetailPage'));
+const SponsorHubPage = lazy(() => import('./pages/SponsorHubPage'));
+const ContractsPage = lazy(() => import('./pages/ContractsPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
+const RolesGuidePage = lazy(() => import('./pages/RolesGuidePage'));
+const DashboardPage = lazy(() => import('./pages/DashboardPage'));
+const RoleOnboardingPage = lazy(() => import('./pages/RoleOnboardingPage'));
 
 function AppContent() {
   const navigate = useNavigate();
   const location = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
+  const firstRoute = useRef(true);
+
+  // Each new page settles into place instead of snapping in.
+  useEffect(() => {
+    if (firstRoute.current) {
+      firstRoute.current = false;
+      return;
+    }
+    const el = mainRef.current;
+    if (!el || !window.matchMedia(NO_REDUCED_MOTION).matches) return;
+    const tween = gsap.fromTo(
+      el,
+      { autoAlpha: 0, y: 36 },
+      {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.95,
+        ease: 'ey',
+        clearProps: 'transform,opacity,visibility',
+        onComplete: () => ScrollTrigger.refresh(),
+      }
+    );
+    return () => {
+      tween.kill();
+      gsap.set(el, { clearProps: 'transform,opacity,visibility' });
+    };
+  }, [location.pathname]);
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/onboarding-role';
 
   const {
@@ -266,7 +297,14 @@ function AppContent() {
       )}
 
       {/* Main Routed Content */}
-      <main className={isAuthPage ? 'flex-1 w-full' : 'flex-1 w-full px-5 sm:px-8 lg:px-12 2xl:px-16 py-6 sm:py-8'}>
+      <main ref={mainRef} className={isAuthPage ? 'flex-1 w-full' : 'flex-1 w-full px-5 sm:px-8 lg:px-12 2xl:px-16 py-6 sm:py-8'}>
+        <Suspense
+          fallback={
+            <div role="status" aria-live="polite" className="flex min-h-[40vh] items-center justify-center text-base text-slate-600">
+              Memuat halaman
+            </div>
+          }
+        >
         <Routes>
           {/* Public Routes (Accessible without login) */}
           <Route
@@ -431,6 +469,7 @@ function AppContent() {
             }
           />
         </Routes>
+        </Suspense>
       </main>
 
       {/* Footer (Hidden on Login & Register full pages) */}
@@ -487,6 +526,7 @@ function AppContent() {
 }
 
 export default function App() {
+  useSmoothScroll();
   return (
     <BrowserRouter>
       <ScrollToTop />
