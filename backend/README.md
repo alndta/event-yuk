@@ -30,3 +30,12 @@ Docs API: `/api-docs` (non-production) dan `/api-docs.json`.
 Foto KTP dan selfie disimpan di bucket Supabase Storage `kyc-documents` yang **privat** (dibuat oleh migrasi).
 Tidak ada tautan publik; admin hanya mendapat tautan bertanda tangan yang berlaku 2 menit, dan setiap pembukaan dicatat di log.
 Akun admin adalah email yang ada di `ADMIN_EMAILS`.
+
+Foto yang ditolak dihapus saat itu juga. Foto yang disetujui dihapus otomatis setelah `KYC_APPROVED_PHOTO_DAYS` hari (bawaan 30).
+Yang tetap tersimpan hanya hash NIK, keputusan, pemeriksa, dan waktunya.
+
+## Pesan error dua bahasa
+
+Pesan error ditulis dalam bahasa Indonesia di kode, dan `src/shared/i18n/messages.ts` berisi versi Inggrisnya.
+Bahasa dipilih per permintaan lewat header `Accept-Language` (web app mengirimnya dari pilihan bahasa pengguna).
+Tes `tests/i18n.test.ts` gagal kalau ada pesan baru tanpa terjemahan.

@@ -23,6 +23,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import type { TranslationKey } from '../i18n/translations';
 import { api, ApiError } from '../lib/api';
+import ApplicantsPanel from '../components/ApplicantsPanel';
 import { UserRole } from '../types/models';
 import { SEOHead } from '../components/SEOHead';
 import { DashboardSkeleton } from '../components/skeletons/DashboardSkeleton';
@@ -397,6 +398,8 @@ export default function DashboardPage({ onShowToast }: Props) {
           </div>
         )}
       </div>
+
+      {role === 'EO' && <ApplicantsPanel onToast={triggerToast} />}
 
       {/* Modal: Tambah Dagangan / Paket Katalog Baru */}
       {showAddModal && (

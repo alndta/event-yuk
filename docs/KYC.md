@@ -246,5 +246,6 @@ Tahap A dan B adalah syarat minimum sebelum Event Yuk menahan uang pengguna sung
 | Penyimpanan privat (`kyc-documents`, tanpa tautan publik) | Dibuat lewat migrasi; perlu dicek di dasbor Supabase |
 | Halaman review admin (`/admin/kyc`): lihat foto 2 menit, setujui, tolak dengan alasan | Selesai |
 | DP hanya untuk penerima terverifikasi | Selesai |
-| Penghapusan foto otomatis setelah masa simpan | Belum (menunggu keputusan §11 nomor 3) |
+| Foto yang ditolak | Dihapus langsung saat ditolak (file dan catatan) |
+| Foto yang disetujui | Disimpan `KYC_APPROVED_PHOTO_DAYS` hari (bawaan 30), lalu dihapus otomatis; dicek saat server menyala dan tiap 6 jam |
 | Penyedia e-KYC pihak ketiga, dokumen badan usaha | Belum (tahap berikutnya) |
