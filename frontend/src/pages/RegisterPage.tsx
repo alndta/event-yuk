@@ -218,7 +218,7 @@ export default function RegisterPage() {
   const activeRoleDetail = rolesCatalog.find((r) => r.id === formData.primaryRole)!;
 
   return (
-    <div className="min-h-screen w-full bg-slate-50 flex flex-col justify-between font-sans">
+    <div className="min-h-screen w-full bg-brand-canvas flex flex-col justify-between font-sans">
       <SEOHead
         title="Daftar Akun Mitra Baru | Event Yuk"
         description="Daftar akun ekosistem acara Event Yuk untuk Event Organizer, Vendor Peralatan, Band Musisi, Tenant Bazaar, Sponsor Brand, atau Kru Lapangan."
@@ -467,104 +467,104 @@ export default function RegisterPage() {
                 onClick={() => setStep('SELECT_ROLE')}
                 className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-slate-900 transition mb-3"
               >
-                <ArrowLeft className="w-3.5 h-3.5" />
-                <span>Ubah Pilihan Peran</span>
+                <ArrowLeft aria-hidden="true" className="h-4 w-4" />
+                <span>Ubah pilihan peran</span>
               </button>
-              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                Lengkapi Data Penanggung Jawab
+              <h2 className="font-display text-3xl font-extrabold tracking-[-0.03em] text-brand-ink sm:text-4xl">
+                Lengkapi data penanggung jawab
               </h2>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1">
+              <p className="mt-2 text-base leading-7 text-slate-600">
                 Data ini digunakan untuk penerbitan dokumen PKS resmi dan otentikasi akunmu.
               </p>
             </div>
 
             {/* Active Role Card Reminder */}
-            <div className="p-4 rounded-2xl bg-white border border-slate-200/90 shadow-xs flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3 rounded-lg bg-white p-4">
               <div className="flex items-center gap-3">
-                <div className={`p-2.5 rounded-xl ${activeRoleDetail.color}`}>
-                  <activeRoleDetail.icon className="w-5 h-5" />
+                <div className={`rounded-lg p-2.5 ${activeRoleDetail.color}`}>
+                  <activeRoleDetail.icon aria-hidden="true" className="h-5 w-5" />
                 </div>
                 <div>
-                  <div className="text-[10px] uppercase font-bold text-slate-400">Peran Akun Utama</div>
-                  <div className="font-extrabold text-sm text-slate-900">{activeRoleDetail.name}</div>
+                  <div className="text-sm text-slate-600">Peran akun utama</div>
+                  <div className="font-display text-lg font-extrabold text-brand-ink">{activeRoleDetail.name}</div>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setStep('SELECT_ROLE')}
-                className="text-xs font-bold text-[#456B39] hover:underline"
+                className="min-h-11 shrink-0 text-sm font-semibold text-brand-navy underline underline-offset-4"
               >
-                Ganti Peran
+                Ganti peran
               </button>
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSendOtp} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-4 text-xs font-sans">
+            <form onSubmit={handleSendOtp} className="space-y-5 rounded-lg bg-white p-6 font-sans sm:p-8">
               <div>
-                <label className="block font-bold text-slate-700 mb-1.5">
-                  Nama Lengkap Penanggung Jawab / Pimpinan
+                <label htmlFor="reg-fullName" className="mb-2 block text-sm font-semibold text-slate-800">
+                  Nama lengkap penanggung jawab atau pimpinan
                 </label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+                  <User aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
                   <input
                     type="text"
                     required
-                    placeholder="Contoh: Raden Satria Pamungkas"
+                    id="reg-fullName" autoComplete="name" placeholder="Contoh: Raden Satria Pamungkas"
                     value={formData.fullName}
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                    className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-300 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                    className="min-h-12 w-full rounded-lg border border-slate-300 bg-white pl-11 pr-4 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1.5">
-                  Nama Entitas / Perusahaan / Nama Panggung
+                <label htmlFor="reg-business" className="mb-2 block text-sm font-semibold text-slate-800">
+                  Nama entitas, perusahaan, atau nama panggung
                 </label>
                 <div className="relative">
-                  <Building2 className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+                  <Building2 aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
                   <input
                     type="text"
                     required
-                    placeholder="Contoh: Kreasi Panggung Nusantara / Senja Di Batavia"
+                    id="reg-business" autoComplete="organization" placeholder="Contoh: Kreasi Panggung Nusantara / Senja Di Batavia"
                     value={formData.businessName}
                     onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                    className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-300 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                    className="min-h-12 w-full rounded-lg border border-slate-300 bg-white pl-11 pr-4 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1.5">
-                    Alamat Email Aktif
+                  <label htmlFor="reg-email" className="mb-2 block text-sm font-semibold text-slate-800">
+                    Email aktif
                   </label>
                   <div className="relative">
-                    <Mail className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+                    <Mail aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
                     <input
                       type="email"
                       required
-                      placeholder="kontak@perusahaan.id"
+                      id="reg-email" autoComplete="email" placeholder="kontak@perusahaan.id"
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-300 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                      className="min-h-12 w-full rounded-lg border border-slate-300 bg-white pl-11 pr-4 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1.5">
-                    Nomor Telepon / WhatsApp Aktif
+                  <label htmlFor="reg-phone" className="mb-2 block text-sm font-semibold text-slate-800">
+                    Nomor telepon atau WhatsApp aktif
                   </label>
                   <div className="relative">
-                    <Phone className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+                    <Phone aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
                     <input
                       type="tel"
                       required
-                      placeholder="081234567890"
+                      id="reg-phone" autoComplete="tel" placeholder="081234567890"
                       value={formData.phoneWa}
                       onChange={(e) => setFormData({ ...formData, phoneWa: e.target.value })}
-                      className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-300 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                      className="min-h-12 w-full rounded-lg border border-slate-300 bg-white pl-11 pr-4 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
                     />
                   </div>
                 </div>
@@ -572,42 +572,43 @@ export default function RegisterPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1.5">
-                    Kata Sandi Akun
+                  <label htmlFor="reg-password" className="mb-2 block text-sm font-semibold text-slate-800">
+                    Kata sandi akun
                   </label>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+                    <Lock aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
-                      placeholder="Minimal 8 karakter"
+                      id="reg-password" autoComplete="new-password" placeholder="Minimal 8 karakter"
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                      className="w-full pl-11 pr-11 py-3 rounded-2xl border border-slate-300 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                      className="min-h-12 w-full rounded-lg border border-slate-300 bg-white pl-11 pr-12 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-4 top-3.5 text-slate-400 hover:text-slate-600 transition"
+                      aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                      className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-slate-600 hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-navy"
                     >
-                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showPassword ? <EyeOff aria-hidden="true" className="h-5 w-5" /> : <Eye aria-hidden="true" className="h-5 w-5" />}
                     </button>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-700 mb-1.5">
-                    Konfirmasi Kata Sandi
+                  <label htmlFor="reg-confirm" className="mb-2 block text-sm font-semibold text-slate-800">
+                    Konfirmasi kata sandi
                   </label>
                   <div className="relative">
-                    <Lock className="w-4 h-4 text-slate-400 absolute left-4 top-3.5" />
+                    <Lock aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
-                      placeholder="Ulangi kata sandi"
+                      id="reg-confirm" autoComplete="new-password" placeholder="Ulangi kata sandi"
                       value={formData.confirmPassword}
                       onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                      className="w-full pl-11 pr-4 py-3 rounded-2xl border border-slate-300 text-xs text-slate-800 font-medium focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                      className="min-h-12 w-full rounded-lg border border-slate-300 bg-white pl-11 pr-4 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
                     />
                   </div>
                 </div>
@@ -620,10 +621,10 @@ export default function RegisterPage() {
                   id="agreeTerms"
                   checked={formData.agreeTerms}
                   onChange={(e) => setFormData({ ...formData, agreeTerms: e.target.checked })}
-                  className="w-4 h-4 rounded border-slate-300 text-[#172D46] focus:ring-[#172D46] mt-0.5"
+                  className="mt-1 h-5 w-5 rounded border-slate-400 text-brand-navy focus:ring-brand-navy"
                 />
-                <label htmlFor="agreeTerms" className="text-slate-600 leading-snug cursor-pointer text-xs">
-                  Saya menyetujui <span className="text-[#172D46] font-bold hover:underline">Syarat & Ketentuan Layanan</span> serta klausul otomatisasi <span className="text-[#172D46] font-bold hover:underline">Rekening Bersama Escrow & PKS Digital</span> Event Yuk.
+                <label htmlFor="agreeTerms" className="cursor-pointer text-base leading-7 text-slate-700">
+                  Saya menyetujui <span className="font-semibold text-brand-navy underline underline-offset-4">Syarat & Ketentuan Layanan</span> serta klausul otomatisasi <span className="font-semibold text-brand-navy underline underline-offset-4">Rekening Bersama Escrow & PKS Digital</span> Event Yuk.
                 </label>
               </div>
 
@@ -632,7 +633,7 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setStep('SELECT_ROLE')}
-                  className="px-5 py-3 rounded-2xl border border-slate-300 text-slate-700 font-bold hover:bg-slate-50 transition"
+                  className="min-h-12 rounded-full border-2 border-brand-navy/30 px-6 text-base font-semibold text-brand-ink transition hover:border-brand-navy"
                 >
                   Kembali
                 </button>
@@ -640,17 +641,17 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={loading || !formData.agreeTerms}
-                  className="px-7 py-3.5 rounded-2xl bg-gradient-to-r from-[#172D46] to-[#0F263B] hover:from-[#0F263B] hover:to-[#0B1F31] text-white font-extrabold text-xs sm:text-sm shadow-md transition flex items-center gap-2 disabled:opacity-50"
+                  className="inline-flex min-h-12 items-center gap-2 rounded-full bg-brand-navy px-7 text-base font-semibold text-white transition-colors hover:bg-brand-navy-dark disabled:opacity-50"
                 >
                   {loading ? (
                     <>
-                      <RotateCw className="w-4 h-4 animate-spin" />
+                      <RotateCw aria-hidden="true" className="h-5 w-5 animate-spin" />
                       <span>Mengirim OTP...</span>
                     </>
                   ) : (
                     <>
-                      <KeyRound className="w-4 h-4" />
-                      <span>Kirim Kode OTP Verifikasi</span>
+                      <KeyRound aria-hidden="true" className="h-5 w-5" />
+                      <span>Kirim kode OTP</span>
                     </>
                   )}
                 </button>
@@ -663,54 +664,57 @@ export default function RegisterPage() {
         {step === 'OTP' && (
           <div className="max-w-md mx-auto space-y-6 animate-fadeIn">
             <div className="text-center">
-              <div className="w-14 h-14 rounded-3xl bg-[#172D46]/10 text-[#172D46] mx-auto flex items-center justify-center mb-4 border border-[#172D46]/20">
-                <KeyRound className="w-7 h-7" />
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-brand-lime text-brand-navy">
+                <KeyRound aria-hidden="true" className="h-7 w-7" />
               </div>
-              <h2 className="text-2xl font-black text-slate-900 tracking-tight">
-                Verifikasi Kode OTP
+              <h2 className="font-display text-3xl font-extrabold tracking-[-0.03em] text-brand-ink">
+                Verifikasi kode OTP
               </h2>
-              <p className="text-xs text-slate-500 mt-1.5 leading-relaxed">
-                Masukkan 6-digit kode verifikasi yang telah dikirimkan ke email{' '}
-                <strong className="text-slate-800">{formData.email}</strong>.
+              <p className="mt-2 text-base leading-7 text-slate-600">
+                Masukkan kode verifikasi 6 digit yang dikirim ke email{' '}
+                <strong className="text-brand-ink">{formData.email}</strong>.
               </p>
             </div>
 
             {previewOtp && (
-              <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 flex items-center justify-between">
-                <span>Kode Verifikasi:</span>
-                <span className="font-mono font-black text-base tracking-widest text-[#456B39]">
+              <div className="flex items-center justify-between rounded-lg bg-brand-lime-soft p-4 text-base text-brand-ink">
+                <span>Kode verifikasi</span>
+                <span className="font-mono text-xl font-bold tracking-widest text-brand-navy">
                   {previewOtp}
                 </span>
               </div>
             )}
 
-            <form onSubmit={handleVerifyOtp} className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-5 text-xs font-sans">
+            <form onSubmit={handleVerifyOtp} className="space-y-5 rounded-lg bg-white p-6 font-sans sm:p-8">
               <div>
-                <label className="block font-bold text-slate-700 text-center mb-2">
-                  Kode Verifikasi 6-Digit
+                <label htmlFor="reg-otp" className="mb-2 block text-center text-sm font-semibold text-slate-800">
+                  Kode verifikasi 6 digit
                 </label>
                 <input
+                  id="reg-otp"
                   type="text"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
                   maxLength={6}
                   required
                   placeholder="------"
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                  className="w-full py-4 text-center font-mono font-black text-2xl tracking-[0.5em] rounded-2xl border-2 border-slate-300 focus:border-[#172D46] focus:ring-2 focus:ring-[#172D46]/20 focus:outline-none transition text-slate-900"
+                  className="min-h-16 w-full rounded-lg border-2 border-slate-300 bg-white text-center font-mono text-3xl font-bold tracking-[0.5em] text-slate-900 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
                 />
               </div>
 
               {/* Timer & Resend */}
-              <div className="text-center text-xs text-slate-500">
+              <div className="text-center text-base text-slate-600">
                 {otpCountdown > 0 ? (
-                  <span>Kirim ulang kode dalam <strong className="text-[#172D46] font-mono">{otpCountdown} detik</strong></span>
+                  <span>Kirim ulang kode dalam <strong className="font-mono text-brand-navy">{otpCountdown} detik</strong></span>
                 ) : (
                   <button
                     type="button"
                     onClick={handleSendOtp}
-                    className="font-bold text-[#456B39] hover:underline"
+                    className="min-h-11 font-semibold text-brand-navy underline underline-offset-4"
                   >
-                    Kirim Ulang Kode OTP Sekarang
+                    Kirim ulang kode OTP
                   </button>
                 )}
               </div>
@@ -720,17 +724,17 @@ export default function RegisterPage() {
                 <button
                   type="submit"
                   disabled={loading || otpCode.length < 6}
-                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white font-extrabold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2 disabled:opacity-50"
+                  className="flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-brand-navy text-base font-semibold text-white transition-colors hover:bg-brand-navy-dark disabled:opacity-50"
                 >
                   {loading ? (
                     <>
-                      <RotateCw className="w-4 h-4 animate-spin" />
-                      <span>Memverifikasi Akun...</span>
+                      <RotateCw aria-hidden="true" className="h-5 w-5 animate-spin" />
+                      <span>Memverifikasi...</span>
                     </>
                   ) : (
                     <>
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Verifikasi & Masuk Otomatis</span>
+                      <CheckCircle2 aria-hidden="true" className="h-5 w-5" />
+                      <span>Verifikasi dan masuk</span>
                     </>
                   )}
                 </button>
@@ -738,9 +742,9 @@ export default function RegisterPage() {
                 <button
                   type="button"
                   onClick={() => setStep('FORM')}
-                  className="w-full py-2.5 text-xs font-bold text-slate-500 hover:text-slate-800 transition"
+                  className="min-h-11 w-full text-base font-semibold text-slate-600 hover:text-slate-950"
                 >
-                  Kembali ke Data Akun
+                  Kembali ke data akun
                 </button>
               </div>
             </form>
