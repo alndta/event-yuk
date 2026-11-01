@@ -115,23 +115,23 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: Props) 
 
   return (
     <div className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white rounded-3xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+      <div className="bg-white rounded-lg max-w-2xl w-full border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800 text-[11px] font-bold mb-1">
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800 text-sm font-bold mb-1">
               <Layers className="w-3.5 h-3.5 text-sky-600" /> Event Project Workspace
             </div>
             <h3 className="font-extrabold text-slate-900 text-xl tracking-tight">
               Bentuk Proyek Acara Baru
             </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-sm text-slate-500 mt-0.5">
               Tentukan parameter acara dan atur izin pengajuan penawaran untuk vendor, band, tenant, serta kru.
             </p>
           </div>
           <button
             onClick={onClose}
-            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-xl transition"
+            className="p-2 text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 rounded-lg transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -145,7 +145,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: Props) 
               type="text"
               required
               placeholder="Contoh: Pentas Seni SMA 1 Jakarta / Nusantara Jazz Festival"
-              className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
+              className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
             />
@@ -155,7 +155,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: Props) 
             <div>
               <label className="block font-semibold text-slate-700 mb-1">Kategori Acara</label>
               <select
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white"
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
               >
@@ -172,7 +172,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: Props) 
               <input
                 type="text"
                 placeholder="Misal: 350.000.000"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                 value={formData.budget}
                 onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
               />
@@ -188,7 +188,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: Props) 
                 type="text"
                 required
                 placeholder="Misal: Istora Senayan, Jakarta"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                 value={formData.venue}
                 onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
               />
@@ -201,7 +201,7 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: Props) 
                 type="text"
                 required
                 placeholder="Misal: 20 - 21 Agustus 2027"
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                 value={formData.date}
                 onChange={(e) => setFormData({ ...formData, date: e.target.value })}
               />
@@ -213,24 +213,24 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: Props) 
             <textarea
               rows={2}
               placeholder="Jelaskan konsep acara, target pengunjung, dan kebutuhan pengadaan panggung/talent..."
-              className="w-full px-3.5 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
+              className="w-full px-3.5 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
             />
           </div>
 
           {/* PERMISSION CONTROLS (EO SETTINGS) */}
-          <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3">
+          <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3">
             <div className="flex items-center justify-between">
-              <span className="font-bold text-slate-800 text-xs uppercase tracking-wider flex items-center gap-1.5">
+              <span className="font-bold text-slate-800 text-sm flex items-center gap-1.5">
                 <Sliders className="w-3.5 h-3.5 text-sky-600" /> Kontrol Izin Pengajuan Mitra
               </span>
-              <span className="text-[11px] text-slate-500 font-medium">Aturan Penerimaan Pengajuan</span>
+              <span className="text-sm text-slate-500 font-medium">Aturan Penerimaan Pengajuan</span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
               {/* Vendor Permission */}
-              <label className="flex items-start gap-2.5 p-2.5 bg-white rounded-xl border border-slate-200 cursor-pointer hover:border-slate-300 transition">
+              <label className="flex items-start gap-2.5 p-2.5 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-slate-300 transition">
                 <input
                   type="checkbox"
                   checked={formData.allowVendorProposals}
@@ -241,12 +241,12 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: Props) 
                   <div className="font-bold text-slate-800 flex items-center gap-1">
                     <Sliders className="w-3.5 h-3.5 text-indigo-600" /> Terima Pengajuan Vendor
                   </div>
-                  <div className="text-[11px] text-slate-500">Vendor luar boleh mengajukan penawaran harga alat</div>
+                  <div className="text-sm text-slate-500">Vendor luar boleh mengajukan penawaran harga alat</div>
                 </div>
               </label>
 
               {/* Band / Talent Permission */}
-              <label className="flex items-start gap-2.5 p-2.5 bg-white rounded-xl border border-slate-200 cursor-pointer hover:border-slate-300 transition">
+              <label className="flex items-start gap-2.5 p-2.5 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-slate-300 transition">
                 <input
                   type="checkbox"
                   checked={formData.allowTalentProposals}
@@ -257,12 +257,12 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: Props) 
                   <div className="font-bold text-slate-800 flex items-center gap-1">
                     <Music className="w-3.5 h-3.5 text-purple-600" /> Terima Pengajuan Band
                   </div>
-                  <div className="text-[11px] text-slate-500">Manajer band/musisi boleh mengajukan proposal manggung</div>
+                  <div className="text-sm text-slate-500">Manajer band/musisi boleh mengajukan proposal manggung</div>
                 </div>
               </label>
 
               {/* Tenant Permission */}
-              <label className="flex items-start gap-2.5 p-2.5 bg-white rounded-xl border border-slate-200 cursor-pointer hover:border-slate-300 transition">
+              <label className="flex items-start gap-2.5 p-2.5 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-slate-300 transition">
                 <input
                   type="checkbox"
                   checked={formData.allowTenantRegistrations}
@@ -273,12 +273,12 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: Props) 
                   <div className="font-bold text-slate-800 flex items-center gap-1">
                     <Store className="w-3.5 h-3.5 text-emerald-600" /> Buka Kaveling Tenant
                   </div>
-                  <div className="text-[11px] text-slate-500">Buka pendaftaran booth bazaar & pameran</div>
+                  <div className="text-sm text-slate-500">Buka pendaftaran booth bazaar & pameran</div>
                 </div>
               </label>
 
               {/* Crew Permission */}
-              <label className="flex items-start gap-2.5 p-2.5 bg-white rounded-xl border border-slate-200 cursor-pointer hover:border-slate-300 transition">
+              <label className="flex items-start gap-2.5 p-2.5 bg-white rounded-lg border border-slate-200 cursor-pointer hover:border-slate-300 transition">
                 <input
                   type="checkbox"
                   checked={formData.allowCrewApplications}
@@ -289,14 +289,14 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: Props) 
                   <div className="font-bold text-slate-800 flex items-center gap-1">
                     <Users className="w-3.5 h-3.5 text-rose-600" /> Buka Rekrutmen Kru
                   </div>
-                  <div className="text-[11px] text-slate-500">Membuka lowongan kru shift lapangan</div>
+                  <div className="text-sm text-slate-500">Membuka lowongan kru shift lapangan</div>
                 </div>
               </label>
             </div>
 
             {/* Private vs Public Toggle */}
             <div className="pt-2 border-t border-slate-200/80">
-              <label className="flex items-center justify-between p-2.5 bg-amber-50/60 rounded-xl border border-amber-200/70 cursor-pointer">
+              <label className="flex items-center justify-between p-2.5 bg-amber-50/60 rounded-lg border border-amber-200/70 cursor-pointer">
                 <div className="flex items-center gap-2">
                   {formData.isInviteOnly ? (
                     <Lock className="w-4 h-4 text-amber-600" />
@@ -304,10 +304,10 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: Props) 
                     <Globe className="w-4 h-4 text-sky-600" />
                   )}
                   <div>
-                    <div className="font-bold text-xs text-slate-900">
+                    <div className="font-bold text-sm text-slate-900">
                       {formData.isInviteOnly ? 'Mode Acara Tertutup (Invite Only)' : 'Mode Acara Terbuka (Public Listing)'}
                     </div>
-                    <div className="text-[11px] text-slate-500">
+                    <div className="text-sm text-slate-500">
                       {formData.isInviteOnly
                         ? 'Hanya mitra yang diundang langsung oleh EO yang dapat bekerjasama'
                         : 'Acara tampil di beranda dan terbuka untuk penawaran mitra terkurasi'}
@@ -329,14 +329,14 @@ export default function CreateEventModal({ isOpen, onClose, onSuccess }: Props) 
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl font-medium transition"
+              className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg font-medium transition"
             >
               Batal
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-xl font-bold shadow-md hover:shadow-lg transition flex items-center gap-2"
+              className="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-bold transition flex items-center gap-2"
             >
               <CheckCircle2 className="w-4 h-4" />
               <span>{loading ? 'Mempublikasikan...' : 'Publikasikan Proyek Acara'}</span>
