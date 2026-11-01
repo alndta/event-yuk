@@ -9,6 +9,7 @@ import { initialContracts, CollaborationContract } from './components/ContractLi
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import useSmoothScroll from './hooks/useSmoothScroll';
 import AuthPromptModal from './components/AuthPromptModal';
 import ScrollToTop from './components/ScrollToTop';
 
@@ -487,6 +488,7 @@ function AppContent() {
 }
 
 export default function App() {
+  useSmoothScroll();
   return (
     <BrowserRouter>
       <ScrollToTop />

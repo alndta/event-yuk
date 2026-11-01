@@ -4,7 +4,12 @@
 
 @layer base {
   html {
+    /* Lenis owns wheel scrolling on desktop; native smooth stays for everything else. */
     scroll-behavior: smooth;
+  }
+  html.lenis,
+  html.lenis body {
+    scroll-behavior: auto;
   }
   body {
     @apply bg-brand-canvas text-slate-900 antialiased font-sans;
@@ -77,4 +82,47 @@
   );
   background-size: 200% 100%;
   animation: shimmerWave 1.8s ease-in-out infinite;
+}
+
+/* Headline lines that rise out of a mask: give descenders room inside the clip. */
+.ey-line-mask {
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+
+/* Hamburger: two bars that trade lengths on hover. */
+.ey-bar {
+  transition: transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ey-menu-btn .ey-bar-a {
+  transform-origin: left center;
+}
+.ey-menu-btn .ey-bar-b {
+  transform-origin: right center;
+  transform: scaleX(0.6);
+}
+.ey-menu-btn:hover .ey-bar-a,
+.ey-menu-btn:focus-visible .ey-bar-a {
+  transform: scaleX(0.6);
+}
+.ey-menu-btn:hover .ey-bar-b,
+.ey-menu-btn:focus-visible .ey-bar-b {
+  transform: scaleX(1);
+}
+
+/* Text that rolls up to reveal a second copy on hover. */
+.ey-roll {
+  display: inline-block;
+  overflow: hidden;
+  height: 1.5em;
+  line-height: 1.5em;
+  vertical-align: middle;
+}
+.ey-roll > span {
+  display: block;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.ey-menu-btn:hover .ey-roll > span,
+.ey-menu-btn:focus-visible .ey-roll > span {
+  transform: translateY(-100%);
 }

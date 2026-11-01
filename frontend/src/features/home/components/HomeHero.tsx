@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import { EventItem } from '../../../data/mockEvents';
 import { useLanguage } from '../../../context/LanguageContext';
+import { gsap, NO_REDUCED_MOTION } from '../../../lib/motion';
+import useMagnetic from '../../../hooks/useMagnetic';
 
 interface Props {
   featuredEvent?: EventItem;
@@ -45,9 +47,57 @@ const BLOB =
 export default function HomeHero({ onOpenCreateEvent }: Props) {
   const { t } = useLanguage();
   const [activeStep, setActiveStep] = useState(0);
+  const rootRef = useRef<HTMLElement>(null);
+  const ctaRef = useMagnetic<HTMLButtonElement>();
+
+  // Opening sequence. States are set before the first paint, so nothing flashes.
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+    const mm = gsap.matchMedia();
+    mm.add(NO_REDUCED_MOTION, () => {
+      const q = gsap.utils.selector(root);
+
+      gsap
+        .timeline({ defaults: { ease: 'ey' } })
+        .from(q('[data-hero-line]'), { yPercent: 115, duration: 1.3, stagger: 0.12 })
+        .from(q('[data-hero-wave]'), { yPercent: 100, duration: 1.2 }, 0.15)
+        .from(q('[data-hero-fade]'), { y: 30, autoAlpha: 0, duration: 1, stagger: 0.12 }, 0.5)
+        .from(q('[data-hero-photo]'), { clipPath: 'inset(100% 0% 0% 0%)', duration: 1.4 }, 0.35)
+        .from(q('[data-hero-photo] img'), { scale: 1.45, duration: 1.8 }, 0.35)
+        .from(q('[data-hero-sticker]'), { scale: 0, rotate: -40, duration: 1, ease: 'back.out(2.2)', stagger: 0.14 }, 1.0)
+        .from(q('[data-hero-step]'), { y: 24, autoAlpha: 0, duration: 0.9, stagger: 0.08 }, 0.9);
+
+      // Idle life: the badge turns, stickers hover, the blob drifts.
+      gsap.to(q('[data-hero-spin]'), { rotate: 360, duration: 36, ease: 'none', repeat: -1, transformOrigin: '50% 50%' });
+      gsap.to(q('[data-hero-sticker]'), {
+        y: -9,
+        duration: 3.2,
+        ease: 'sine.inOut',
+        yoyo: true,
+        repeat: -1,
+        stagger: { each: 0.6, from: 'random' },
+      });
+      gsap.to(q('[data-hero-blob]'), { x: 26, y: -14, scale: 1.06, duration: 9, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+
+      // As the hero leaves, the photo rises a little faster than the page and the blob lags behind.
+      gsap.to(q('[data-hero-photo-wrap]'), {
+        yPercent: -8,
+        ease: 'none',
+        scrollTrigger: { trigger: root, start: 'top top', end: 'bottom top', scrub: true },
+      });
+      gsap.to(q('[data-hero-blob]'), {
+        yPercent: 16,
+        ease: 'none',
+        scrollTrigger: { trigger: root, start: 'top top', end: 'bottom top', scrub: true },
+      });
+    });
+    return () => mm.revert();
+  }, []);
 
   return (
     <section
+      ref={rootRef}
       aria-labelledby="home-title"
       className="-mx-5 -my-6 overflow-hidden sm:-mx-8 sm:-my-8 lg:-mx-12 2xl:-mx-16"
     >
@@ -55,6 +105,7 @@ export default function HomeHero({ onOpenCreateEvent }: Props) {
         <svg
           aria-hidden="true"
           viewBox="0 0 800 600"
+          data-hero-blob
           className="absolute -left-24 -bottom-8 -z-10 h-[24rem] w-[34rem] text-brand-lime-hover lg:-left-10 lg:h-[30rem] lg:w-[42rem]"
         >
           <path d={BLOB} fill="currentColor" />
@@ -65,16 +116,26 @@ export default function HomeHero({ onOpenCreateEvent }: Props) {
             id="home-title"
             className="font-display text-[clamp(2.9rem,7.4vw,7.25rem)] font-extrabold uppercase leading-[0.9] tracking-[-0.04em]"
           >
-            <span className="block">{t('hero.title')}</span>
-            <span className="block text-white [-webkit-text-stroke:clamp(2px,0.26vw,4px)_#172D46] [paint-order:stroke_fill]">
-              {t('hero.titleHighlight')}
+            <span className="-mx-[0.05em] -mb-[0.08em] block overflow-hidden px-[0.05em] pb-[0.08em]">
+              <span data-hero-line className="block">
+                {t('hero.title')}
+              </span>
+            </span>
+            <span className="-mx-[0.05em] -mb-[0.08em] block overflow-hidden px-[0.05em] pb-[0.08em]">
+              <span
+                data-hero-line
+                className="block text-white [-webkit-text-stroke:clamp(2px,0.26vw,4px)_#172D46] [paint-order:stroke_fill]"
+              >
+                {t('hero.titleHighlight')}
+              </span>
             </span>
           </h1>
 
           <div className="relative z-30 mt-6 max-w-[34rem] lg:mt-9">
-            <p className="font-display text-lg font-bold leading-7">{t('hero.desc')}</p>
-            <div className="mt-5 flex flex-wrap items-center gap-3">
+            <p data-hero-fade className="font-display text-lg font-bold leading-7">{t('hero.desc')}</p>
+            <div data-hero-fade className="mt-5 flex flex-wrap items-center gap-3">
               <button
+                ref={ctaRef}
                 type="button"
                 onClick={onOpenCreateEvent}
                 className="inline-flex min-h-12 items-center gap-3 rounded-full bg-brand-navy px-7 text-base font-semibold text-brand-lime transition-colors hover:bg-brand-navy-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy"
@@ -92,8 +153,8 @@ export default function HomeHero({ onOpenCreateEvent }: Props) {
           </div>
         </div>
 
-        <div className="relative z-20 mx-auto mt-8 w-[72%] max-w-[20rem] lg:absolute lg:bottom-0 lg:right-[7%] lg:mx-0 lg:mt-0 lg:w-[min(24vw,23rem)] lg:max-w-none">
-          <div className="aspect-[4/5] overflow-hidden rounded-t-[999px] bg-brand-navy-light">
+        <div data-hero-photo-wrap className="relative z-20 mx-auto mt-8 w-[72%] max-w-[20rem] lg:absolute lg:bottom-0 lg:right-[7%] lg:mx-0 lg:mt-0 lg:w-[min(24vw,23rem)] lg:max-w-none">
+          <div data-hero-photo className="aspect-[4/5] overflow-hidden rounded-t-[999px] bg-brand-navy-light">
             <img
               src="/assets/crowd-festival.jpg"
               alt={t('hero.photoAlt')}
@@ -106,8 +167,8 @@ export default function HomeHero({ onOpenCreateEvent }: Props) {
             />
           </div>
 
-          <div className="absolute -left-[16%] top-[22%] w-[34%] max-w-[7.5rem] -rotate-[8deg]">
-            <svg aria-hidden="true" viewBox="0 0 100 100" className="block w-full text-brand-navy">
+          <div data-hero-sticker className="absolute -left-[16%] top-[22%] w-[34%] max-w-[7.5rem] -rotate-[8deg]">
+            <svg data-hero-spin aria-hidden="true" viewBox="0 0 100 100" className="block w-full text-brand-navy">
               <polygon points={BURST} fill="currentColor" />
             </svg>
             <span className="absolute inset-0 flex items-center justify-center px-2 text-center font-display text-[clamp(0.65rem,1.2vw,1rem)] font-extrabold uppercase leading-[1.05] text-brand-lime">
@@ -117,11 +178,12 @@ export default function HomeHero({ onOpenCreateEvent }: Props) {
             </span>
           </div>
 
-          <span className="absolute -right-[14%] top-[10%] rotate-[11deg] rounded-md bg-brand-navy px-3 py-1.5 font-display text-[clamp(0.65rem,1.1vw,0.95rem)] font-extrabold uppercase leading-none text-white sm:px-4 sm:py-2">
+          <span data-hero-sticker className="absolute -right-[14%] top-[10%] rotate-[11deg] rounded-md bg-brand-navy px-3 py-1.5 font-display text-[clamp(0.65rem,1.1vw,0.95rem)] font-extrabold uppercase leading-none text-white sm:px-4 sm:py-2">
             Escrow Midtrans
           </span>
 
           <svg
+            data-hero-sticker
             aria-hidden="true"
             viewBox="0 0 100 100"
             className="absolute -right-[6%] bottom-[28%] w-[14%] text-white"
@@ -137,6 +199,7 @@ export default function HomeHero({ onOpenCreateEvent }: Props) {
         </div>
 
         <svg
+          data-hero-wave
           aria-hidden="true"
           viewBox="0 0 1440 90"
           preserveAspectRatio="none"
@@ -156,7 +219,7 @@ export default function HomeHero({ onOpenCreateEvent }: Props) {
             className="mt-5 grid grid-cols-2 gap-x-5 gap-y-6 sm:gap-x-8 lg:grid-cols-4 lg:gap-x-10"
           >
             {workflowSteps.map(([titleKey, descriptionKey], index) => (
-              <li key={titleKey}>
+              <li key={titleKey} data-hero-step>
                 <button
                   type="button"
                   aria-pressed={activeStep === index}

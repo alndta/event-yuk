@@ -25,6 +25,7 @@ export default function SectionHeading({
       <div className="mx-auto flex max-w-3xl flex-col items-center text-center">
         <h2
           id={id}
+          data-split-title
           className={'font-display text-4xl font-extrabold leading-[1.05] tracking-[-0.04em] sm:text-6xl ' + titleClass}
         >
           {title}

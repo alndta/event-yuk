@@ -46,15 +46,18 @@ export default function HomeRoleSection({ onOpenCreateEvent }: Props) {
             const cta = t(('pillars.' + id + '.cta') as 'pillars.eo.cta');
             return (
               <li key={id} data-gsap-reveal className={'relative flex flex-col overflow-hidden rounded-lg ' + tone}>
-                <img
-                  src={'/assets/' + photo}
-                  alt=""
-                  width={800}
-                  height={560}
-                  loading="lazy"
-                  decoding="async"
-                  className="aspect-[10/7] w-full object-cover"
-                />
+                <div className="aspect-[10/7] w-full overflow-hidden">
+                  <img
+                    data-parallax
+                    src={'/assets/' + photo}
+                    alt=""
+                    width={800}
+                    height={560}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full scale-[1.16] object-cover"
+                  />
+                </div>
                 <div className="flex flex-1 flex-col items-start p-6 sm:p-7">
                   <h3 className="font-display text-2xl font-extrabold leading-tight tracking-[-0.03em]">
                     {t(('pillars.' + id + '.title') as 'pillars.eo.title')}

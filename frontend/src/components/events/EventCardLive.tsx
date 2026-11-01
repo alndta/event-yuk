@@ -128,7 +128,7 @@ export default function EventCardLive({ event, onSelectAction }: Props) {
               aria-label={t('eventCard.progressLabel') + ': ' + completion + '%'}
               className="mt-3 h-2 w-full overflow-hidden rounded-full bg-brand-sand"
             >
-              <div className="h-full rounded-full bg-brand-navy" style={{ width: completion + '%' }} />
+              <div data-gsap-bar className="h-full rounded-full bg-brand-navy" style={{ width: completion + '%' }} />
             </div>
             <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-600">
               <span>{t('eventCard.boothCount')}: <strong className="font-semibold text-slate-950">{event.progress.boothFilled}</strong></span>

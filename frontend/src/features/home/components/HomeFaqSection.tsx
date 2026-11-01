@@ -43,7 +43,7 @@ export default function HomeFaqSection() {
         />
         <div className="mx-auto max-w-3xl divide-y divide-brand-navy/15 border-y border-brand-navy/15">
           {faqs.map(({ role, q, a }, index) => (
-            <details key={q} open={index === 0} className="group py-1">
+            <details key={q} data-gsap-reveal open={index === 0} className="group py-1">
               <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-6 py-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy [&::-webkit-details-marker]:hidden">
                 <span>
                   <span className="block text-sm font-semibold text-brand-lime-strong">{role}</span>

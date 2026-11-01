@@ -1,11 +1,35 @@
+import { useLayoutEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, MapPin } from 'lucide-react';
+import { gsap, NO_REDUCED_MOTION } from '../lib/motion';
 
 const linkClass = 'text-sm leading-6 text-slate-300 transition-colors hover:text-white';
 
 export default function Footer() {
+  const footerRef = useRef<HTMLElement>(null);
+  const markRef = useRef<HTMLParagraphElement>(null);
+
+  useLayoutEffect(() => {
+    const footer = footerRef.current;
+    const mark = markRef.current;
+    if (!footer || !mark) return;
+    const mm = gsap.matchMedia();
+    mm.add(NO_REDUCED_MOTION, () => {
+      gsap.fromTo(
+        mark,
+        { yPercent: 38 },
+        {
+          yPercent: 0,
+          ease: 'none',
+          scrollTrigger: { trigger: footer, start: 'top bottom', end: 'bottom bottom', scrub: true },
+        }
+      );
+    });
+    return () => mm.revert();
+  }, []);
+
   return (
-    <footer className="mt-20 bg-brand-ink text-slate-200">
+    <footer ref={footerRef} className="mt-20 overflow-hidden bg-brand-ink text-slate-200">
       <div className="bg-brand-navy px-5 py-7 sm:px-8 lg:px-12 2xl:px-16">
         <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
           <div className="max-w-3xl">
@@ -82,6 +106,7 @@ export default function Footer() {
         </div>
 
         <p
+          ref={markRef}
           aria-hidden="true"
           className="mt-12 select-none overflow-hidden whitespace-nowrap text-center font-display text-[clamp(4.5rem,21vw,22rem)] font-extrabold leading-[0.8] tracking-[-0.06em] text-white/10"
         >

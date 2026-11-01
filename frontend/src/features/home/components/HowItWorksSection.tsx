@@ -23,7 +23,7 @@ export default function HowItWorksSection() {
         />
         <ol className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 lg:gap-5">
           {steps.map(({ title, description }, index) => (
-            <li key={title} className="flex min-h-[19rem] flex-col rounded-lg bg-brand-navy-dark p-7">
+            <li key={title} data-gsap-reveal className="flex min-h-[19rem] flex-col rounded-lg bg-brand-navy-dark p-7">
               <span
                 aria-hidden="true"
                 className="font-display text-7xl font-extrabold leading-none tracking-[-0.05em] text-brand-lime"

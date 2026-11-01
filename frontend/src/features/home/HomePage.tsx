@@ -14,6 +14,7 @@ import HowItWorksSection from './components/HowItWorksSection';
 import HomeDiscoverySections from './components/HomeDiscoverySections';
 import HomeCallToAction from './components/HomeCallToAction';
 import HomeFaqSection from './components/HomeFaqSection';
+import HomeMarquee from './components/HomeMarquee';
 import useGsapReveal from '../../hooks/useGsapReveal';
 
 interface Props {
@@ -105,6 +106,7 @@ export default function HomePage({
         onViewDetails={onViewDetails}
       />
       <HomeRoleSection onOpenCreateEvent={onOpenCreateEvent} />
+      <HomeMarquee />
       <HowItWorksSection />
       <HomeFaqSection />
       <HomeCallToAction onOpenCreateEvent={onOpenCreateEvent} />
