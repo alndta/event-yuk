@@ -11,10 +11,13 @@ import {
   Mail,
   ArrowRight,
 } from 'lucide-react';
-import { mockOrganizers, OrganizerItem } from '../data/mockOrganizers';
+import { OrganizerItem } from '../types/models';
 import { PartnerCardsSkeletonList } from '../components/skeletons/PartnerCardSkeleton';
 import { SEOHead } from '../components/SEOHead';
-import { cachedFetch } from '../utils/apiCache';
+import EmptyState from '../components/EmptyState';
+import { useLanguage } from '../context/LanguageContext';
+import { api, query } from '../lib/api';
+import useDebounced from '../hooks/useDebounced';
 import Avatar from '../components/Avatar';
 
 interface Props {
@@ -22,50 +25,52 @@ interface Props {
 }
 
 export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrganizer }: Props) {
-  const [organizers, setOrganizers] = useState<OrganizerItem[]>(mockOrganizers);
-  const [loading, setLoading] = useState<boolean>(false);
+  const { t, language } = useLanguage();
+  const [organizers, setOrganizers] = useState<OrganizerItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const pageRef = useRef<HTMLDivElement>(null);
   useGsapReveal(pageRef, '[data-gsap-reveal]', [loading]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedCity, setSelectedCity] = useState<string>('ALL');
 
+  const debouncedSearch = useDebounced(searchTerm.trim(), 300);
+  const cityFilter = selectedCity === 'ALL' ? undefined : selectedCity;
+
+  // Search runs on the server. Without a running server, development builds fall back to the bundled samples.
   useEffect(() => {
+    const controller = new AbortController();
     setLoading(true);
-    cachedFetch('/api/v1/users/partners?type=EO')
-      .then((resData: any) => {
-        if (resData.success && Array.isArray(resData.data) && resData.data.length > 0) {
-          const mapped: OrganizerItem[] = resData.data.map((eo: any) => ({
-            id: eo.id,
-            name: eo.name,
-            category: 'CONCERT' as const,
-            city: eo.city || 'Jakarta Selatan',
-            avatar: eo.avatar || '/assets/crowd-festival.jpg',
-            bannerImage: '/assets/hero-concert.jpg',
-            rating: eo.rating || 4.9,
-            totalEventsCompleted: eo.completedGigs || 28,
-            totalAttendeesServed: '320.000+',
-            verified: true,
-            specialties: eo.specsOrRiders || ['Festival Musik Terbuka', 'Konser Internasional'],
-            description: eo.description || 'Penyelenggara acara resmi terdaftar di ekosistem Event Yuk.',
-            contactEmail: 'organizer@eventyuk.id',
-            phone: '+62 811-2233-4455',
-            pastHighlightEvents: ['Soundfest Archipelago 2027', 'Jakarta Creative Gathering'],
-          }));
-          setOrganizers(mapped);
-        }
+    api('/partners' + query({ type: 'EO', q: debouncedSearch, city: cityFilter }), { anonymous: true, signal: controller.signal })
+      .then((resData) => setOrganizers((resData.data || []).map((eo: any): OrganizerItem => ({
+          id: eo.id,
+          name: eo.name,
+          category: 'CONCERT',
+          city: eo.city || '',
+          avatar: eo.avatar || '/assets/crowd-festival.jpg',
+          bannerImage: '/assets/hero-concert.jpg',
+          rating: eo.rating || 0,
+          totalEventsCompleted: eo.completedGigs || 0,
+          totalAttendeesServed: '',
+          verified: Boolean(eo.verified),
+          specialties: [],
+          description: eo.description || '',
+          contactEmail: '',
+          phone: '',
+          pastHighlightEvents: [],
+        }))))
+      .catch((err) => {
+        if (err?.name !== 'AbortError') setOrganizers([]);
       })
-      .catch(() => {})
       .finally(() => {
-        setLoading(false);
+        // A superseded request must not end the loading state of the one that replaced it.
+        if (!controller.signal.aborted) setLoading(false);
       });
-  }, []);
+    return () => controller.abort();
+  }, [debouncedSearch, cityFilter]);
 
   const filtered = organizers.filter((eo) => {
-    const matchesSearch =
-      eo.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      eo.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      eo.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = true;
     const matchesCat = selectedCategory === 'ALL' || eo.category === selectedCategory;
     const matchesCity = selectedCity === 'ALL' || eo.city.toLowerCase().includes(selectedCity.toLowerCase());
     return matchesSearch && matchesCat && matchesCity;
@@ -86,8 +91,8 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
           <Calendar aria-hidden="true" className="h-4 w-4" />
           Direktori promotor dan event organizer
         </p>
-        <h1 data-split-title className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
-          Cari event organizer yang cocok
+        <h1 key={language} data-split-title className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
+          {t('orgs.title')}
         </h1>
         <p className="mt-4 text-lg leading-8 text-slate-700">
           Penyelenggara festival musik, pensi sekolah, dan pameran dengan rekam jejak, pagu anggaran, dan ulasan yang bisa kamu lihat sebelum menghubungi.
@@ -98,8 +103,8 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
           <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
           <input
             type="search"
-            aria-label="Cari event organizer"
-            placeholder="Cari nama EO, kota, atau jenis acara"
+            aria-label={t('orgs.searchLabel')}
+            placeholder={t('orgs.searchPh')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="min-h-14 w-full rounded-full border border-slate-300 bg-white pl-12 pr-5 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
@@ -137,12 +142,12 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
         <div className="flex items-center gap-2">
           <MapPin aria-hidden="true" className="h-4 w-4 text-slate-600" />
           <select
-            aria-label="Filter kota"
+            aria-label={t('common.cityFilter')}
             value={selectedCity}
             onChange={(e) => setSelectedCity(e.target.value)}
             className="min-h-11 rounded-full border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
           >
-            <option value="ALL">Semua kota</option>
+            <option value="ALL">{t('common.allCities')}</option>
             <option value="Jakarta">Jakarta</option>
             <option value="Bandung">Bandung</option>
             <option value="Surabaya">Surabaya</option>
@@ -154,8 +159,15 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
       {/* Organizer Cards Grid */}
       {loading ? (
         <PartnerCardsSkeletonList count={4} />
+      ) : filtered.length === 0 ? (
+        <EmptyState
+          title={t('common.noResults')}
+          body={t('common.noResultsBody')}
+          actionLabel={t('common.reset')}
+          onAction={() => { setSearchTerm(''); setSelectedCity('ALL'); setSelectedCategory('ALL'); }}
+        />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 ey-stagger">
         {filtered.map((eo) => (
           <div
             key={eo.id}

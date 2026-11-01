@@ -4,6 +4,8 @@ import {
   AlertCircle,
   ArrowUpRight,
   Globe,
+  Moon,
+  Sun,
   Layers,
   LogOut,
   PlusCircle,
@@ -12,6 +14,7 @@ import {
 } from 'lucide-react';
 import { UserRole } from './RoleOnboardingModal';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';
 import { gsap, NO_REDUCED_MOTION } from '../lib/motion';
 import useMagnetic from '../hooks/useMagnetic';
@@ -31,6 +34,8 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
   const location = useLocation();
   const { user, isAuthenticated, logout } = useAuth();
   const { language, toggleLanguage, t } = useLanguage();
+  const { theme, toggleTheme } = useTheme();
+  const themeLabel = language === 'id' ? (theme === 'dark' ? 'Aktifkan mode terang' : 'Aktifkan mode gelap') : theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
   const [menu, setMenu] = useState<'closed' | 'open' | 'closing'>('closed');
   const mounted = menu !== 'closed';
   const menuRef = useRef(menu);
@@ -188,6 +193,7 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
   return (
     <>
       <header
+        data-on-lime={isHome && !solid ? 'true' : undefined}
         className={
           'sticky top-0 z-40 h-16 font-sans transition-colors duration-200 ' +
           (overlay ? '-mb-16 ' : '') +
@@ -217,6 +223,16 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
             >
               <Globe aria-hidden="true" className="h-4 w-4" />
               {language.toUpperCase()}
+            </button>
+
+            <button
+              type="button"
+              onClick={toggleTheme}
+              className={'inline-flex min-h-11 min-w-11 items-center justify-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-current ' + textTone}
+              title={themeLabel}
+              aria-label={themeLabel}
+            >
+              {theme === 'dark' ? <Sun aria-hidden="true" className="h-5 w-5" /> : <Moon aria-hidden="true" className="h-5 w-5" />}
             </button>
 
             {!isAuthenticated && (
@@ -449,6 +465,14 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
               >
                 <Globe aria-hidden="true" className="h-5 w-5" />
                 {language === 'id' ? 'Bahasa Indonesia' : 'English'}
+              </button>
+              <button data-menu-item
+                type="button"
+                onClick={toggleTheme}
+                className={pill + 'w-full justify-center text-slate-200 hover:text-white focus-visible:outline-white'}
+              >
+                {theme === 'dark' ? <Sun aria-hidden="true" className="h-5 w-5" /> : <Moon aria-hidden="true" className="h-5 w-5" />}
+                {themeLabel}
               </button>
             </div>
           </div>

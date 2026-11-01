@@ -30,3 +30,27 @@ export function priceRange(prices: number[]): string | null {
   const sorted = [...prices].sort((a, b) => a - b);
   return sorted[0] === sorted[sorted.length - 1] ? rupiah(sorted[0]) : `${rupiah(sorted[0])} - ${rupiah(sorted[sorted.length - 1])}`;
 }
+
+import type { TalentProfile, VendorPackage } from './ports';
+
+/** Wire format for catalog items: snake_case, as the web app expects. */
+export const presentPackage = (x: VendorPackage) => ({
+  id: x.id,
+  package_name: x.packageName,
+  category: x.category,
+  base_price: x.basePrice,
+  daily_quota: x.dailyQuota,
+  tech_specs: x.techSpecs,
+  is_active: x.isActive,
+});
+
+export const presentTalent = (t: TalentProfile) => ({
+  id: t.id,
+  package_name: t.stageName,
+  stage_name: t.stageName,
+  genre: t.genre,
+  category: t.genre ?? 'Penampilan',
+  base_price: t.baseRate,
+  tech_specs: t.technicalRiders,
+  hospitality_riders: t.hospitalityRiders,
+});

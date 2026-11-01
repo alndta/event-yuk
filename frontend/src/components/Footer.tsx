@@ -2,10 +2,12 @@ import { useLayoutEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, MapPin } from 'lucide-react';
 import { gsap, NO_REDUCED_MOTION } from '../lib/motion';
+import { useLanguage } from '../context/LanguageContext';
 
 const linkClass = 'text-sm leading-6 text-slate-300 transition-colors hover:text-white';
 
 export default function Footer() {
+  const { t } = useLanguage();
   const footerRef = useRef<HTMLElement>(null);
   const markRef = useRef<HTMLParagraphElement>(null);
 
@@ -34,15 +36,15 @@ export default function Footer() {
         <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
           <div className="max-w-3xl">
             <h2 className="text-lg font-semibold text-white">
-              Transaksi Terproteksi Rekening Bersama Escrow
+              {t('footer.escrowTitle')}
             </h2>
             <p className="mt-2 text-sm leading-6 text-white">
-              Pencairan dana bertahap DP 30-50% &amp; pelunasan instan setelah BAST digital disetujui bersama.
+              {t('footer.escrowDesc')}
             </p>
           </div>
           <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm font-medium text-white">
-            <span>Escrow Midtrans Berizin BI</span>
-            <span>e-KYC &amp; PKS Digital</span>
+            <span>{t('footer.escrowTag')}</span>
+            <span>{t('footer.kycTag')}</span>
           </div>
         </div>
       </div>
@@ -55,7 +57,7 @@ export default function Footer() {
               <span className="text-lg font-semibold text-white">Event Yuk</span>
             </Link>
             <p className="max-w-md text-sm leading-6 text-slate-300">
-              Satu ekosistem yang menghubungkan penyelenggara, vendor, talent, tenant, sponsor, dan kru acara.
+              {t('footer.about')}
             </p>
             <div className="space-y-2 text-sm text-slate-300">
               <p className="flex items-center gap-2">
@@ -69,27 +71,27 @@ export default function Footer() {
             </div>
           </div>
 
-          <nav aria-label="Eksplorasi">
-            <h3 className="mb-4 text-base font-semibold text-white">Eksplorasi</h3>
+          <nav aria-label={t('footer.explore')}>
+            <h3 className="mb-4 text-base font-semibold text-white">{t('footer.explore')}</h3>
             <ul className="space-y-2">
-              <li><Link to="/events" className={linkClass}>Proyek acara</Link></li>
-              <li><Link to="/organizers" className={linkClass}>Penyelenggara</Link></li>
-              <li><Link to="/bands" className={linkClass}>Band &amp; talent</Link></li>
-              <li><Link to="/vendors" className={linkClass}>Vendor produksi</Link></li>
-              <li><Link to="/sponsors" className={linkClass}>Sponsor</Link></li>
+              <li><Link to="/events" className={linkClass}>{t('footer.projects')}</Link></li>
+              <li><Link to="/organizers" className={linkClass}>{t('footer.organizers')}</Link></li>
+              <li><Link to="/bands" className={linkClass}>{t('footer.bands')}</Link></li>
+              <li><Link to="/vendors" className={linkClass}>{t('footer.vendors')}</Link></li>
+              <li><Link to="/sponsors" className={linkClass}>{t('footer.sponsors')}</Link></li>
             </ul>
           </nav>
 
-          <nav aria-label="Akun dan dokumen">
-            <h3 className="mb-4 text-base font-semibold text-white">Akun dan dokumen</h3>
+          <nav aria-label={t('footer.account')}>
+            <h3 className="mb-4 text-base font-semibold text-white">{t('footer.account')}</h3>
             <ul className="space-y-2">
-              <li><Link to="/profile" className={linkClass}>Profil dan e-KYC</Link></li>
-              <li><Link to="/contracts" className={linkClass}>Kontrak PKS</Link></li>
-              <li><Link to="/login" className={linkClass}>Masuk</Link></li>
-              <li><Link to="/register" className={linkClass}>Daftar akun</Link></li>
+              <li><Link to="/profile" className={linkClass}>{t('footer.profile')}</Link></li>
+              <li><Link to="/contracts" className={linkClass}>{t('footer.contracts')}</Link></li>
+              <li><Link to="/login" className={linkClass}>{t('footer.login')}</Link></li>
+              <li><Link to="/register" className={linkClass}>{t('footer.register')}</Link></li>
               <li>
                 <a href="/api-docs" target="_blank" rel="noreferrer" className={linkClass}>
-                  Dokumentasi API
+                  {t('footer.apiDocs')}
                 </a>
               </li>
             </ul>
@@ -97,11 +99,11 @@ export default function Footer() {
         </div>
 
         <div className="mt-10 flex flex-col gap-3 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
-          <p>&copy; {new Date().getFullYear()} Event Yuk. Seluruh hak cipta dilindungi undang-undang.</p>
+          <p>&copy; {new Date().getFullYear()} Event Yuk. {t('footer.rights')}</p>
           <div className="flex flex-wrap gap-x-4 gap-y-2">
-            <span>Syarat dan ketentuan PKS</span>
-            <span>Kebijakan privasi e-KYC</span>
-            <span>Protokol arbitrase Escrow</span>
+            <span>{t('footer.terms')}</span>
+            <span>{t('footer.privacy')}</span>
+            <span>{t('footer.arbitration')}</span>
           </div>
         </div>
 

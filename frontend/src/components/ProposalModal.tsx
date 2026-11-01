@@ -13,15 +13,17 @@ import {
   Trash2,
   FileCheck,
 } from 'lucide-react';
-import { EventItem } from '../data/mockEvents';
-import { PartnerItem } from '../data/mockPartners';
-import { useAuth } from '../context/AuthContext';
+import { EventItem } from '../types/models';
+import { PartnerItem } from '../types/models';
+import { api, ApiError } from '../lib/api';
 
 interface Props {
   isOpen: boolean;
   event?: EventItem | null;
   partner?: PartnerItem | null;
   mode: 'PARTNER_TO_EO' | 'EO_TO_PARTNER';
+  /** The organizer's own events, offered as the target when inviting a partner. */
+  myEvents?: EventItem[];
   onClose: () => void;
   onSuccess: (proposalData: any) => void;
 }
@@ -31,11 +33,11 @@ function ProposalModalInner({
   event,
   partner,
   mode,
+  myEvents = [],
   onClose,
   onSuccess,
 }: Props) {
   const dialogRef = useDialog(onClose);
-  const { user } = useAuth();
   const [formData, setFormData] = useState({
     title: '',
     offeredPrice: '',
@@ -55,6 +57,8 @@ function ProposalModalInner({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [selectedEventId, setSelectedEventId] = useState('');
 
   if (!isOpen) return null;
 
@@ -99,47 +103,41 @@ function ProposalModalInner({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
+    const eventId = event ? event.id : selectedEventId;
+    const receiverId = event ? event.organizerId : partner?.id;
+    if (!eventId) return setError('Pilih acara yang menjadi tujuan kerja sama ini.');
+    if (!receiverId) return setError('Penerima pengajuan belum diketahui. Muat ulang halaman lalu coba lagi.');
+
+    const price = parseInt(formData.offeredPrice.replace(/\D/g, ''), 10);
+    if (!price) return setError('Isi nominal penawaran.');
+
     setLoading(true);
-
-    const price = parseInt(formData.offeredPrice.replace(/\D/g, '')) || 25000000;
-    const dp = parseInt(formData.dpPercentage) || 50;
-
-    const payload = {
-      event_id: event ? event.id : 'b0000000-0000-0000-0000-000000000001',
-      sender_id: user?.id || 'a0000000-0000-0000-0000-000000000001',
-      receiver_id: partner?.id || 'a0000000-0000-0000-0000-000000000002',
-      proposal_type: roleType,
-      direction: mode,
-      title: formData.title || `Penawaran Kerjasama: ${targetTitle}`,
-      offered_price: price,
-      deal_price: price,
-      dp_percentage: dp,
-      scope_of_work: formData.scopeOfWork,
-      riders_or_specs: { details: formData.ridersOrSpecs },
-      attached_file_name: uploadedFile?.name || null,
-      attached_file_size: uploadedFile?.size || null,
-      contract_document_url: uploadedFile ? `/documents/${uploadedFile.name}` : null,
-    };
-
-    let savedProposal = payload;
-
     try {
-      const res = await fetch('/api/v1/proposals', {
+      const res = await api('/proposals', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
+        body: {
+          event_id: eventId,
+          receiver_id: receiverId,
+          proposal_type: roleType,
+          direction: mode,
+          title: formData.title.trim() || `Penawaran kerja sama: ${targetTitle}`,
+          offered_price: price,
+          dp_percentage: parseInt(formData.dpPercentage, 10) || 50,
+          scope_of_work: formData.scopeOfWork,
+          riders_or_specs: formData.ridersOrSpecs ? { details: formData.ridersOrSpecs } : {},
+          attached_file_name: uploadedFile?.name || null,
+          attached_file_size: uploadedFile?.size || null,
+        },
       });
-      const resJson = await res.json();
-      if (res.ok && resJson.data) {
-        savedProposal = resJson.data;
-      }
+      onSuccess(res.data);
+      onClose();
     } catch (err) {
-      console.warn('API error, proceeding with frontend state update:', err);
+      setError(err instanceof ApiError ? err.message : 'Penawaran belum terkirim.');
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
-    onSuccess(savedProposal);
-    onClose();
   };
 
   return (
@@ -169,6 +167,26 @@ function ProposalModalInner({
 
         {/* Form Body */}
         <form onSubmit={handleSubmit} className="p-6 overflow-y-auto space-y-4 text-sm font-sans">
+          {error && (
+            <p role="alert" className="rounded-lg bg-rose-50 px-3.5 py-2.5 text-sm font-semibold text-rose-800">{error}</p>
+          )}
+          {mode === 'EO_TO_PARTNER' && (
+            <div>
+              <label htmlFor="proposal-event" className="block font-semibold text-slate-700 mb-1">Untuk acara yang mana</label>
+              <select
+                id="proposal-event"
+                required
+                value={selectedEventId}
+                onChange={(e) => setSelectedEventId(e.target.value)}
+                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-brand-navy/30 focus:outline-none"
+              >
+                <option value="">{myEvents.length ? 'Pilih acaramu' : 'Kamu belum punya acara aktif'}</option>
+                {myEvents.map((ev) => (
+                  <option key={ev.id} value={ev.id}>{ev.title}</option>
+                ))}
+              </select>
+            </div>
+          )}
           {/* Judul */}
           <div>
             <label className="block font-semibold text-slate-700 mb-1">

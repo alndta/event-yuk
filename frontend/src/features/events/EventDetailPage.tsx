@@ -17,11 +17,13 @@ import {
   Briefcase,
   X,
 } from 'lucide-react';
-import { initialEvents, EventItem } from '../../data/mockEvents';
+import EmptyState from '../../components/EmptyState';
+import { EventItem } from '../../types/models';
 import { useAuth } from '../../context/AuthContext';
 import { SEOHead } from '../../components/SEOHead';
 import { DetailSkeleton } from '../../components/skeletons/DetailSkeleton';
 import { cachedFetch } from '../../utils/apiCache';
+import { api, ApiError } from '../../lib/api';
 import useGsapReveal from '../../hooks/useGsapReveal';
 import useEnter from '../../hooks/useEnter';
 import Avatar from '../../components/Avatar';
@@ -34,12 +36,11 @@ interface Props {
 
 export default function EventDetailPage({ events: propEvents, onOpenProposal }: Props) {
   const { id } = useParams();
-  const { user, requireAuth } = useAuth();
+  const { requireAuth } = useAuth();
   const pageRef = useRef<HTMLDivElement>(null);
   useGsapReveal(pageRef);
 
-  const fallbackEvent = (propEvents || initialEvents).find((e) => e.id === id) || initialEvents[0];
-  const [event, setEvent] = useState<any>(fallbackEvent);
+  const [event, setEvent] = useState<any>((propEvents || []).find((e) => e.id === id) ?? null);
   const [booths, setBooths] = useState<any[]>([]);
   const [crewShifts, setCrewShifts] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'overview' | 'booths' | 'crew' | 'sponsorship'>('overview');
@@ -59,7 +60,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
     setTimeout(() => setFeedbackToast(null), 4000);
   };
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!id) return;
@@ -114,64 +115,32 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
     requireAuth(async () => {
       setSubmittingBooth(true);
       try {
-        const res = await fetch(`/api/v1/events/${event.id}/booths/${selectedBooth.id}/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            tenant_user_id: user?.id || 'a0000000-0000-0000-0000-000000000004',
-            brand_name: boothBrandName || 'Tenant Brand Baru',
-          }),
-        });
-        const json = await res.json();
-        if (json.success) {
-          showNotification(`Pendaftaran kaveling booth ${selectedBooth.booth_code} berhasil diajukan untuk kurasi!`);
-        } else {
-          showNotification(json.error || 'Pendaftaran kaveling booth diproses.');
-        }
-      } catch {
-        showNotification(`Pendaftaran kaveling booth ${selectedBooth.booth_code} berhasil diajukan!`);
-      } finally {
-        setSubmittingBooth(false);
+        await api(`/events/${event.id}/booths/${selectedBooth.id}/register`, { method: 'POST', body: { brand_name: boothBrandName } });
+        showNotification(`Pendaftaran kaveling ${selectedBooth.booth_code} terkirim dan menunggu kurasi penyelenggara.`);
         setSelectedBooth(null);
         setBoothBrandName('');
+      } catch (err) {
+        showNotification(err instanceof ApiError ? err.message : 'Pendaftaran booth belum berhasil.');
+      } finally {
+        setSubmittingBooth(false);
       }
-    }, 'Silakan masuk ke akun Tenant Anda untuk mendaftar kaveling booth.');
+    }, 'Silakan masuk ke akun Tenant kamu untuk mendaftar kaveling booth.');
   };
 
   const handleApplyShift = (shift: any) => {
     requireAuth(async () => {
       try {
-        const res = await fetch(`/api/v1/events/${event.id}/shifts/${shift.id}/apply`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            crew_user_id: user?.id || 'a0000000-0000-0000-0000-000000000006',
-          }),
-        });
-        const json = await res.json();
-        if (json.success) {
-          showNotification(`Lamaran posisi kru ${shift.role_title} berhasil dikirim ke koordinator EO!`);
-        } else {
-          showNotification(json.error || 'Lamaran shift kru diproses.');
-        }
-      } catch {
-        showNotification(`Lamaran posisi kru ${shift.role_title} berhasil diajukan!`);
+        await api(`/events/${event.id}/shifts/${shift.id}/apply`, { method: 'POST' });
+        showNotification(`Lamaran posisi ${shift.role_title} terkirim ke koordinator.`);
+      } catch (err) {
+        showNotification(err instanceof ApiError ? err.message : 'Lamaran belum berhasil dikirim.');
       }
     }, `Silakan masuk ke akun Kru Lapangan untuk melamar shift ${shift.role_title}.`);
   };
 
-  const displayBooths = booths.length > 0 ? booths : [
-    { id: 'bth-1', booth_code: 'FNB-01', booth_category: 'FNB', size_dimension: '3x3m', rental_price: 7500000, is_occupied: false },
-    { id: 'bth-2', booth_code: 'FNB-02', booth_category: 'FNB', size_dimension: '3x3m', rental_price: 7500000, is_occupied: false },
-    { id: 'bth-3', booth_code: 'FASHION-01', booth_category: 'FASHION', size_dimension: '3x3m', rental_price: 6000000, is_occupied: false },
-    { id: 'bth-4', booth_code: 'SPONSOR-A', booth_category: 'SPONSOR', size_dimension: '6x6m', rental_price: 25000000, is_occupied: false },
-  ];
+  const displayBooths = booths;
 
-  const displayShifts = crewShifts.length > 0 ? crewShifts : [
-    { id: 'shf-1', role_title: 'LO', shift_date: '2027-05-15', headcount_req: 8, rate_per_shift: 350000 },
-    { id: 'shf-2', role_title: 'USHER', shift_date: '2027-05-15', headcount_req: 12, rate_per_shift: 300000 },
-    { id: 'shf-3', role_title: 'STAGEHAND', shift_date: '2027-05-15', headcount_req: 6, rate_per_shift: 400000 },
-  ];
+  const displayShifts = crewShifts;
 
   const eventSchema = event
     ? {
@@ -203,6 +172,10 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
   if (loading && !event) {
     return <DetailSkeleton />;
+  }
+
+  if (!event) {
+    return <EmptyState title="Acara tidak ditemukan" body="Acara ini mungkin sudah dihapus atau belum dipublikasikan." actionLabel="Lihat semua acara" actionTo="/events" />;
   }
 
   return (

@@ -43,7 +43,7 @@ export const openApiSpec = {
     '/users/roles/set-role': { post: { tags: ['Identity'], summary: 'Pilih peran tetap akun (sekali saja)', security: bearer, requestBody: body({ role_type: str, business_name: str, city_region: str }, ['role_type']), responses: { 201: { description: 'Peran aktif' } } } },
     '/admin/users/{id}/kyc': { post: { tags: ['Identity'], summary: 'Putuskan e-KYC (hanya admin)', security: bearer, parameters: [idParam], requestBody: body({ decision: { type: 'string', enum: ['VERIFIED', 'UNVERIFIED'] } }, ['decision']), responses: ok() } },
     '/events': {
-      get: { tags: ['Events'], summary: 'Daftar acara (publik)', parameters: [{ name: 'type', in: 'query', schema: { type: 'string', enum: ['live', 'portfolio'] } }, { name: 'category', in: 'query', schema: str }], responses: ok() },
+      get: { tags: ['Events'], summary: 'Daftar acara (publik)', parameters: [{ name: 'type', in: 'query', schema: { type: 'string', enum: ['live', 'portfolio'] } }, { name: 'category', in: 'query', schema: str }, { name: 'q', in: 'query', description: 'Cari di judul, venue, dan penyelenggara', schema: str }, { name: 'city', in: 'query', schema: str }], responses: ok() },
       post: { tags: ['Events'], summary: 'Buat acara (peran EO)', security: bearer, requestBody: body({ title: str, event_category: str, venue_name: str, start_date: str, end_date: str, total_budget: num }, ['title', 'event_category', 'venue_name', 'start_date', 'end_date']), responses: { 201: { description: 'Acara dibuat' } } },
     },
     '/events/portfolio': { post: { tags: ['Events'], summary: 'Unggah portofolio acara (peran EO)', security: bearer, requestBody: body({ title: str, event_category: str, venue_name: str, start_date: str }, ['title', 'event_category', 'venue_name', 'start_date']), responses: { 201: { description: 'Portofolio dibuat' } } } },
@@ -56,7 +56,7 @@ export const openApiSpec = {
     },
     '/proposals/{id}/counter': { post: { tags: ['Proposals'], summary: 'Ajukan penawaran balik (hanya pihak yang gilirannya)', security: bearer, parameters: [idParam], requestBody: body({ counter_price: num, counter_dp_percentage: num, counter_notes: str }, ['counter_price']), responses: ok() } },
     '/proposals/{id}/respond': { post: { tags: ['Proposals'], summary: 'Setujui atau tolak', security: bearer, parameters: [idParam], requestBody: body({ action: { type: 'string', enum: ['ACCEPT', 'REJECT'] } }, ['action']), responses: ok() } },
-    '/partners': { get: { tags: ['Catalog'], summary: 'Direktori mitra (publik)', parameters: [{ name: 'type', in: 'query', schema: str }], responses: ok() } },
+    '/partners': { get: { tags: ['Catalog'], summary: 'Direktori mitra (publik)', parameters: [{ name: 'type', in: 'query', schema: str }, { name: 'q', in: 'query', description: 'Cari nama, kota, kategori, dan spesifikasi', schema: str }, { name: 'city', in: 'query', schema: str }], responses: ok() } },
     '/partners/{id}': { get: { tags: ['Catalog'], summary: 'Detail mitra (publik; kontak hanya untuk yang masuk)', parameters: [idParam], responses: ok() } },
     '/catalog/my-catalog': { get: { tags: ['Catalog'], summary: 'Katalog atau aktivitas milik sendiri', security: bearer, responses: ok() } },
     '/catalog/item': { post: { tags: ['Catalog'], summary: 'Tambah paket (VENDOR) atau katalog penampilan (TALENT)', security: bearer, responses: { 201: { description: 'Tersimpan' } } } },

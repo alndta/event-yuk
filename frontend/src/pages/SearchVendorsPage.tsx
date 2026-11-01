@@ -12,10 +12,13 @@ import {
   ShieldCheck,
   ArrowRight,
 } from 'lucide-react';
-import { mockPartners, PartnerItem } from '../data/mockPartners';
+import { PartnerItem } from '../types/models';
 import { PartnerCardsSkeletonList } from '../components/skeletons/PartnerCardSkeleton';
 import { SEOHead } from '../components/SEOHead';
-import { cachedFetch } from '../utils/apiCache';
+import EmptyState from '../components/EmptyState';
+import { useLanguage } from '../context/LanguageContext';
+import { api, query } from '../lib/api';
+import useDebounced from '../hooks/useDebounced';
 import Avatar from '../components/Avatar';
 
 interface Props {
@@ -23,36 +26,36 @@ interface Props {
 }
 
 export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }: Props) {
-  const [vendors, setVendors] = useState<PartnerItem[]>(() =>
-    mockPartners.filter((p) => p.type === 'VENDOR')
-  );
-  const [loading, setLoading] = useState<boolean>(false);
+  const { t, language } = useLanguage();
+  const [vendors, setVendors] = useState<PartnerItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const pageRef = useRef<HTMLDivElement>(null);
   useGsapReveal(pageRef, '[data-gsap-reveal]', [loading]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedCity, setSelectedCity] = useState<string>('ALL');
 
+  const debouncedSearch = useDebounced(searchTerm.trim(), 300);
+  const cityFilter = selectedCity === 'ALL' ? undefined : selectedCity;
+
+  // Search runs on the server. Without a running server, development builds fall back to the bundled samples.
   useEffect(() => {
+    const controller = new AbortController();
     setLoading(true);
-    cachedFetch('/api/v1/users/partners?type=VENDOR')
-      .then((resData: any) => {
-        if (resData.success && Array.isArray(resData.data) && resData.data.length > 0) {
-          setVendors(resData.data);
-        }
+    api('/partners' + query({ type: 'VENDOR', q: debouncedSearch, city: cityFilter }), { anonymous: true, signal: controller.signal })
+      .then((resData) => setVendors(resData.data || []))
+      .catch((err) => {
+        if (err?.name !== 'AbortError') setVendors([]);
       })
-      .catch(() => {})
       .finally(() => {
-        setLoading(false);
+        // A superseded request must not end the loading state of the one that replaced it.
+        if (!controller.signal.aborted) setLoading(false);
       });
-  }, []);
+    return () => controller.abort();
+  }, [debouncedSearch, cityFilter]);
 
   const filtered = vendors.filter((v) => {
-    const matchesSearch =
-      v.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      v.city.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      v.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      v.categoryLabel.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = true;
     const matchesCat =
       selectedCategory === 'ALL' ||
       v.categoryLabel.toLowerCase().includes(selectedCategory.toLowerCase());
@@ -74,13 +77,13 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
       <div className="max-w-3xl">
         <p className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-brand-lime-strong">
           <Sliders aria-hidden="true" className="h-4 w-4" />
-          Katalog vendor produksi dan peralatan konser
+          {t('vendors.eyebrow')}
         </p>
-        <h1 data-split-title className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
-          Cari vendor panggung dan alat produksi
+        <h1 key={language} data-split-title className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
+          {t('vendors.title')}
         </h1>
         <p className="mt-4 text-lg leading-8 text-slate-700">
-          Sound system line array, rigging panggung, lighting bergerak, videotron LED, dan genset silent berstandar K3. Pembayarannya dilindungi Escrow dan BAST digital.
+          {t('vendors.lead')}
         </p>
 
         {/* Search Input */}
@@ -88,8 +91,8 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
           <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
           <input
             type="search"
-            aria-label="Cari spesifikasi vendor"
-            placeholder="Cari spesifikasi, misalnya Line Array, LED P3.9, atau Genset 100 kVA"
+            aria-label={t('vendors.searchLabel')}
+            placeholder={t('vendors.searchPh')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="min-h-14 w-full rounded-full border border-slate-300 bg-white pl-12 pr-5 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
@@ -103,11 +106,11 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
         <div className="flex items-center gap-2 overflow-x-auto">
           <Filter aria-hidden="true" className="mr-1 h-4 w-4 shrink-0 text-slate-600" />
           {[
-            { id: 'ALL', label: 'Semua vendor' },
-            { id: 'Sound', label: 'Sound System' },
-            { id: 'Lighting', label: 'Lighting & LED' },
-            { id: 'Rigging', label: 'Rigging & Stage' },
-            { id: 'Genset', label: 'Genset & Power' },
+            { id: 'ALL', label: t('vendors.all') },
+            { id: 'Sound', label: t('vendors.sound') },
+            { id: 'Lighting', label: t('vendors.lighting') },
+            { id: 'Rigging', label: t('vendors.rigging') },
+            { id: 'Genset', label: t('vendors.power') },
           ].map((cat) => (
             <button
               key={cat.id}
@@ -128,12 +131,12 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
         <div className="flex items-center gap-2">
           <MapPin aria-hidden="true" className="h-4 w-4 text-slate-600" />
           <select
-            aria-label="Filter kota"
+            aria-label={t('common.cityFilter')}
             value={selectedCity}
             onChange={(e) => setSelectedCity(e.target.value)}
             className="min-h-11 rounded-full border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
           >
-            <option value="ALL">Semua kota</option>
+            <option value="ALL">{t('common.allCities')}</option>
             <option value="Jakarta">Jakarta</option>
             <option value="Tangerang">Tangerang</option>
             <option value="Bandung">Bandung</option>
@@ -144,8 +147,15 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
       {/* Vendors Grid */}
       {loading ? (
         <PartnerCardsSkeletonList count={4} />
+      ) : filtered.length === 0 ? (
+        <EmptyState
+          title={t('common.noResults')}
+          body={t('common.noResultsBody')}
+          actionLabel={t('common.reset')}
+          onAction={() => { setSearchTerm(''); setSelectedCity('ALL'); setSelectedCategory('ALL'); }}
+        />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 ey-stagger">
           {filtered.map((vendor) => (
           <div
             key={vendor.id}
@@ -174,7 +184,7 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
 
                   <h3 className="mt-1 flex items-center gap-1.5 font-display text-xl font-extrabold tracking-[-0.03em] text-brand-ink">
                     <span>{vendor.name}</span>
-                    <CheckCircle2 aria-label="Terverifikasi" className="h-5 w-5 text-brand-forest" />
+                    <CheckCircle2 aria-label={t('common.verified')} className="h-5 w-5 text-brand-forest" />
                   </h3>
                   <div className="mt-0.5 flex items-center gap-2 text-sm text-slate-600">
                     <MapPin aria-hidden="true" className="h-4 w-4 text-brand-forest" />
@@ -193,7 +203,7 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
               {/* Price Range */}
               <div className="mt-5 flex items-center justify-between gap-3 rounded-lg bg-brand-cream p-4">
                 <div>
-                  <div className="text-sm text-slate-700">Perkiraan biaya sewa per paket produksi</div>
+                  <div className="text-sm text-slate-700">{t('vendors.priceNote')}</div>
                   <div className="mt-0.5 font-display text-lg font-extrabold tracking-[-0.02em] text-brand-ink">{vendor.priceRange}</div>
                 </div>
                 <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-brand-forest-dark">
@@ -206,7 +216,7 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
               <div className="mt-4 space-y-2">
                 <div className="flex items-center gap-2 text-sm font-semibold text-slate-800">
                   <Wrench aria-hidden="true" className="h-4 w-4 text-slate-600" />
-                  <span>Spesifikasi teknis dan unit siap pasang</span>
+                  <span>{t('vendors.specs')}</span>
                 </div>
                 <ul className="space-y-1.5 border-l-2 border-brand-navy/20 pl-4">
                   {vendor.specsOrRiders.map((item, idx) => (
@@ -228,7 +238,7 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
                   to={`/vendors/${vendor.id}`}
                   className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-brand-navy px-5 text-sm font-semibold text-white transition-colors hover:bg-brand-navy-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy"
                 >
-                  <span>Lihat detail dan sewa</span>
+                  <span>{t('vendors.detail')}</span>
                   <ArrowRight aria-hidden="true" className="h-4 w-4" />
                 </Link>
               </div>

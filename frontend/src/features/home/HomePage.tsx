@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { EventItem, initialEvents } from '../../data/mockEvents';
-import { mockPartners, PartnerItem } from '../../data/mockPartners';
+import { EventItem } from '../../types/models';
+import { PartnerItem } from '../../types/models';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { SEOHead } from '../../components/SEOHead';
@@ -38,22 +38,20 @@ export default function HomePage({
 }: Props) {
   const { user } = useAuth();
   const { t } = useLanguage();
-  const [partners, setPartners] = useState<PartnerItem[]>(mockPartners);
+  const [partners, setPartners] = useState<PartnerItem[]>([]);
   const pageRef = useRef<HTMLDivElement>(null);
 
   useGsapReveal(pageRef);
 
   useEffect(() => {
-    cachedFetch('/api/v1/users/partners')
+    cachedFetch('/api/v1/partners')
       .then((response: any) => {
-        if (response?.success && Array.isArray(response.data) && response.data.length > 0) {
-          setPartners(response.data);
-        }
+        if (response?.success && Array.isArray(response.data)) setPartners(response.data);
       })
       .catch(() => {});
   }, []);
 
-  const visibleEvents = events && events.length > 0 ? events : initialEvents;
+  const visibleEvents = events || [];
 
   return (
     <>

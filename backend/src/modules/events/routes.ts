@@ -23,7 +23,7 @@ export function createEventsRouter(service: EventsService, guards: AuthGuards, c
     cache.middleware(30),
     validate({ query: listEventsQuery }),
     asyncHandler(async (req, res) => {
-      const data = await service.list(req.query as { type?: 'portfolio' | 'live'; category?: never });
+      const data = await service.list(req.query as { type?: 'portfolio' | 'live'; category?: never; q?: string; city?: string });
       res.json({ success: true, count: data.length, data });
     })
   );

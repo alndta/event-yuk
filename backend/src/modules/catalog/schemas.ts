@@ -3,7 +3,10 @@ import { z } from 'zod';
 const specs = z.union([z.array(z.string().trim().min(1).max(300)).max(40), z.record(z.string().max(80), z.string().max(300))]);
 const price = z.coerce.number().int().min(0).max(100_000_000_000);
 
-export const listPartnersQuery = z.object({ type: z.enum(['VENDOR', 'TALENT', 'SPONSOR', 'EO', 'TENANT', 'CREW']).optional() });
+export const listPartnersQuery = z.object({ type: z.enum(['VENDOR', 'TALENT', 'SPONSOR', 'EO', 'TENANT', 'CREW']).optional(),
+  q: z.string().trim().max(100).optional(),
+  city: z.string().trim().max(100).optional(),
+});
 export const partnerParams = z.object({ id: z.uuid() });
 export const itemParams = z.object({ id: z.uuid() });
 

@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { Award, CalendarDays, Filter, RotateCcw, Search, Zap } from 'lucide-react';
-import { EventItem, initialEvents } from '../../data/mockEvents';
+import { EventItem } from '../../types/models';
 import EventCardLive from '../../components/events/EventCardLive';
 import EventCardPortfolio from '../../components/events/EventCardPortfolio';
 import { EventCardsSkeletonList } from '../../components/skeletons/EventCardSkeleton';
 import { SEOHead } from '../../components/SEOHead';
 import { useLanguage } from '../../context/LanguageContext';
-import { cachedFetch } from '../../utils/apiCache';
+import { api, query } from '../../lib/api';
+import useDebounced from '../../hooks/useDebounced';
+import { mapBackendEvent } from '../../utils/mapEvent';
+import EmptyState from '../../components/EmptyState';
 import useGsapReveal from '../../hooks/useGsapReveal';
 
 interface Props {
@@ -26,76 +29,42 @@ export default function SearchEventsPage({
 }: Props) {
   const { t } = useLanguage();
   const pageRef = useRef<HTMLDivElement>(null);
-  const [eventsList, setEventsList] = useState<EventItem[]>(propEvents || initialEvents);
-  const [loading, setLoading] = useState<boolean>(!propEvents || propEvents.length === 0);
+  const [eventsList, setEventsList] = useState<EventItem[]>(propEvents || []);
+  const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<(typeof categoryIds)[number]>('ALL');
   const [selectedStatus, setSelectedStatus] = useState<StatusFilter>('ALL');
 
   useGsapReveal(pageRef);
 
+  const debouncedSearch = useDebounced(searchTerm.trim(), 300);
+
+  // Searching and filtering happen on the server; the page only shows what comes back.
   useEffect(() => {
-    if (propEvents && propEvents.length > 0) {
-      setEventsList(propEvents);
-      setLoading(false);
-      return;
-    }
-
+    const controller = new AbortController();
     setLoading(true);
-    cachedFetch('/api/v1/events')
-      .then((response: any) => {
-        if (response?.success && Array.isArray(response.data) && response.data.length > 0) {
-          const mapped: EventItem[] = response.data.map((event: any) => ({
-            id: event.id,
-            title: event.title,
-            category: event.event_category,
-            venue: event.venue_name,
-            date: event.start_date,
-            organizer: {
-              name: event.organizer?.full_name || 'Nusantara Live Kreasi',
-              avatar: event.organizer?.avatar_url || '/assets/crew-production.jpg',
-              verified: event.organizer?.kyc_status === 'VERIFIED',
-              city: event.organizer?.city || 'Jakarta',
-            },
-            description: event.description || '',
-            bannerImage: event.banner_image || '/assets/hero-concert.jpg',
-            isPortfolio: Boolean(event.is_portfolio || event.status === 'COMPLETED'),
-            progress: event.is_portfolio
-              ? undefined
-              : {
-                  stage: t('eventSearch.productionStage'),
-                  vendorFilled: 35,
-                  boothFilled: (event.tenant_booths || []).filter((booth: any) => !booth.is_occupied).length,
-                  crewNeeded:
-                    (event.crew_shifts || []).reduce(
-                      (total: number, shift: any) => total + (shift.headcount_req || 1),
-                      0
-                    ) || 0,
-                },
-          }));
-          setEventsList(mapped);
-        }
+    api(
+      '/events' +
+        query({
+          q: debouncedSearch,
+          category: selectedCategory === 'ALL' ? undefined : selectedCategory,
+          type: selectedStatus === 'LIVE' ? 'live' : selectedStatus === 'PORTFOLIO' ? 'portfolio' : undefined,
+        }),
+      { anonymous: true, signal: controller.signal }
+    )
+      .then((res) => setEventsList((res.data || []).map(mapBackendEvent)))
+      .catch((err) => {
+        if (err?.name === 'AbortError') return;
+        setEventsList([]);
       })
-      .catch(() => {})
       .finally(() => {
-        setLoading(false);
+        // A superseded request must not end the loading state of the one that replaced it.
+        if (!controller.signal.aborted) setLoading(false);
       });
-  }, [propEvents, t]);
+    return () => controller.abort();
+  }, [debouncedSearch, selectedCategory, selectedStatus, propEvents]);
 
-  const normalizedSearch = searchTerm.trim().toLocaleLowerCase();
-  const filteredEvents = eventsList.filter((event) => {
-    const matchesSearch =
-      !normalizedSearch ||
-      [event.title, event.venue, event.organizer.name, event.organizer.city].some((value) =>
-        value.toLocaleLowerCase().includes(normalizedSearch)
-      );
-    const matchesCategory = selectedCategory === 'ALL' || event.category === selectedCategory;
-    const matchesStatus =
-      selectedStatus === 'ALL' ||
-      (selectedStatus === 'LIVE' && !event.isPortfolio) ||
-      (selectedStatus === 'PORTFOLIO' && event.isPortfolio);
-    return matchesSearch && matchesCategory && matchesStatus;
-  });
+  const filteredEvents = eventsList;
 
   const clearFilters = () => {
     setSearchTerm('');
@@ -260,7 +229,7 @@ export default function SearchEventsPage({
           <EventCardsSkeletonList count={6} />
         </div>
       ) : filteredEvents.length > 0 ? (
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3 ey-stagger">
           {filteredEvents.map((event) =>
             event.isPortfolio ? (
               <EventCardPortfolio key={event.id} event={event} onViewDetails={onViewDetails} />
@@ -270,23 +239,12 @@ export default function SearchEventsPage({
           )}
         </div>
       ) : (
-        <div className="mx-auto max-w-xl bg-white px-6 py-12 text-center">
-          <CalendarDays aria-hidden="true" className="mx-auto h-8 w-8 text-brand-navy" />
-          <h2 className="mt-4 font-display text-2xl font-semibold text-slate-950">
-            {t('eventSearch.noResultsTitle')}
-          </h2>
-          <p className="mx-auto mt-2 max-w-sm text-base leading-7 text-slate-600">
-            {t('eventSearch.noResultsDescription')}
-          </p>
-          <button
-            type="button"
-            onClick={clearFilters}
-            className="mt-5 inline-flex min-h-11 items-center gap-2 bg-brand-navy px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-navy-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
-          >
-            <RotateCcw aria-hidden="true" className="h-4 w-4" />
-            {t('eventSearch.reset')}
-          </button>
-        </div>
+        <EmptyState
+          title={t('eventSearch.noResultsTitle')}
+          body={t('eventSearch.noResultsDescription')}
+          actionLabel={t('eventSearch.reset')}
+          onAction={clearFilters}
+        />
       )}
       </div>
     </>

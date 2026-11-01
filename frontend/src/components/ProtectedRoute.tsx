@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import LoadingState from './Spinner';
 
 interface Props {
   children: React.ReactNode;
@@ -13,9 +14,7 @@ export default function ProtectedRoute({ children, requiresRole = true }: Props)
 
   if (isLoading) {
     return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-[#172D46] border-t-transparent rounded-full animate-spin" />
-      </div>
+      <LoadingState />
     );
   }
 

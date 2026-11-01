@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, Award, CalendarDays, Film, MapPin, Star } from 'lucide-react';
-import { EventItem } from '../../data/mockEvents';
+import { EventItem } from '../../types/models';
 import { useLanguage } from '../../context/LanguageContext';
 import { categoryLabels } from './EventCardLive';
 

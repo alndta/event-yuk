@@ -46,6 +46,8 @@ export const createPortfolioSchema = z
 export const listEventsQuery = z.object({
   type: z.enum(['portfolio', 'live']).optional(),
   category: category.optional(),
+  q: z.string().trim().max(100).optional(),
+  city: z.string().trim().max(100).optional(),
 });
 
 export const eventParams = z.object({ id: z.uuid() });

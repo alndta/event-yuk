@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-import { EventItem } from '../../../data/mockEvents';
+import { EventItem } from '../../../types/models';
 import { useLanguage } from '../../../context/LanguageContext';
 import { gsap, NO_REDUCED_MOTION } from '../../../lib/motion';
 import useMagnetic from '../../../hooks/useMagnetic';

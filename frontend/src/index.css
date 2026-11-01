@@ -48,25 +48,60 @@
   background: #94a3b8;
 }
 
-/* Elegant Shimmer Skeleton Effect (Non-flickering, Stripe/Linear style) */
-@keyframes shimmerWave {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+/* Skeleton: a soft light band glides across a calm base. The band moves with transform
+   (GPU, no repaints), and skeleton blocks fade in so a page never "pops" into view. */
+:root {
+  --sk-base: #e8edf2;
+  --sk-band: rgba(255, 255, 255, 0.75);
 }
-
+.dark {
+  --sk-base: #1f3044;
+  --sk-band: rgba(255, 255, 255, 0.09);
+}
+@keyframes skSweep {
+  to { transform: translateX(100%); }
+}
+@keyframes eyFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes eySpin {
+  to { transform: rotate(360deg); }
+}
 .skeleton-shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(241, 245, 249, 0.9) 0%,
-    rgba(226, 232, 240, 0.95) 35%,
-    rgba(241, 245, 249, 0.9) 70%
-  );
-  background-size: 200% 100%;
-  animation: shimmerWave 1.8s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--sk-base);
+}
+.skeleton-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(100deg, transparent 20%, var(--sk-band) 50%, transparent 80%);
+  animation: skSweep 1.7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.ey-fade-in {
+  animation: eyFadeIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+/* Cards inside a fresh list arrive one after another. */
+.ey-stagger > * {
+  animation: eyFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.ey-stagger > *:nth-child(2) { animation-delay: 60ms; }
+.ey-stagger > *:nth-child(3) { animation-delay: 120ms; }
+.ey-stagger > *:nth-child(4) { animation-delay: 180ms; }
+.ey-stagger > *:nth-child(5) { animation-delay: 240ms; }
+.ey-stagger > *:nth-child(n + 6) { animation-delay: 300ms; }
+.ey-spinner {
+  border-radius: 9999px;
+  border: 3px solid currentColor;
+  border-right-color: transparent;
+  animation: eySpin 0.75s cubic-bezier(0.5, 0.2, 0.5, 0.8) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer::after { animation: none; }
+  .ey-fade-in, .ey-stagger > * { animation: none; }
 }
 
 /* Headline lines that rise out of a mask: give descenders room inside the clip. */
@@ -132,3 +167,104 @@
   background-color: #d7f36a;
   color: #172d46;
 }
+
+/* ---------- Dark mode ----------
+   The components use fixed Tailwind colors, so dark mode remaps those utilities here in one place.
+   Surfaces step up in lightness; text steps down; lime blocks keep their navy text. */
+.dark {
+  --d-page: #0d1621;
+  --d-surface: #14212f;
+  --d-surface-2: #1a2b3d;
+  --d-line: rgba(255, 255, 255, 0.13);
+  --d-text: #eef2f6;
+  --d-text-2: #c7d2de;
+  --d-text-3: #94a3b4;
+  --d-accent: #e4f58f;
+}
+.dark body,
+.dark .bg-brand-canvas { background-color: var(--d-page); color: var(--d-text); }
+.dark .bg-white,
+.dark .bg-brand-white { background-color: var(--d-surface); }
+.dark .bg-slate-50,
+.dark .bg-slate-100,
+.dark .bg-brand-cream,
+.dark .bg-brand-sand,
+.dark .bg-brand-clay,
+.dark .bg-brand-lime-soft,
+.dark .bg-brand-forest-light { background-color: var(--d-surface-2); }
+.dark .bg-slate-200,
+.dark .bg-slate-300 { background-color: #2a3d52; }
+.dark .bg-brand-navy,
+.dark .bg-brand-navy-light { background-color: #1e3a56; }
+.dark .bg-brand-navy-dark,
+.dark .bg-brand-ink { background-color: #112133; }
+.dark .bg-brand-navy\/10,
+.dark .bg-brand-navy\/5 { background-color: rgba(255, 255, 255, 0.07); }
+
+.dark .text-slate-950,
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark .text-brand-ink { color: var(--d-text); }
+.dark .text-slate-700,
+.dark .text-slate-600 { color: var(--d-text-2); }
+.dark .text-slate-500,
+.dark .text-slate-400 { color: var(--d-text-3); }
+.dark .text-brand-navy,
+.dark .text-brand-navy-dark,
+.dark .text-brand-forest,
+.dark .text-brand-forest-dark,
+.dark .text-brand-lime-strong,
+.dark .text-brand-lime-deep { color: var(--d-accent); }
+
+.dark .border-slate-100,
+.dark .border-slate-200,
+.dark .border-slate-300,
+.dark .border-brand-navy\/10,
+.dark .border-brand-navy\/15,
+.dark .border-brand-navy\/20,
+.dark .border-brand-navy\/30 { border-color: var(--d-line); }
+.dark .border-brand-navy { border-color: var(--d-accent); }
+
+/* Lime blocks stay light, so everything on them stays navy. */
+.dark .bg-brand-lime,
+.dark .bg-brand-lime-hover,
+.dark .bg-brand-lime :is(.text-brand-navy, .text-brand-ink, .text-brand-navy-dark),
+.dark .bg-brand-lime-hover :is(.text-brand-navy, .text-brand-ink) { color: #172d46; }
+.dark .bg-brand-lime .border-brand-navy,
+.dark .bg-brand-lime .border-brand-navy\/30 { border-color: #172d46; }
+.dark .bg-brand-lime .bg-brand-navy { background-color: #172d46; }
+.dark .bg-brand-lime .bg-brand-navy.text-brand-lime { color: #d7f36a; }
+.dark .bg-brand-navy.text-brand-lime,
+.dark .bg-brand-navy .text-brand-lime { color: #d7f36a; }
+.dark .hover\:bg-brand-lime:hover { color: #172d46; }
+
+.dark input,
+.dark select,
+.dark textarea { color: var(--d-text); }
+.dark ::placeholder { color: var(--d-text-3); }
+.dark ::selection { background: #d7f36a; color: #172d46; }
+.dark ::-webkit-scrollbar-track { background: #0d1621; }
+.dark ::-webkit-scrollbar-thumb { background: #2a3d52; }
+.dark img { filter: brightness(0.92); }
+.dark .bg-brand-canvas\/90 { background-color: rgba(13, 22, 33, 0.9); }
+.dark .bg-white\/80,
+.dark .bg-white\/90 { background-color: rgba(20, 33, 47, 0.88); }
+/* The transparent header sits on the lime hero; keep it navy there. */
+.dark header[data-on-lime] :is(a, button, span, svg) { color: #172d46; }
+.dark header[data-on-lime] a.bg-brand-navy,
+.dark header[data-on-lime] a.bg-brand-navy span { color: #d7f36a; }
+
+/* Translucent variants of the light surfaces and text colors (e.g. bg-slate-50/80, text-brand-navy/70). */
+.dark [class*="bg-slate-50/"],
+.dark [class*="bg-slate-100/"],
+.dark [class*="bg-brand-cream/"],
+.dark [class*="bg-brand-sand/"],
+.dark [class*="bg-brand-lime-soft/"],
+.dark [class*="bg-brand-forest-light/"] { background-color: var(--d-surface-2); }
+.dark [class*="border-slate-200/"],
+.dark [class*="border-slate-100/"],
+.dark [class*="border-slate-300/"] { border-color: var(--d-line); }
+.dark [class*="text-brand-navy/"],
+.dark [class*="text-brand-ink/"],
+.dark [class*="text-slate-900/"],
+.dark [class*="text-slate-700/"] { color: var(--d-text-2); }
