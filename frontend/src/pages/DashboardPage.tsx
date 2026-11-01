@@ -232,7 +232,7 @@ export default function DashboardPage({ onShowToast }: Props) {
     setNewItemPrice('');
     setNewItemSpecs('');
 
-    triggerToast(`"${newItem.name}" berhasil ditambahkan ke katalog dagangan Anda.`);
+    triggerToast(`"${newItem.name}" berhasil ditambahkan ke katalog dagangan kamu.`);
 
     // Sync to backend
     fetch('/api/v1/users/catalog/item', {
@@ -252,7 +252,7 @@ export default function DashboardPage({ onShowToast }: Props) {
   };
 
   const handleDeleteItem = (id: string, name: string) => {
-    if (confirm(`Yakin ingin menghapus "${name}" dari katalog Anda?`)) {
+    if (confirm(`Yakin mau menghapus "${name}" dari katalogmu?`)) {
       setCatalogItems(catalogItems.filter((item) => item.id !== id));
       triggerToast(`"${name}" telah dihapus dari katalog.`);
 
@@ -266,69 +266,69 @@ export default function DashboardPage({ onShowToast }: Props) {
     switch (role) {
       case 'VENDOR':
         return {
-          title: 'Ruang Kerja & Katalog Vendor Produksi',
+          title: 'Ruang kerja vendor produksi',
           subtitle: 'Kelola paket alat panggung, sound system, rigging, dan pantau pencairan termin Escrow Midtrans.',
           icon: Sliders,
-          themeColor: 'text-indigo-700 bg-indigo-50 border-indigo-200',
-          badgeText: 'Vendor Produksi Terverifikasi',
-          catalogLabel: 'Katalog Paket Alat & Rigging',
-          addBtnLabel: '+ Tambah Paket Alat Produksi',
-          priceUnit: '/ Hari Sewa',
+          themeColor: 'text-brand-navy bg-brand-lime-soft border-brand-navy/15',
+          badgeText: 'Vendor produksi terverifikasi',
+          catalogLabel: 'Paket alat dan rigging',
+          addBtnLabel: 'Tambah paket alat produksi',
+          priceUnit: '/ hari sewa',
         };
       case 'TALENT':
         return {
-          title: 'Ruang Kerja & Rate Card Band Musik',
+          title: 'Ruang kerja band dan musisi',
           subtitle: 'Kelola paket manggung live, riders teknis, riders konsumsi, dan kepastian honor terkunci di Escrow.',
           icon: Music,
-          themeColor: 'text-purple-700 bg-purple-50 border-purple-200',
-          badgeText: 'Musisi & Manajemen Band Resmi',
-          catalogLabel: 'Katalog Paket Penampilan Manggung',
-          addBtnLabel: '+ Tambah Paket Tampil Baru',
-          priceUnit: '/ Sesi Penampilan',
+          themeColor: 'text-brand-navy bg-brand-lime-soft border-brand-navy/15',
+          badgeText: 'Musisi dan manajemen band resmi',
+          catalogLabel: 'Paket penampilan manggung',
+          addBtnLabel: 'Tambah paket tampil',
+          priceUnit: '/ sesi penampilan',
         };
       case 'TENANT':
         return {
-          title: 'Ruang Kerja & Produk Tenant Bazaar',
+          title: 'Ruang kerja tenant bazaar',
           subtitle: 'Kelola menu andalan, produk retail, dan pantau status kurasi kaveling booth dari Event Organizer.',
           icon: Store,
-          themeColor: 'text-emerald-700 bg-emerald-50 border-emerald-200',
-          badgeText: 'Tenant Kuliner & Pameran',
-          catalogLabel: 'Katalog Menu & Produk Dagangan',
-          addBtnLabel: '+ Tambah Menu / Produk Baru',
-          priceUnit: '/ Porsi / Item',
+          themeColor: 'text-brand-navy bg-brand-lime-soft border-brand-navy/15',
+          badgeText: 'Tenant kuliner dan pameran',
+          catalogLabel: 'Menu dan produk dagangan',
+          addBtnLabel: 'Tambah menu atau produk',
+          priceUnit: '/ porsi atau item',
         };
       case 'EO':
         return {
-          title: 'Ruang Kerja & Proyek Acara Event Organizer',
+          title: 'Ruang kerja event organizer',
           subtitle: 'Kelola pagu anggaran acara, plot denah kaveling booth tenant, dan rekrut puluhan shift kru harian.',
           icon: Calendar,
-          themeColor: 'text-[#172D46] bg-[#172D46]/10 border-[#172D46]/20',
-          badgeText: 'Event Organizer & Promotor',
-          catalogLabel: 'Katalog Proyek Acara Aktif',
-          addBtnLabel: '+ Buat Proyek Acara Baru',
-          priceUnit: 'Pagu Anggaran',
+          themeColor: 'text-brand-navy bg-brand-lime-soft border-brand-navy/15',
+          badgeText: 'Event organizer dan promotor',
+          catalogLabel: 'Proyek acara aktif',
+          addBtnLabel: 'Buat proyek acara',
+          priceUnit: 'Pagu anggaran',
         };
       case 'SPONSOR':
         return {
-          title: 'Ruang Kerja & Portofolio Sponsorship Brand',
+          title: 'Ruang kerja sponsor brand',
           subtitle: 'Kelola alokasi sponsorship acara, tinjau impresi audiens riil, dan amankan hak aktivasi stan lapangan.',
           icon: Building2,
-          themeColor: 'text-amber-800 bg-amber-50 border-amber-200',
-          badgeText: 'Mitra Sponsor Brand Korporasi',
-          catalogLabel: 'Paket Sponsorship & Stan Aktivasi',
-          addBtnLabel: '+ Ajukan Paket Kemitraan Baru',
-          priceUnit: 'Nilai Sponsorship',
+          themeColor: 'text-brand-navy bg-brand-lime-soft border-brand-navy/15',
+          badgeText: 'Mitra sponsor brand korporasi',
+          catalogLabel: 'Paket sponsorship dan stan aktivasi',
+          addBtnLabel: 'Ajukan paket kemitraan',
+          priceUnit: 'Nilai sponsorship',
         };
       case 'CREW':
         return {
-          title: 'Ruang Kerja & Kualifikasi Shift Kru Lapangan',
+          title: 'Ruang kerja kru lapangan',
           subtitle: 'Kelola keahlian lapangan, rate honor harian, dan pantau jadwal presensi scan QR geofencing GPS.',
           icon: Users,
-          themeColor: 'text-rose-700 bg-rose-50 border-rose-200',
-          badgeText: 'Event Crew & Kru Harian',
-          catalogLabel: 'Kualifikasi Peran Shift Lapangan',
-          addBtnLabel: '+ Tambah Kualifikasi Shift Baru',
-          priceUnit: '/ Shift Harian',
+          themeColor: 'text-brand-navy bg-brand-lime-soft border-brand-navy/15',
+          badgeText: 'Kru harian acara',
+          catalogLabel: 'Kualifikasi peran dan shift',
+          addBtnLabel: 'Tambah kualifikasi shift',
+          priceUnit: '/ shift harian',
         };
     }
   };
@@ -358,46 +358,46 @@ export default function DashboardPage({ onShowToast }: Props) {
       />
       {/* Toast Alert */}
       {successToast && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#172D46] text-white px-5 py-3.5 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-2.5 text-xs sm:text-sm animate-fadeIn">
+        <div className="fixed bottom-6 right-6 z-50 bg-[#172D46] text-white px-5 py-3.5 rounded-lg border border-slate-700 flex items-center gap-2.5 text-sm sm:text-sm animate-fadeIn">
           <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
           <span>{successToast}</span>
         </div>
       )}
 
       {/* 1. Header Profile Banner */}
-      <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+      <div className="bg-white rounded-lg p-6 sm:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
         <div className="flex items-start sm:items-center gap-4">
-          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-[#172D46] to-[#5E7628] p-0.5 shrink-0 shadow-md">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-brand-lime p-0.5 shrink-0">
             <img
               src={user?.avatarUrl || '/assets/crew-production.jpg'}
               alt={user?.fullName || 'User'}
-              className="w-full h-full object-cover rounded-2xl"
+              className="w-full h-full object-cover rounded-lg"
             />
           </div>
 
           <div className="space-y-1.5 min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${roleMeta.themeColor}`}>
+              <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold border ${roleMeta.themeColor}`}>
                 <RoleIcon className="w-3.5 h-3.5" />
                 <span>{roleMeta.badgeText}</span>
               </span>
 
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-200">
-                <Lock className="w-3 h-3 text-slate-500" />
-                <span>1 Akun = 1 Peran Tetap</span>
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold bg-brand-cream text-slate-700">
+                <Lock aria-hidden="true" className="w-4 h-4 text-slate-600" />
+                <span>1 akun, 1 peran tetap</span>
               </span>
 
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                <span>e-KYC Terverifikasi</span>
+              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold bg-brand-forest-light text-brand-forest-dark">
+                <CheckCircle2 aria-hidden="true" className="w-4 h-4" />
+                <span>e-KYC terverifikasi</span>
               </span>
             </div>
 
-            <h1 className="text-xl sm:text-2xl font-black text-slate-900 tracking-tight truncate">
+            <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-[-0.03em] text-brand-ink truncate">
               {user?.businessName || user?.fullName || 'Mitra Event Yuk'}
             </h1>
-            <p className="text-xs text-slate-500">
-              {user?.email} • {user?.cityRegion || 'Jakarta Selatan'} • Terdaftar Resmi
+            <p className="text-sm text-slate-500">
+              {user?.email} • {user?.cityRegion || 'Jakarta Selatan'} • Terdaftar resmi
             </p>
           </div>
         </div>
@@ -406,74 +406,74 @@ export default function DashboardPage({ onShowToast }: Props) {
         <div className="flex flex-wrap items-center gap-2.5">
           <Link
             to="/profile"
-            className="px-4 py-2.5 rounded-xl border border-slate-200 hover:bg-slate-50 text-xs font-bold text-slate-700 transition"
+            className="inline-flex min-h-11 items-center px-5 rounded-full border-2 border-brand-navy/25 hover:border-brand-navy text-sm font-semibold text-brand-ink transition"
           >
-            Pengaturan Akun & Bank
+            Pengaturan akun dan bank
           </Link>
           <Link
             to="/contracts"
-            className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs"
+            className="inline-flex min-h-11 items-center gap-2 px-5 rounded-full bg-brand-navy hover:bg-brand-navy-dark text-white text-sm font-semibold transition"
           >
-            <FileText className="w-3.5 h-3.5" />
-            <span>Kontrak PKS Digital</span>
+            <FileText aria-hidden="true" className="w-4 h-4" />
+            <span>Kontrak PKS digital</span>
           </Link>
         </div>
       </div>
 
       {/* 2. Escrow & Wallet Summary Strip */}
-      <div className="bg-gradient-to-r from-[#172D46] via-[#1B3B56] to-slate-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-slate-800">
+      <div className="bg-brand-navy rounded-lg p-6 sm:p-8 text-white">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-white/10">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-[#5E7628] text-xs font-bold mb-1 border border-white/20">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Rekening Bersama Escrow Berlisensi Bank Indonesia</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-lime text-brand-navy text-sm font-semibold mb-2">
+              <ShieldCheck aria-hidden="true" className="w-4 h-4" />
+              <span>Rekening bersama Escrow berlisensi Bank Indonesia</span>
             </div>
-            <h2 className="text-lg sm:text-xl font-black tracking-tight text-white">
-              Posisi Keuangan & Pembayaran Acara Anda
+            <h2 className="font-display text-2xl font-extrabold tracking-[-0.03em] text-white">
+              Posisi keuangan dan pembayaran acaramu
             </h2>
           </div>
 
           <Link
             to="/profile"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-bold transition self-start sm:self-auto"
+            className="inline-flex min-h-11 items-center gap-2 px-5 rounded-full border-2 border-white/40 hover:border-white text-white text-sm font-semibold transition self-start sm:self-auto"
           >
-            <span>Tarik Saldo ke Rekening Bank</span>
-            <ExternalLink className="w-3.5 h-3.5 text-[#5E7628]" />
+            <span>Tarik saldo ke rekening bank</span>
+            <ExternalLink aria-hidden="true" className="w-4 h-4 text-brand-lime" />
           </Link>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 mt-6">
-          <div className="bg-white/5 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-white/10">
-            <div className="text-xs text-slate-400 font-medium flex items-center gap-1.5 mb-1">
-              <Lock className="w-3.5 h-3.5 text-coral-400" />
-              <span>Dana Tertahan di Escrow (Kontrak Berjalan)</span>
+          <div className="bg-brand-navy-dark p-5 sm:p-6 rounded-lg">
+            <div className="text-sm text-slate-300 font-medium flex items-center gap-2 mb-1">
+              <Lock aria-hidden="true" className="w-4 h-4 text-brand-lime" />
+              <span>Dana tertahan di escrow (kontrak berjalan)</span>
             </div>
-            <div className="text-xl sm:text-2xl font-black text-white font-mono mt-1">
+            <div className="font-display text-3xl font-extrabold tracking-[-0.03em] text-white tabular-nums mt-2">
               Rp {wallet.escrow_locked.toLocaleString('id-ID')}
             </div>
-            <div className="text-[10px] text-amber-300 mt-1">Cair otomatis setelah BAST digital disetujui</div>
+            <div className="text-sm text-slate-300 mt-2">Cair otomatis setelah BAST digital disetujui</div>
           </div>
 
-          <div className="bg-white/5 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-white/10">
-            <div className="text-xs text-slate-400 font-medium flex items-center gap-1.5 mb-1">
-              <DollarSign className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Saldo Siap Tarik (Available Balance)</span>
+          <div className="bg-brand-navy-dark p-5 sm:p-6 rounded-lg">
+            <div className="text-sm text-slate-300 font-medium flex items-center gap-2 mb-1">
+              <DollarSign aria-hidden="true" className="w-4 h-4 text-brand-lime" />
+              <span>Saldo siap tarik</span>
             </div>
-            <div className="text-xl sm:text-2xl font-black text-emerald-400 font-mono mt-1">
+            <div className="font-display text-3xl font-extrabold tracking-[-0.03em] text-brand-lime tabular-nums mt-2">
               Rp {wallet.available_bal.toLocaleString('id-ID')}
             </div>
-            <div className="text-[10px] text-emerald-300 mt-1">Bebas ditarik instan ke BCA / Mandiri / GoPay</div>
+            <div className="text-sm text-slate-300 mt-2">Bisa ditarik instan ke BCA, Mandiri, atau GoPay</div>
           </div>
 
-          <div className="bg-white/5 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-white/10">
-            <div className="text-xs text-slate-400 font-medium flex items-center gap-1.5 mb-1">
-              <ShieldCheck className="w-3.5 h-3.5 text-sky-400" />
-              <span>Proteksi Transaksi PKS</span>
+          <div className="bg-brand-navy-dark p-5 sm:p-6 rounded-lg">
+            <div className="text-sm text-slate-300 font-medium flex items-center gap-2 mb-1">
+              <ShieldCheck aria-hidden="true" className="w-4 h-4 text-brand-lime" />
+              <span>Proteksi transaksi PKS</span>
             </div>
-            <div className="text-sm font-black text-white mt-1">
+            <div className="font-display text-xl font-extrabold text-white mt-2">
               Midtrans Escrow Gateway
             </div>
-            <div className="text-[10px] text-slate-300 mt-1">Termin DP 50% & pelunasan diikat klausul hukum resmi</div>
+            <div className="text-sm text-slate-300 mt-2">Termin DP 50% dan pelunasan diikat klausul hukum resmi</div>
           </div>
         </div>
       </div>
@@ -482,47 +482,47 @@ export default function DashboardPage({ onShowToast }: Props) {
       <div className="space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold border mb-2 ${roleMeta.themeColor}`}>
+            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-bold border mb-2 ${roleMeta.themeColor}`}>
               <Layers className="w-3.5 h-3.5" />
-              <span>Manajemen Produk & Dagangan Aktif</span>
+              <span>Produk dan dagangan aktif</span>
             </div>
-            <h2 className="text-2xl font-black text-slate-900 tracking-tight">
+            <h2 className="font-display text-3xl font-extrabold tracking-[-0.03em] text-brand-ink">
               {roleMeta.catalogLabel}
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500 mt-0.5">
-              Di sinilah Anda mengelola paket penawaran yang dipajang di katalog publik dan siap dipesan pihak rekanan.
+            <p className="text-base text-slate-600 mt-1">
+              Kelola paket penawaran yang tampil di katalog publik dan bisa dipesan mitra.
             </p>
           </div>
 
           <button
             onClick={() => setShowAddModal(true)}
-            className="px-5 py-3 rounded-2xl bg-gradient-to-r from-[#456B39] to-[#5E7628] hover:from-[#2F5232] hover:to-[#3F531D] text-white font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-[#456B39]/25 transition shrink-0"
+            className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 px-6 rounded-full bg-brand-navy hover:bg-brand-navy-dark text-white font-semibold text-base transition"
           >
-            <Plus className="w-4 h-4" />
+            <Plus aria-hidden="true" className="w-4 h-4" />
             <span>{roleMeta.addBtnLabel}</span>
           </button>
         </div>
 
         {/* Catalog Items Grid */}
         {loading ? (
-          <div className="p-12 text-center text-xs font-bold text-slate-400">
-            Memuat katalog dagangan Anda...
+          <div className="p-12 text-center text-sm font-bold text-slate-400">
+            Memuat katalogmu...
           </div>
         ) : catalogItems.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {catalogItems.map((item) => (
               <div
                 key={item.id}
-                className="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-xs hover:shadow-md transition flex flex-col justify-between group"
+                className="bg-white rounded-lg p-5 transition flex flex-col justify-between group"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                    <span className="text-sm font-bold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
                       {item.category}
                     </span>
-                    <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                    <span className="flex items-center gap-1 text-sm font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                      <span>Aktif di Katalog</span>
+                      <span>Aktif di katalog</span>
                     </span>
                   </div>
 
@@ -530,20 +530,20 @@ export default function DashboardPage({ onShowToast }: Props) {
                     {item.name}
                   </h3>
 
-                  <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 space-y-1">
-                    <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                      Harga Penawaran:
+                  <div className="p-3 bg-slate-50 rounded-lg border border-slate-100 space-y-1">
+                    <div className="text-sm font-bold text-slate-400">
+                      Harga penawaran
                     </div>
-                    <div className="text-base font-black text-slate-900 font-mono flex items-baseline gap-1">
+                    <div className="text-base font-extrabold text-slate-900 tabular-nums flex items-baseline gap-1">
                       <span>Rp {item.price.toLocaleString('id-ID')}</span>
-                      <span className="text-[11px] text-slate-500 font-normal">{roleMeta.priceUnit}</span>
+                      <span className="text-sm text-slate-500 font-normal">{roleMeta.priceUnit}</span>
                     </div>
                   </div>
 
                   {/* Specs List */}
                   <div className="space-y-1.5 pt-1">
-                    <div className="text-[11px] font-bold text-slate-500">Spesifikasi & Keunggulan:</div>
-                    <ul className="space-y-1 text-xs text-slate-600">
+                    <div className="text-sm font-bold text-slate-500">Spesifikasi dan keunggulan</div>
+                    <ul className="space-y-1 text-sm text-slate-600">
                       {item.specs.slice(0, 3).map((spec, sIdx) => (
                         <li key={sIdx} className="flex items-start gap-1.5">
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
@@ -554,11 +554,11 @@ export default function DashboardPage({ onShowToast }: Props) {
                   </div>
                 </div>
 
-                <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
-                  <span className="text-[11px] text-slate-400">Garansi PKS Resmi</span>
+                <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-sm">
+                  <span className="text-sm text-slate-400">Garansi PKS resmi</span>
                   <button
                     onClick={() => handleDeleteItem(item.id, item.name)}
-                    className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition flex items-center gap-1 font-bold text-[11px]"
+                    className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition flex items-center gap-1 font-bold text-sm"
                     title="Hapus item dari katalog"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
@@ -569,17 +569,17 @@ export default function DashboardPage({ onShowToast }: Props) {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200">
-            <RoleIcon className="w-10 h-10 text-slate-300 mx-auto mb-3" />
-            <h3 className="font-extrabold text-slate-800 text-sm">Belum Ada Item di Katalog Anda</h3>
-            <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
-              Tambahkan paket dagangan pertama Anda agar dapat ditemukan oleh mitra kolaborasi di ekosistem Event Yuk.
+          <div className="bg-white rounded-lg p-12 text-center">
+            <RoleIcon aria-hidden="true" className="w-10 h-10 text-slate-400 mx-auto mb-3" />
+            <h3 className="font-display text-xl font-extrabold text-brand-ink">Katalogmu masih kosong</h3>
+            <p className="text-base text-slate-600 mt-2 max-w-sm mx-auto">
+              Tambahkan paket pertamamu supaya mitra bisa menemukanmu di Event Yuk.
             </p>
             <button
               onClick={() => setShowAddModal(true)}
-              className="mt-4 px-5 py-2.5 rounded-xl bg-[#172D46] text-white font-bold text-xs inline-flex items-center gap-1.5 shadow-sm"
+              className="mt-5 inline-flex min-h-11 items-center gap-2 px-6 rounded-full bg-brand-navy hover:bg-brand-navy-dark text-white font-semibold text-sm transition"
             >
-              <Plus className="w-3.5 h-3.5" />
+              <Plus aria-hidden="true" className="w-4 h-4" />
               <span>{roleMeta.addBtnLabel}</span>
             </button>
           </div>
@@ -588,26 +588,27 @@ export default function DashboardPage({ onShowToast }: Props) {
 
       {/* Modal: Tambah Dagangan / Paket Katalog Baru */}
       {showAddModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-lg w-full p-6 sm:p-8 space-y-5">
+        <div className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 animate-fadeIn">
+          <div role="dialog" aria-modal="true" aria-labelledby="add-item-title" className="bg-white rounded-lg max-w-lg w-full p-6 sm:p-8 space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div>
-                <h3 className="font-black text-lg text-slate-900">{roleMeta.addBtnLabel}</h3>
-                <p className="text-xs text-slate-500">Item ini akan langsung tampil di katalog publik dan terhubung ke SPK kontrak.</p>
+                <h3 id="add-item-title" className="font-display text-2xl font-extrabold tracking-[-0.03em] text-brand-ink">{roleMeta.addBtnLabel}</h3>
+                <p className="text-sm text-slate-600">Item ini langsung tampil di katalog publik dan terhubung ke SPK kontrak.</p>
               </div>
               <button
                 onClick={() => setShowAddModal(false)}
-                className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition"
-                title="Tutup Modal"
+                className="flex h-11 w-11 items-center justify-center rounded-full text-slate-600 hover:text-slate-950 hover:bg-slate-100 transition"
+                aria-label="Tutup"
               >
-                <X className="w-5 h-5" />
+                <X aria-hidden="true" className="w-5 h-5" />
               </button>
             </div>
 
             <form onSubmit={handleAddItem} className="space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">Nama Paket / Produk Dagangan *</label>
+                <label htmlFor="add-name" className="text-sm font-semibold text-slate-800">Nama paket atau produk dagangan *</label>
                 <input
+                  id="add-name"
                   type="text"
                   required
                   value={newItemName}
@@ -621,45 +622,48 @@ export default function DashboardPage({ onShowToast }: Props) {
                       ? 'Misal: Paket Combo Kopi Artisan + Pastry'
                       : 'Nama paket dagangan atau proyek'
                   }
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                  className="min-h-12 w-full px-4 rounded-lg border border-slate-300 bg-white text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">Kategori</label>
+                  <label htmlFor="add-category" className="text-sm font-semibold text-slate-800">Kategori</label>
                   <input
+                    id="add-category"
                     type="text"
                     value={newItemCategory}
                     onChange={(e) => setNewItemCategory(e.target.value)}
                     placeholder="Misal: Sound System, F&B, dsb."
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-semibold focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                    className="min-h-12 w-full px-4 rounded-lg border border-slate-300 bg-white text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-bold text-slate-700">Harga Penawaran (IDR) *</label>
+                  <label htmlFor="add-price" className="text-sm font-semibold text-slate-800">Harga penawaran (Rp) *</label>
                   <input
+                    id="add-price"
                     type="number"
                     required
                     value={newItemPrice}
                     onChange={(e) => setNewItemPrice(e.target.value)}
                     placeholder="Misal: 25000000"
-                    className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-mono font-bold focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                    className="min-h-12 w-full px-4 rounded-lg border border-slate-300 bg-white text-base tabular-nums text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
                   />
                 </div>
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700">
-                  Spesifikasi Teknis / Rincian Layanan (1 baris per poin)
+                <label htmlFor="add-specs" className="text-sm font-semibold text-slate-800">
+                  Spesifikasi teknis atau rincian layanan (satu baris per poin)
                 </label>
                 <textarea
+                  id="add-specs"
                   rows={4}
                   value={newItemSpecs}
                   onChange={(e) => setNewItemSpecs(e.target.value)}
                   placeholder={`- Spesifikasi unit pertama\n- Keunggulan teknis kedua\n- Operator sound / kelengkapan riders`}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                  className="py-3 w-full px-4 rounded-lg border border-slate-300 bg-white text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
                 />
               </div>
 
@@ -667,15 +671,15 @@ export default function DashboardPage({ onShowToast }: Props) {
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2.5 rounded-xl border border-slate-300 text-xs font-bold text-slate-700 hover:bg-slate-100 transition"
+                  className="min-h-12 px-6 rounded-full border-2 border-brand-navy/25 hover:border-brand-navy text-base font-semibold text-brand-ink transition"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#456B39] to-[#5E7628] hover:from-[#2F5232] hover:to-[#3F531D] text-white font-bold text-xs shadow-md transition"
+                  className="min-h-12 px-7 rounded-full bg-brand-navy hover:bg-brand-navy-dark text-white font-semibold text-base transition-colors"
                 >
-                  Simpan ke Katalog
+                  Simpan ke katalog
                 </button>
               </div>
             </form>

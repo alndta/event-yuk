@@ -134,29 +134,29 @@ export default function RoleContextBar({
   const RoleIcon = details.icon;
 
   return (
-    <div className={`relative overflow-hidden rounded-3xl bg-gradient-to-r ${details.bgBanner} text-white p-5 sm:p-7 shadow-xl border border-slate-800`}>
+    <div className={`relative overflow-hidden rounded-lg bg-gradient-to-r ${details.bgBanner} text-white p-5 sm:p-7  border border-slate-800`}>
       <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
         {/* Left Info */}
         <div className="space-y-2">
           <div className="flex flex-wrap items-center gap-2">
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${details.colorClass} shadow-sm`}>
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold ${details.colorClass} `}>
               <RoleIcon className="w-3.5 h-3.5" />
               <span>{details.title}</span>
             </span>
-            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+            <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-sm font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
               <ShieldCheck className="w-3 h-3 text-emerald-400" />
               <span>1 Akun = 1 Peran Tetap</span>
             </span>
-            <span className="text-xs text-slate-300 font-medium hidden sm:inline">
+            <span className="text-sm text-slate-300 font-medium hidden sm:inline">
               • {details.badgeText}
             </span>
           </div>
 
-          <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white">
-            Ruang Kerja & Kendali Peran Aktif Anda
+          <h2 className="text-xl sm:text-2xl font-extrabold tracking-tight text-white">
+            Ruang Kerja & Kendali Peran Aktif kamu
           </h2>
-          <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
-            Sistem otomatis menyesuaikan fitur, izin pengajuan, dan hak akses transaksi berdasarkan profil peran yang sedang Anda gunakan saat ini.
+          <p className="text-sm sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+            Sistem otomatis menyesuaikan fitur, izin pengajuan, dan hak akses transaksi berdasarkan profil peran yang sedang kamu gunakan saat ini.
           </p>
         </div>
 
@@ -164,7 +164,7 @@ export default function RoleContextBar({
         <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
           <button
             onClick={() => navigate('/dashboard')}
-            className="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-xs transition flex items-center gap-1.5 backdrop-blur-sm"
+            className="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/20 text-white font-bold text-sm transition flex items-center gap-1.5 backdrop-blur-sm"
           >
             <LayoutDashboard className="w-3.5 h-3.5 text-coral" />
             <span>Buka Dashboard Dagangan</span>
@@ -174,7 +174,7 @@ export default function RoleContextBar({
           {currentRole === 'EO' && onOpenUploadPortfolio && (
             <button
               onClick={onOpenUploadPortfolio}
-              className="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-300 font-bold text-xs transition flex items-center gap-1.5"
+              className="px-3.5 py-2 sm:px-4 sm:py-2.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 border border-amber-400/40 text-amber-300 font-bold text-sm transition flex items-center gap-1.5"
             >
               <FileCheck className="w-3.5 h-3.5" />
               <span>Upload Portofolio EO</span>
@@ -183,9 +183,9 @@ export default function RoleContextBar({
 
           <button
             onClick={details.onPrimaryAction}
-            className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-bold text-xs transition flex items-center gap-2 shadow-lg ${
+            className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-lg font-bold text-sm transition flex items-center gap-2  ${
               currentRole === 'EO'
-                ? 'bg-gradient-to-r from-[#456B39] to-[#5E7628] hover:from-[#2F5232] hover:to-[#3F531D] text-white shadow-[#456B39]/25'
+                ? 'bg-gradient-to-r from-[#456B39] to-[#5E7628] hover:from-[#2F5232] hover:to-[#3F531D] text-white /25'
                 : 'bg-white hover:bg-slate-100 text-[#172D46]'
             }`}
           >
@@ -199,12 +199,12 @@ export default function RoleContextBar({
         {details.stats.map((s, idx) => {
           const SIcon = s.icon;
           return (
-            <div key={idx} className="bg-white/5 backdrop-blur-md p-3 sm:p-3.5 rounded-2xl border border-white/10">
-              <div className="text-[11px] text-slate-400 font-medium flex items-center gap-1.5 mb-1">
+            <div key={idx} className="bg-white/5 backdrop-blur-md p-3 sm:p-3.5 rounded-lg border border-white/10">
+              <div className="text-sm text-slate-400 font-medium flex items-center gap-1.5 mb-1">
                 <SIcon className="w-3.5 h-3.5 text-slate-300 shrink-0" />
                 <span className="truncate">{s.label}</span>
               </div>
-              <div className="text-base sm:text-lg font-black tracking-tight text-white font-mono truncate">
+              <div className="text-base sm:text-lg font-extrabold tracking-tight text-white tabular-nums truncate">
                 {s.value}
               </div>
             </div>

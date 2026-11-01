@@ -283,7 +283,7 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
           role="dialog"
           aria-modal="true"
           aria-label="Menu utama"
-          className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-brand-navy font-sans text-white"
+          className="fixed inset-0 !mt-0 z-50 flex flex-col overflow-y-auto bg-brand-navy font-sans text-white"
         >
           <div data-menu-top className="mx-auto flex w-full max-w-[96rem] items-center justify-between px-5 py-3 sm:px-8 lg:px-12">
             <Link to="/" className="flex items-center gap-2.5 rounded-lg focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-lime">

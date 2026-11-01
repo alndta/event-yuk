@@ -11,7 +11,7 @@ export default function AuthPromptModal({ isOpen, message, onClose }: Props) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fadeIn font-sans">
+    <div className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-fadeIn font-sans">
       <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col relative">
         {/* Top Accent Gradient */}
         <div className="h-2 bg-gradient-to-r from-[#172D46] via-[#456B39] to-[#5E7628]" />

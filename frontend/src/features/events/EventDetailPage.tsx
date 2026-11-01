@@ -567,7 +567,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
       {/* Modal Booth Registration */}
       {selectedBooth && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
+        <div className="fixed inset-0 !mt-0 z-50 flex items-center justify-center bg-slate-950/60 p-4 backdrop-blur-sm">
           <div role="dialog" aria-modal="true" aria-labelledby="booth-dialog-title" className="w-full max-w-md rounded-lg bg-white p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-4">
               <h2 id="booth-dialog-title" className="font-display text-lg font-bold tracking-[-0.02em] text-slate-950">

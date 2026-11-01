@@ -208,7 +208,7 @@ export default function ContractsPage({ onShowToast }: Props) {
             counterAmount: counterPrice,
             counterDpPercentage: counterDp,
             counterNotes: counterNotes,
-            lastUpdatedBy: 'Anda (Pengajuan Perubahan)',
+            lastUpdatedBy: 'Kamu (Pengajuan Perubahan)',
           };
         }
         return p;
@@ -328,37 +328,37 @@ export default function ContractsPage({ onShowToast }: Props) {
     switch (status) {
       case 'ESCROW_FUNDED':
         return (
-          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Escrow Terproteksi</span>
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold bg-brand-forest-light text-brand-forest-dark">
+            <ShieldCheck aria-hidden="true" className="w-4 h-4" />
+            <span>Escrow terproteksi</span>
           </span>
         );
       case 'CONTRACT_SIGNED':
         return (
-          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-800 border border-sky-200">
-            <FileCheck className="w-3.5 h-3.5 text-sky-600" />
-            <span>PKS Disepakati (Siap Bayar)</span>
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold bg-brand-lime text-brand-navy">
+            <FileCheck aria-hidden="true" className="w-4 h-4" />
+            <span>PKS disepakati (siap bayar)</span>
           </span>
         );
       case 'COUNTER_OFFER':
         return (
-          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
-            <RotateCcw className="w-3.5 h-3.5 text-amber-600" />
-            <span>Negosiasi Ulang (Counter)</span>
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold bg-amber-100 text-amber-900">
+            <RotateCcw aria-hidden="true" className="w-4 h-4" />
+            <span>Negosiasi ulang (counter)</span>
           </span>
         );
       case 'SUBMITTED':
         return (
-          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">
-            <Clock className="w-3.5 h-3.5 text-indigo-600" />
-            <span>Menunggu Respon Awal</span>
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold bg-brand-clay text-brand-ink">
+            <Clock aria-hidden="true" className="w-4 h-4" />
+            <span>Menunggu respons awal</span>
           </span>
         );
       case 'REJECTED':
         return (
-          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold bg-rose-100 text-rose-800 border border-rose-200">
-            <XCircle className="w-3.5 h-3.5 text-rose-600" />
-            <span>Penawaran Ditolak</span>
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold bg-rose-100 text-rose-900">
+            <XCircle aria-hidden="true" className="w-4 h-4" />
+            <span>Penawaran ditolak</span>
           </span>
         );
     }
@@ -373,26 +373,27 @@ export default function ContractsPage({ onShowToast }: Props) {
       />
       {/* Header */}
       <div className="max-w-3xl">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#172D46]/10 text-[#172D46] text-xs font-bold mb-3 border border-[#172D46]/20">
-          <Handshake className="w-3.5 h-3.5 text-[#172D46]" />
-          <span>Ruang Negosiasi & Kontrak PKS Digital Dua Arah</span>
-        </div>
-        <h1 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-          Kelola Penawaran, Kesepakatan & PKS
+        <p className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-brand-lime-strong">
+          <Handshake aria-hidden="true" className="h-4 w-4" />
+          Ruang negosiasi dan kontrak PKS digital
+        </p>
+        <h1 className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
+          Kelola penawaran, kesepakatan, dan PKS
         </h1>
-        <p className="text-xs sm:text-sm text-slate-500 mt-1">
-          Alur negosiasi fleksibel: ajukan tawaran, lakukan penyesuaian harga (counter-offer), tentukan skema termin bersama (70:30 atau 50:50), dan kunci dana aman di rekening bersama Escrow.
+        <p className="mt-4 text-lg leading-8 text-slate-700">
+          Ajukan tawaran, sesuaikan harga lewat counter-offer, pilih skema termin (70:30 atau 50:50), lalu kunci dananya di rekening bersama Escrow.
         </p>
 
         {/* Search */}
         <div className="mt-5 relative">
-          <Search className="w-5 h-5 text-slate-400 absolute left-4 top-3.5" />
+          <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
           <input
-            type="text"
-            placeholder="Cari berdasarkan nomor PKS, nama acara, vendor, band atau sponsor..."
+            type="search"
+            aria-label="Cari kontrak"
+            placeholder="Cari nomor PKS, nama acara, vendor, band, atau sponsor"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-11 sm:pl-12 pr-4 py-3 bg-white rounded-2xl border border-slate-300 shadow-xs text-xs sm:text-sm focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+            className="min-h-14 w-full rounded-full border border-slate-300 bg-white pl-12 pr-5 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
           />
         </div>
       </div>
@@ -400,20 +401,21 @@ export default function ContractsPage({ onShowToast }: Props) {
       {/* Filter Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 border-b border-slate-200">
         {[
-          { id: 'ALL', label: 'Semua Status' },
-          { id: 'SUBMITTED', label: 'Pengajuan Baru' },
-          { id: 'COUNTER_OFFER', label: 'Negosiasi Ulang (Counter)' },
-          { id: 'CONTRACT_SIGNED', label: 'Disepakati (PKS Siap)' },
-          { id: 'ESCROW_FUNDED', label: 'Escrow Aktif' },
+          { id: 'ALL', label: 'Semua status' },
+          { id: 'SUBMITTED', label: 'Pengajuan baru' },
+          { id: 'COUNTER_OFFER', label: 'Negosiasi ulang (counter)' },
+          { id: 'CONTRACT_SIGNED', label: 'Disepakati (PKS siap)' },
+          { id: 'ESCROW_FUNDED', label: 'Escrow aktif' },
           { id: 'REJECTED', label: 'Ditolak' },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setFilterStatus(tab.id)}
-            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            aria-pressed={filterStatus === tab.id}
+            className={`min-h-11 rounded-full border-2 px-5 text-sm font-semibold transition whitespace-nowrap focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy ${
               filterStatus === tab.id
-                ? 'bg-[#172D46] text-white shadow-sm'
-                : 'bg-white text-slate-600 border border-slate-200 hover:border-slate-300'
+                ? 'border-brand-navy bg-brand-navy text-white'
+                : 'border-brand-navy/25 text-brand-ink hover:border-brand-navy'
             }`}
           >
             {tab.label}
@@ -424,10 +426,10 @@ export default function ContractsPage({ onShowToast }: Props) {
       {/* Proposals List */}
       <div className="space-y-4">
         {filtered.length === 0 ? (
-          <div className="p-12 text-center bg-white rounded-3xl border border-slate-200">
+          <div className="p-12 text-center bg-white rounded-lg border border-slate-200">
             <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
             <div className="font-extrabold text-slate-800 text-sm">Tidak ada proposal yang sesuai filter</div>
-            <p className="text-xs text-slate-400 mt-1">Coba sesuaikan kata kunci pencarian atau ubah tab status filter.</p>
+            <p className="text-sm text-slate-400 mt-1">Coba sesuaikan kata kunci pencarian atau ubah tab status filter.</p>
           </div>
         ) : (
           filtered.map((item) => {
@@ -441,52 +443,52 @@ export default function ContractsPage({ onShowToast }: Props) {
             return (
               <div
                 key={item.id}
-                className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-md transition flex flex-col md:flex-row md:items-center justify-between gap-6"
+                className="bg-white rounded-lg p-6 transition flex flex-col md:flex-row md:items-center justify-between gap-6"
               >
                 {/* Left: Info */}
                 <div className="flex-1 space-y-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
+                    <span className="tabular-nums text-sm font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-md">
                       {item.contractNumber}
                     </span>
                     {getStatusBadge(item.status)}
-                    <span className="text-xs text-slate-400">• Diperbarui oleh: {item.lastUpdatedBy}</span>
+                    <span className="text-sm text-slate-400">• Diperbarui oleh: {item.lastUpdatedBy}</span>
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-black text-slate-900 tracking-tight">
+                    <h3 className="text-lg font-extrabold text-slate-900 tracking-tight">
                       {item.eventTitle}
                     </h3>
-                    <div className="flex flex-wrap items-center gap-2 text-xs text-slate-600 mt-1">
+                    <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600 mt-1">
                       <span className="font-bold text-slate-900">{item.partyOne}</span>
                       <span>—</span>
                       <span className="font-semibold text-slate-800">{item.partyTwo}</span>
-                      <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-slate-100 text-slate-700">
+                      <span className="px-2 py-0.5 rounded text-sm font-bold bg-slate-100 text-slate-700">
                         {item.roleType}
                       </span>
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-xl border border-slate-100">
-                    <strong className="text-slate-800">Lingkup Kerja:</strong> {item.scopeOfWork}
+                  <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <strong className="text-slate-800">Lingkup kerja:</strong> {item.scopeOfWork}
                   </p>
 
                   {/* Custom Attached Contract File */}
                   {item.attachedFileName && (
-                    <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-300 text-amber-950 text-xs">
+                    <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-300 text-amber-950 text-sm">
                       <Paperclip className="w-3.5 h-3.5 text-[#5E7628] shrink-0" />
-                      <span className="font-semibold text-slate-700">Berkas PKS Mandiri:</span>
+                      <span className="font-semibold text-slate-700">Berkas PKS mandiri:</span>
                       <span className="font-bold text-slate-900 truncate">{item.attachedFileName}</span>
-                      <span className="text-slate-500 font-mono text-[10px] shrink-0">({item.attachedFileSize || 'File'})</span>
+                      <span className="text-slate-500 tabular-nums text-sm shrink-0">({item.attachedFileSize || 'File'})</span>
                     </div>
                   )}
 
                   {/* Counter Notes Display */}
                   {item.counterNotes && (
-                    <div className="p-3 bg-amber-50 rounded-xl border border-amber-200 text-xs text-amber-900">
+                    <div className="p-3 bg-amber-50 rounded-lg border border-amber-200 text-sm text-amber-900">
                       <div className="font-bold flex items-center gap-1 text-amber-800 mb-0.5">
                         <MessageSquare className="w-3.5 h-3.5" />
-                        <span>Catatan Negosiasi Ulang:</span>
+                        <span>Catatan negosiasi ulang:</span>
                       </div>
                       <p>{item.counterNotes}</p>
                     </div>
@@ -494,40 +496,40 @@ export default function ContractsPage({ onShowToast }: Props) {
 
                   {/* Financial & Payment Scheme Details */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                    <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
-                      <div className="text-[10px] uppercase font-bold text-slate-400">Total Kesepakatan</div>
-                      <div className="text-xs sm:text-sm font-black text-slate-900 font-mono mt-0.5">
+                    <div className="p-3 bg-brand-cream rounded-lg">
+                      <div className="text-sm font-medium text-slate-600">Total kesepakatan</div>
+                      <div className="text-sm sm:text-sm font-extrabold text-slate-900 tabular-nums mt-0.5">
                         Rp {currentPrice.toLocaleString('id-ID')}
                       </div>
                       {hasCounter && (
-                        <div className="text-[10px] text-slate-400 line-through">
+                        <div className="text-sm text-slate-600 line-through">
                           Rp {item.totalAmount.toLocaleString('id-ID')}
                         </div>
                       )}
                     </div>
 
-                    <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
-                      <div className="text-[10px] uppercase font-bold text-slate-400">Skema Termin</div>
-                      <div className="text-xs font-black text-[#172D46] mt-0.5">
+                    <div className="p-3 bg-brand-cream rounded-lg">
+                      <div className="text-sm font-medium text-slate-600">Skema termin</div>
+                      <div className="text-sm font-extrabold text-[#172D46] mt-0.5">
                         {currentDpRatio} : {currentSettlementRatio}
                       </div>
-                      <div className="text-[10px] text-slate-500">DP : Pelunasan BAST</div>
+                      <div className="text-sm text-slate-500">DP : Pelunasan BAST</div>
                     </div>
 
-                    <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
-                      <div className="text-[10px] uppercase font-bold text-slate-400">Nominal DP ({currentDpRatio}%)</div>
-                      <div className="text-xs font-black text-emerald-700 font-mono mt-0.5">
+                    <div className="p-3 bg-brand-cream rounded-lg">
+                      <div className="text-sm font-medium text-slate-600">Nominal DP ({currentDpRatio}%)</div>
+                      <div className="text-sm font-extrabold text-brand-forest-dark tabular-nums mt-0.5">
                         Rp {dpRupiah.toLocaleString('id-ID')}
                       </div>
-                      <div className="text-[10px] text-slate-500">Escrow Awal</div>
+                      <div className="text-sm text-slate-500">Escrow awal</div>
                     </div>
 
-                    <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
-                      <div className="text-[10px] uppercase font-bold text-slate-400">Pelunasan ({currentSettlementRatio}%)</div>
-                      <div className="text-xs font-black text-slate-700 font-mono mt-0.5">
+                    <div className="p-3 bg-brand-cream rounded-lg">
+                      <div className="text-sm font-medium text-slate-600">Pelunasan ({currentSettlementRatio}%)</div>
+                      <div className="text-sm font-extrabold text-slate-700 tabular-nums mt-0.5">
                         Rp {settlementRupiah.toLocaleString('id-ID')}
                       </div>
-                      <div className="text-[10px] text-slate-500">Setelah BAST</div>
+                      <div className="text-sm text-slate-500">Setelah BAST</div>
                     </div>
                   </div>
                 </div>
@@ -539,25 +541,25 @@ export default function ContractsPage({ onShowToast }: Props) {
                     <>
                       <button
                         onClick={() => handleApproveProposal(item)}
-                        className="w-full px-4 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center gap-1.5 shadow-sm transition"
+                        className="w-full min-h-12 px-5 rounded-full text-sm font-semibold bg-brand-navy hover:bg-brand-navy-dark text-white flex items-center justify-center gap-2 transition-colors"
                       >
-                        <CheckCircle2 className="w-4 h-4" />
-                        <span>Setujui Kesepakatan</span>
+                        <CheckCircle2 aria-hidden="true" className="w-5 h-5 text-brand-lime" />
+                        <span>Setujui kesepakatan</span>
                       </button>
 
                       <button
                         onClick={() => handleOpenCounterModal(item)}
-                        className="w-full px-4 py-2.5 rounded-xl text-xs font-bold bg-[#172D46] hover:bg-[#163a50] text-white flex items-center justify-center gap-1.5 shadow-sm transition"
+                        className="w-full min-h-12 px-5 rounded-full text-sm font-semibold border-2 border-brand-navy/30 hover:border-brand-navy text-brand-ink flex items-center justify-center gap-2 transition-colors"
                       >
-                        <RotateCcw className="w-4 h-4" />
-                        <span>Ajukan Perubahan (Counter)</span>
+                        <RotateCcw aria-hidden="true" className="w-5 h-5" />
+                        <span>Ajukan perubahan (counter)</span>
                       </button>
 
                       <button
                         onClick={() => handleRejectProposal(item)}
-                        className="w-full px-4 py-2 rounded-xl text-xs font-bold text-rose-600 hover:bg-rose-50 border border-rose-200 transition"
+                        className="w-full min-h-12 px-5 rounded-full text-sm font-semibold text-rose-700 hover:bg-rose-50 border-2 border-rose-200 transition-colors"
                       >
-                        <span>Tolak Penawaran</span>
+                        <span>Tolak penawaran</span>
                       </button>
                     </>
                   )}
@@ -566,10 +568,10 @@ export default function ContractsPage({ onShowToast }: Props) {
                   {item.status === 'CONTRACT_SIGNED' && (
                     <button
                       onClick={() => handleOpenPks(item)}
-                      className="w-full px-4 py-3 rounded-xl text-xs font-bold bg-[#456B39] hover:bg-[#2F5232] text-white flex items-center justify-center gap-1.5 shadow-md transition"
+                      className="w-full min-h-12 px-5 rounded-full text-sm font-semibold bg-brand-navy hover:bg-brand-navy-dark text-white flex items-center justify-center gap-2 transition-colors"
                     >
-                      <FileCheck className="w-4 h-4" />
-                      <span>Buka PKS & Bayar Escrow DP</span>
+                      <FileCheck aria-hidden="true" className="w-5 h-5 text-brand-lime" />
+                      <span>Buka PKS dan bayar DP escrow</span>
                     </button>
                   )}
 
@@ -577,16 +579,16 @@ export default function ContractsPage({ onShowToast }: Props) {
                   {item.status === 'ESCROW_FUNDED' && (
                     <button
                       onClick={() => handleOpenPks(item)}
-                      className="w-full px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-900 hover:bg-slate-800 text-white flex items-center justify-center gap-1.5 shadow-sm transition"
+                      className="w-full min-h-12 px-5 rounded-full text-sm font-semibold bg-brand-navy hover:bg-brand-navy-dark text-white flex items-center justify-center gap-2 transition-colors"
                     >
-                      <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                      <span>Lihat Dokumen PKS Aktif</span>
+                      <ShieldCheck aria-hidden="true" className="w-5 h-5 text-brand-lime" />
+                      <span>Lihat dokumen PKS aktif</span>
                     </button>
                   )}
 
                   {item.status === 'REJECTED' && (
-                    <div className="text-xs text-rose-600 font-bold px-3 py-1.5 bg-rose-50 rounded-xl border border-rose-200">
-                      Penawaran Dibatalkan
+                    <div className="text-sm text-rose-800 font-semibold px-4 py-2 bg-rose-50 rounded-full">
+                      Penawaran dibatalkan
                     </div>
                   )}
                 </div>
@@ -598,16 +600,16 @@ export default function ContractsPage({ onShowToast }: Props) {
 
       {/* Counter-Offer Negotiation Modal */}
       {counterTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col">
+        <div className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white rounded-lg max-w-lg w-full border border-slate-200 overflow-hidden flex flex-col">
             <div className="p-6 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
               <div>
-                <span className="text-[11px] font-mono text-slate-500 font-semibold">{counterTarget.contractNumber}</span>
+                <span className="text-sm tabular-nums text-slate-500 font-semibold">{counterTarget.contractNumber}</span>
                 <h3 className="font-extrabold text-slate-900 text-base">Ajukan Perubahan (Counter-Offer)</h3>
               </div>
               <button
                 onClick={() => setCounterTarget(null)}
-                className="text-slate-400 hover:text-slate-600 text-xs font-bold"
+                className="text-slate-400 hover:text-slate-600 text-sm font-bold"
               >
                 Tutup
               </button>
@@ -615,7 +617,7 @@ export default function ContractsPage({ onShowToast }: Props) {
 
             <form onSubmit={handleSubmitCounter} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-sm font-bold text-slate-700 mb-1">
                   Nominal Penawaran Baru (Rp)
                 </label>
                 <input
@@ -623,13 +625,13 @@ export default function ContractsPage({ onShowToast }: Props) {
                   required
                   value={counterPrice}
                   onChange={(e) => setCounterPrice(Number(e.target.value))}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-300 font-mono font-bold text-sm focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                  className="w-full px-4 py-2.5 rounded-lg border border-slate-300 tabular-nums font-bold text-sm focus:ring-2 focus:ring-[#172D46] focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
-                  Skema Termin Pembayaran Bersama (DP : Pelunasan BAST)
+                <label className="block text-sm font-bold text-slate-700 mb-1">
+                  Skema termin Pembayaran Bersama (DP : Pelunasan BAST)
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
@@ -641,24 +643,24 @@ export default function ContractsPage({ onShowToast }: Props) {
                       key={ratio.dp}
                       type="button"
                       onClick={() => setCounterDp(ratio.dp)}
-                      className={`p-2.5 rounded-xl border text-center transition ${
+                      className={`p-2.5 rounded-lg border text-center transition ${
                         counterDp === ratio.dp
                           ? 'border-[#172D46] bg-[#172D46]/10 font-bold text-[#172D46]'
                           : 'border-slate-200 text-slate-600 hover:bg-slate-50'
                       }`}
                     >
-                      <div className="text-xs font-black">{ratio.label}</div>
-                      <div className="text-[10px] text-slate-400">{ratio.desc}</div>
+                      <div className="text-sm font-extrabold">{ratio.label}</div>
+                      <div className="text-sm text-slate-400">{ratio.desc}</div>
                     </button>
                   ))}
                 </div>
-                <div className="text-[11px] text-slate-500 mt-2">
+                <div className="text-sm text-slate-500 mt-2">
                   DP {counterDp}% disetor ke Escrow saat kontrak ditandatangani, dan sisa {100 - counterDp}% dicairkan setelah Berita Acara Serah Terima (BAST) digital disetujui.
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">
+                <label className="block text-sm font-bold text-slate-700 mb-1">
                   Alasan Penyesuaian & Catatan Teknis
                 </label>
                 <textarea
@@ -667,7 +669,7 @@ export default function ContractsPage({ onShowToast }: Props) {
                   placeholder="Jelaskan penyesuaian yang diajukan (misal: pengurangan unit speaker, penambahan durasi tampil band, dll)..."
                   value={counterNotes}
                   onChange={(e) => setCounterNotes(e.target.value)}
-                  className="w-full px-4 py-2 rounded-xl border border-slate-300 text-xs focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                  className="w-full px-4 py-2 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-[#172D46] focus:outline-none"
                 />
               </div>
 
@@ -675,13 +677,13 @@ export default function ContractsPage({ onShowToast }: Props) {
                 <button
                   type="button"
                   onClick={() => setCounterTarget(null)}
-                  className="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100"
+                  className="px-4 py-2 rounded-lg text-sm font-bold text-slate-600 hover:bg-slate-100"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2.5 rounded-xl text-xs font-bold bg-[#172D46] hover:bg-[#163a50] text-white flex items-center gap-1.5 shadow-sm"
+                  className="px-5 py-2.5 rounded-lg text-sm font-bold bg-[#172D46] hover:bg-[#163a50] text-white flex items-center gap-1.5"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
                   <span>Kirim Counter-Offer</span>

@@ -161,7 +161,7 @@ export default function ProfilePage() {
       />
       {/* Toast Alert */}
       {successToast && (
-        <div className="fixed bottom-6 right-6 z-50 bg-[#172D46] text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-2 text-xs font-semibold">
+        <div className="fixed bottom-6 right-6 z-50 bg-[#172D46] text-white px-5 py-3 rounded-lg flex items-center gap-2 text-sm font-semibold">
           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           <span>{successToast}</span>
         </div>
@@ -170,22 +170,22 @@ export default function ProfilePage() {
       {/* Header Profile Title */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             Pengaturan Profil Akun & Verifikasi e-KYC
           </h1>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-sm text-slate-500 mt-1">
             Kelola data identitas, rekening bank penarikan saldo, dan posisi dompet rekening bersama (Escrow).
           </p>
         </div>
 
         <div className="flex items-center gap-2">
           {profileData.kycStatus === 'VERIFIED' ? (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-xs font-bold">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-full text-sm font-bold">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
               <span>Akun e-KYC Terverifikasi</span>
             </span>
           ) : (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-full text-xs font-bold">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-full text-sm font-bold">
               <AlertCircle className="w-4 h-4 text-amber-600" />
               <span>Verifikasi Identitas Tertunda</span>
             </span>
@@ -194,12 +194,12 @@ export default function ProfilePage() {
       </div>
 
       {/* Profile Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-3 mb-6 overflow-x-auto text-xs font-bold">
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-3 mb-6 overflow-x-auto text-sm font-bold">
         <button
           onClick={() => setActiveTab('profile')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition ${
             activeTab === 'profile'
-              ? 'bg-[#172D46] text-white shadow-sm'
+              ? 'bg-[#172D46] text-white '
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
@@ -209,9 +209,9 @@ export default function ProfilePage() {
 
         <button
           onClick={() => setActiveTab('kyc')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition ${
             activeTab === 'kyc'
-              ? 'bg-[#172D46] text-white shadow-sm'
+              ? 'bg-[#172D46] text-white '
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
@@ -221,9 +221,9 @@ export default function ProfilePage() {
 
         <button
           onClick={() => setActiveTab('wallet')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl transition ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-lg transition ${
             activeTab === 'wallet'
-              ? 'bg-[#172D46] text-white shadow-sm'
+              ? 'bg-[#172D46] text-white '
               : 'text-slate-600 hover:bg-slate-100'
           }`}
         >
@@ -234,18 +234,18 @@ export default function ProfilePage() {
 
       {/* TAB 1: INFORMASI PROFIL */}
       {activeTab === 'profile' && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm max-w-2xl">
+        <div className="bg-white rounded-lg p-6 sm:p-8 max-w-2xl">
           <h3 className="font-extrabold text-slate-900 text-lg mb-1">Data Identitas Akun</h3>
-          <p className="text-xs text-slate-500 mb-6">Informasi kontak yang tampil pada kontrak PKS digital dan profil resmi.</p>
+          <p className="text-sm text-slate-500 mb-6">Informasi kontak yang tampil pada kontrak PKS digital dan profil resmi.</p>
 
-          <form onSubmit={handleSaveProfile} className="space-y-4 text-xs">
+          <form onSubmit={handleSaveProfile} className="space-y-4 text-sm">
             <div>
               <label className="block font-bold text-slate-700 mb-1">Nama Lengkap Penanggung Jawab</label>
               <input
                 type="text"
                 value={profileData.fullName}
                 onChange={(e) => setFormData({ ...profileData, fullName: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none"
               />
             </div>
 
@@ -256,7 +256,7 @@ export default function ProfilePage() {
                   type="email"
                   disabled
                   value={profileData.email}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-500"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-200 bg-slate-50 text-slate-500"
                 />
               </div>
               <div>
@@ -265,7 +265,7 @@ export default function ProfilePage() {
                   type="tel"
                   value={profileData.phoneWa}
                   onChange={(e) => setFormData({ ...profileData, phoneWa: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none"
                 />
               </div>
             </div>
@@ -276,7 +276,7 @@ export default function ProfilePage() {
                 type="text"
                 value={profileData.businessName}
                 onChange={(e) => setFormData({ ...profileData, businessName: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none"
               />
             </div>
 
@@ -286,7 +286,7 @@ export default function ProfilePage() {
                 type="text"
                 value={profileData.cityRegion}
                 onChange={(e) => setFormData({ ...profileData, cityRegion: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none"
               />
             </div>
 
@@ -294,7 +294,7 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-5 py-2.5 rounded-xl bg-[#172D46] hover:bg-[#0F263B] text-white font-bold transition shadow-md"
+                className="px-5 py-2.5 rounded-lg bg-[#172D46] hover:bg-[#0F263B] text-white font-bold transition"
               >
                 {loading ? 'Menyimpan...' : 'Simpan Perubahan Profil'}
               </button>
@@ -305,16 +305,16 @@ export default function ProfilePage() {
 
       {/* TAB 2: VERIFIKASI E-KYC & BANK */}
       {activeTab === 'kyc' && (
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-sm max-w-2xl">
+        <div className="bg-white rounded-lg p-6 sm:p-8 max-w-2xl">
           <div className="flex items-center gap-2 mb-1">
             <ShieldCheck className="w-5 h-5 text-emerald-600" />
             <h3 className="font-extrabold text-slate-900 text-lg">Verifikasi e-KYC & Rekening Penarikan</h3>
           </div>
-          <p className="text-xs text-slate-500 mb-6">
+          <p className="text-sm text-slate-500 mb-6">
             Sesuai regulasi FR-AUTH-03, identitas KTP/NPWP dan rekening bank wajib terverifikasi sebelum dapat mencairkan dana dari Escrow.
           </p>
 
-          <form onSubmit={handleSaveKyc} className="space-y-4 text-xs">
+          <form onSubmit={handleSaveKyc} className="space-y-4 text-sm">
             <div>
               <label className="block font-bold text-slate-700 mb-1">Nomor Induk Kependudukan (NIK / KTP)</label>
               <input
@@ -322,15 +322,15 @@ export default function ProfilePage() {
                 required
                 value={profileData.idCardNumber}
                 onChange={(e) => setFormData({ ...profileData, idCardNumber: e.target.value })}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none font-mono"
+                className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none tabular-nums"
               />
             </div>
 
-            <div className="border border-dashed border-slate-300 rounded-2xl p-5 text-center bg-slate-50">
+            <div className="border border-dashed border-slate-300 rounded-lg p-5 text-center bg-slate-50">
               <UploadCloud className="w-8 h-8 text-slate-400 mx-auto mb-2" />
-              <div className="font-bold text-slate-800 text-xs">Unggah Foto KTP / NPWP Asli</div>
-              <div className="text-[11px] text-slate-400 mt-0.5">Format JPG/PNG maksimal 5 MB (Dokumen tersimpan aman & terenkripsi)</div>
-              <div className="mt-3 inline-block px-3 py-1 bg-white border border-slate-200 rounded-lg font-mono text-[10px] text-slate-600">
+              <div className="font-bold text-slate-800 text-sm">Unggah Foto KTP / NPWP Asli</div>
+              <div className="text-sm text-slate-400 mt-0.5">Format JPG/PNG maksimal 5 MB (Dokumen tersimpan aman & terenkripsi)</div>
+              <div className="mt-3 inline-block px-3 py-1 bg-white border border-slate-200 rounded-lg tabular-nums text-sm text-slate-600">
                 ktp_nusantara_live_kreasi.jpg (Terverifikasi)
               </div>
             </div>
@@ -347,7 +347,7 @@ export default function ProfilePage() {
                   <select
                     value={profileData.bankName}
                     onChange={(e) => setFormData({ ...profileData, bankName: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none bg-white"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none bg-white"
                   >
                     <option value="BCA">BCA (Bank Central Asia)</option>
                     <option value="Mandiri">Bank Mandiri</option>
@@ -363,7 +363,7 @@ export default function ProfilePage() {
                     required
                     value={profileData.accountNumber}
                     onChange={(e) => setFormData({ ...profileData, accountNumber: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none font-mono"
+                    className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none tabular-nums"
                   />
                 </div>
               </div>
@@ -375,7 +375,7 @@ export default function ProfilePage() {
                   required
                   value={profileData.accountHolder}
                   onChange={(e) => setFormData({ ...profileData, accountHolder: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none"
                 />
               </div>
             </div>
@@ -384,7 +384,7 @@ export default function ProfilePage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition shadow-md flex items-center gap-2"
+                className="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition flex items-center gap-2"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 <span>Simpan & Verifikasi e-KYC</span>
@@ -399,39 +399,39 @@ export default function ProfilePage() {
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Escrow Locked Card */}
-            <div className="bg-gradient-to-tr from-slate-900 to-slate-800 text-white p-6 rounded-3xl border border-slate-700 shadow-xl relative overflow-hidden">
+            <div className="bg-gradient-to-tr from-slate-900 to-slate-800 text-white p-6 rounded-lg border border-slate-700 relative overflow-hidden">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-semibold px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30 flex items-center gap-1">
+                <span className="text-sm font-semibold px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded-full border border-amber-500/30 flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" /> Escrow Locked
                 </span>
-                <span className="text-[11px] text-slate-400">Kontrak Berjalan</span>
+                <span className="text-sm text-slate-400">Kontrak Berjalan</span>
               </div>
 
-              <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white mb-1">
+              <div className="text-2xl sm:text-3xl font-extrabold tabular-nums tracking-tight text-white mb-1">
                 Rp {wallet.escrowLocked.toLocaleString('id-ID')}
               </div>
-              <p className="text-[11px] text-slate-300 leading-relaxed">
+              <p className="text-sm text-slate-300 leading-relaxed">
                 Dana yang sedang ditahan dalam kontrak aktif vendor panggung & gaji kru. Akan cair otomatis saat BAST disetujui atau presensi kru tervalidasi.
               </p>
             </div>
 
             {/* Available Balance Card */}
-            <div className="bg-gradient-to-tr from-[#172D46] to-[#153a50] text-white p-6 rounded-3xl border border-sky-900 shadow-xl relative overflow-hidden">
+            <div className="bg-gradient-to-tr from-[#172D46] to-[#153a50] text-white p-6 rounded-lg border border-sky-900 relative overflow-hidden">
               <div className="flex items-center justify-between mb-4">
-                <span className="text-xs font-semibold px-2.5 py-1 bg-emerald-500/20 text-emerald-300 rounded-full border border-emerald-500/30 flex items-center gap-1">
+                <span className="text-sm font-semibold px-2.5 py-1 bg-emerald-500/20 text-emerald-300 rounded-full border border-emerald-500/30 flex items-center gap-1">
                   <CheckCircle2 className="w-3.5 h-3.5" /> Saldo Siap Tarik
                 </span>
-                <span className="text-[11px] text-slate-300">Available Balance</span>
+                <span className="text-sm text-slate-300">Available Balance</span>
               </div>
 
-              <div className="text-2xl sm:text-3xl font-black font-mono tracking-tight text-white mb-1">
+              <div className="text-2xl sm:text-3xl font-extrabold tabular-nums tracking-tight text-white mb-1">
                 Rp {wallet.availableBal.toLocaleString('id-ID')}
               </div>
-              <p className="text-[11px] text-slate-200 leading-relaxed mb-4">
-                Dana bersih hasil sewa booth tenant dan pelunasan termin yang siap ditransfer instan ke rekening bank Anda.
+              <p className="text-sm text-slate-200 leading-relaxed mb-4">
+                Dana bersih hasil sewa booth tenant dan pelunasan termin yang siap ditransfer instan ke rekening bank kamu.
               </p>
 
-              <button className="px-4 py-2 bg-gradient-to-r from-[#456B39] to-[#5E7628] hover:opacity-90 rounded-xl text-white font-bold text-xs shadow-md transition flex items-center gap-1.5">
+              <button className="px-4 py-2 bg-gradient-to-r from-[#456B39] to-[#5E7628] hover:opacity-90 rounded-lg text-white font-bold text-sm transition flex items-center gap-1.5">
                 <span>Tarik Dana ke Bank Sekarang</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
