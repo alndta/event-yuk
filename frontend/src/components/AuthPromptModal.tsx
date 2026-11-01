@@ -1,5 +1,6 @@
 import useDialog from '../hooks/useDialog';
 import { Link } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
 import { ShieldCheck, X, LogIn, UserPlus, CheckCircle2 } from 'lucide-react';
 
 interface Props {
@@ -10,6 +11,7 @@ interface Props {
 
 function AuthPromptModalInner({ isOpen, message, onClose }: Props) {
   const dialogRef = useDialog(onClose);
+  const { t } = useLanguage();
   if (!isOpen) return null;
 
   return (
@@ -37,23 +39,23 @@ function AuthPromptModalInner({ isOpen, message, onClose }: Props) {
           </div>
 
           <h3 className="text-xl font-extrabold text-slate-900 tracking-tight">
-            Masuk dulu, yuk
+            {t('auth.promptTitle')}
           </h3>
 
           <p className="text-sm sm:text-sm text-slate-600 mt-2 leading-relaxed">
             {message ||
-              'Untuk mengajukan penawaran, mengunci kaveling booth, atau menandatangani PKS resmi, yuk masuk ke akunmu atau daftar gratis dalam sekejap.'}
+              t('auth.promptDefault')}
           </p>
 
           {/* Reassuring Value Points */}
           <div className="mt-5 p-3.5 bg-slate-50/80 rounded-lg border border-slate-200/80 text-left space-y-2 text-sm text-slate-700">
             <div className="flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-              <span>DP dan transaksi dijaga di Rekening Bersama Escrow</span>
+              <span>{t('auth.promptEscrow')}</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-sky-600 shrink-0" />
-              <span>Kesepakatan sah berkekuatan hukum lewat PKS digital</span>
+              <span>{t('auth.promptPks')}</span>
             </div>
           </div>
 
@@ -65,7 +67,7 @@ function AuthPromptModalInner({ isOpen, message, onClose }: Props) {
               className="w-full min-h-12 px-4 rounded-full text-white font-bold text-sm sm:text-sm transition flex items-center justify-center gap-2 bg-brand-navy hover:bg-brand-navy-dark transition-colors"
             >
               <LogIn className="w-4 h-4 text-[#5E7628]" />
-              <span>Masuk Sekarang</span>
+              <span>{t('auth.promptLogin')}</span>
             </Link>
 
             <Link
@@ -74,7 +76,7 @@ function AuthPromptModalInner({ isOpen, message, onClose }: Props) {
               className="w-full min-h-12 px-4 rounded-full text-white font-bold text-sm sm:text-sm /25 transition flex items-center justify-center gap-2 bg-brand-navy hover:bg-brand-navy-dark transition-colors"
             >
               <UserPlus className="w-4 h-4" />
-              <span>Buat akun baru (gratis)</span>
+              <span>{t('auth.promptRegister')}</span>
             </Link>
 
             <button

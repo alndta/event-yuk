@@ -12,6 +12,7 @@ import {
   Check,
   RotateCw,
 } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 import { useAuth } from '../context/AuthContext';
 import { SEOHead } from '../components/SEOHead';
 
@@ -19,6 +20,7 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login, signInWithGoogle } = useAuth();
+  const { t } = useLanguage();
 
   const [email, setEmail] = useState('');
   const pageRef = useRef<HTMLDivElement>(null);
@@ -47,24 +49,20 @@ export default function LoginPage() {
         navigate('/onboarding-role', { replace: true });
       }
     } else {
-      setErrorMessage(result.error || 'Email atau kata sandi tidak sesuai.');
+      setErrorMessage(result.error || t('login.badCreds'));
     }
   };
 
   const inputClass =
     'w-full min-h-12 rounded-lg border border-slate-300 bg-white py-3 pl-11 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30';
 
-  const guarantees = [
-    'Rekening bersama Escrow berizin Bank Indonesia (Midtrans)',
-    'Perjanjian kerja sama (PKS) digital, atau unggah dokumenmu sendiri',
-    'Dana cair lewat BAST digital dan presensi QR GPS',
-  ];
+  const guarantees = [t('login.g1'), t('login.g2'), t('login.g3')];
 
   return (
     <div ref={pageRef} className="flex min-h-screen w-full flex-col bg-white font-sans lg:flex-row">
       <SEOHead
-        title="Masuk ke Akun Mitra | Event Yuk"
-        description="Masuk ke ruang kerja kolaborasi acara Event Yuk untuk mengelola pagu anggaran, kontrak PKS sah, dan rekening bersama Escrow."
+        title={t('login.seoTitle')}
+        description={t('login.seoDesc')}
         noIndex={true}
       />
 
@@ -78,11 +76,11 @@ export default function LoginPage() {
 
         <div className="max-w-lg">
           <h1 data-enter className="font-display text-5xl font-extrabold leading-[1.05] tracking-[-0.03em]">
-            Satu akun,
-            <span className="mt-2 block text-brand-lime">semua peran di acaramu.</span>
+            {t('login.h1a')}
+            <span className="mt-2 block text-brand-lime">{t('login.h1b')}</span>
           </h1>
           <p data-enter className="mt-6 text-lg leading-8 text-slate-200">
-            Masuk untuk mengelola proyek, kontrak, dan pembayaran, baik sebagai penyelenggara, vendor, musisi, tenant, sponsor, maupun kru.
+            {t('login.lead')}
           </p>
           <ul data-enter className="mt-8 space-y-4">
             {guarantees.map((item) => (
@@ -104,15 +102,15 @@ export default function LoginPage() {
             className="inline-flex min-h-11 items-center gap-2 font-semibold text-slate-700 hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
           >
             <ArrowLeft aria-hidden="true" className="h-4 w-4" />
-            Kembali ke beranda
+            {t('login.back')}
           </Link>
           <p className="text-slate-600">
-            Belum punya akun?{' '}
+            {t('login.noAccount')}{' '}
             <Link
               to="/register"
               className="font-semibold text-brand-navy underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
             >
-              Daftar gratis
+              {t('login.signUp')}
             </Link>
           </p>
         </div>
@@ -123,10 +121,10 @@ export default function LoginPage() {
           </Link>
 
           <h2 data-enter className="font-display text-3xl font-extrabold tracking-[-0.03em] text-slate-950 sm:text-4xl">
-            Masuk ke akunmu
+            {t('login.title')}
           </h2>
           <p className="mt-3 text-base leading-7 text-slate-600">
-            Pakai email dan kata sandi untuk membuka dasbor proyek, proposal kerja sama, dan dompet escrow.
+            {t('login.sub')}
           </p>
 
           {errorMessage && (
@@ -142,7 +140,7 @@ export default function LoginPage() {
           <form data-enter onSubmit={handleLogin} className="mt-8 space-y-5">
             <div>
               <label htmlFor="login-email" className="mb-2 block text-sm font-semibold text-slate-800">
-                Email
+                {t('login.email')}
               </label>
               <div className="relative">
                 <Mail aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
@@ -162,14 +160,14 @@ export default function LoginPage() {
             <div>
               <div className="mb-2 flex items-center justify-between gap-3">
                 <label htmlFor="login-password" className="text-sm font-semibold text-slate-800">
-                  Kata sandi
+                  {t('login.password')}
                 </label>
                 <button
                   type="button"
-                  onClick={() => alert('Silakan hubungi tim support di support@eventyuk.id untuk reset kata sandi.')}
+                  onClick={() => alert(t('login.forgotMsg'))}
                   className="min-h-11 text-sm font-semibold text-brand-navy underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
                 >
-                  Lupa kata sandi?
+                  {t('login.forgot')}
                 </button>
               </div>
               <div className="relative">
@@ -179,7 +177,7 @@ export default function LoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   required
                   autoComplete="current-password"
-                  placeholder="Kata sandi akunmu"
+                  placeholder={t('login.passwordPh')}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className={inputClass + ' pr-12'}
@@ -187,7 +185,7 @@ export default function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  aria-label={showPassword ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
+                  aria-label={showPassword ? t('login.hide') : t('login.show')}
                   className="absolute right-1 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center text-slate-600 hover:text-slate-950 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand-navy"
                 >
                   {showPassword ? <EyeOff aria-hidden="true" className="h-5 w-5" /> : <Eye aria-hidden="true" className="h-5 w-5" />}
@@ -203,7 +201,7 @@ export default function LoginPage() {
                 onChange={(e) => setRememberMe(e.target.checked)}
                 className="h-5 w-5 rounded border-slate-400 text-brand-navy focus:ring-brand-navy"
               />
-              Ingat saya di perangkat ini
+              {t('login.remember')}
             </label>
 
             <button
@@ -214,12 +212,12 @@ export default function LoginPage() {
               {loading ? (
                 <>
                   <RotateCw aria-hidden="true" className="h-5 w-5 animate-spin" />
-                  <span>Memverifikasi...</span>
+                  <span>{t('login.checking')}</span>
                 </>
               ) : (
                 <>
                   <LogIn aria-hidden="true" className="h-5 w-5" />
-                  <span>Masuk</span>
+                  <span>{t('login.submit')}</span>
                 </>
               )}
             </button>
@@ -242,7 +240,7 @@ export default function LoginPage() {
                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" />
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" />
               </svg>
-              Lanjutkan dengan Google
+              {t('login.google')}
             </button>
           </div>
         </div>
@@ -250,9 +248,9 @@ export default function LoginPage() {
         <div className="flex flex-col items-center justify-between gap-3 border-t border-slate-200 pt-6 text-sm text-slate-600 sm:flex-row">
           <p className="flex items-center gap-2">
             <ShieldCheck aria-hidden="true" className="h-4 w-4 text-brand-forest" />
-            Koneksi terenkripsi TLS 1.3 dan SHA-256
+            {t('login.secure')}
           </p>
-          <p>© {new Date().getFullYear()} Event Yuk. Seluruh hak cipta dilindungi.</p>
+          <p>© {new Date().getFullYear()} Event Yuk. {t('login.rights')}</p>
         </div>
       </main>
     </div>

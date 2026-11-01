@@ -9,6 +9,7 @@ import { PartnerItem } from './data/mockPartners';
 // Auth Context & Protected Route
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
+import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import useSmoothScroll from './hooks/useSmoothScroll';
 import { gsap, ScrollTrigger, NO_REDUCED_MOTION } from './lib/motion';
@@ -416,9 +417,11 @@ export default function App() {
     <BrowserRouter>
       <ScrollToTop />
       <AuthProvider>
-        <LanguageProvider>
-          <AppContent />
-        </LanguageProvider>
+        <ThemeProvider>
+          <LanguageProvider>
+            <AppContent />
+          </LanguageProvider>
+        </ThemeProvider>
       </AuthProvider>
     </BrowserRouter>
   );
