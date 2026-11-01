@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, CalendarDays, Check, MapPin } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { EventItem } from '../../../data/mockEvents';
 import { useLanguage } from '../../../context/LanguageContext';
 
@@ -16,90 +16,33 @@ const workflowSteps = [
   ['hero.phase.finish', 'hero.phase.finishDescription'],
 ] as const;
 
-function ProjectPanel({ event }: { event: EventItem }) {
-  const { t } = useLanguage();
-  const progress = event.progress;
-  const completion = Math.min(100, Math.max(0, progress?.vendorFilled ?? 0));
-
-  return (
-    <article
-      aria-label={event.title}
-      className="w-full max-w-[34rem] overflow-hidden rounded-lg bg-white text-brand-ink"
-    >
-      <div className="aspect-[16/8] bg-brand-navy-light">
-        <img
-          src={event.bannerImage}
-          alt=""
-          width={1200}
-          height={600}
-          fetchPriority="high"
-          decoding="async"
-          className="h-full w-full object-cover"
-        />
-      </div>
-
-      <div className="p-5 sm:p-6">
-        <p className="text-sm font-semibold text-brand-lime-strong">{t('eventCard.openStatus')}</p>
-        <h2 className="mt-1 font-display text-2xl font-bold leading-tight tracking-[-0.02em] sm:text-[1.7rem]">
-          {event.title}
-        </h2>
-        <p className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm text-slate-600">
-          <span className="inline-flex items-center gap-1.5">
-            <CalendarDays aria-hidden="true" className="h-4 w-4" />
-            {event.date}
-          </span>
-          <span className="inline-flex items-center gap-1.5">
-            <MapPin aria-hidden="true" className="h-4 w-4" />
-            {event.venue}
-          </span>
-        </p>
-
-        {progress && (
-          <div className="mt-6">
-            <div className="flex items-baseline justify-between gap-4">
-              <p className="text-sm font-medium text-slate-800">{progress.stage}</p>
-              <p className="shrink-0 font-display text-2xl font-bold">
-                {completion}%
-                <span className="ml-1 text-sm font-medium text-slate-600">{t('eventCard.filled')}</span>
-              </p>
-            </div>
-            <div
-              role="progressbar"
-              aria-valuenow={completion}
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-label={t('eventCard.progressLabel')}
-              className="mt-3 h-2.5 overflow-hidden rounded-full bg-brand-sand"
-            >
-              <div className="h-full rounded-full bg-brand-navy" style={{ width: completion + '%' }} />
-            </div>
-            <dl className="mt-4 grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <dt className="text-slate-600">{t('eventCard.boothCount')}</dt>
-                <dd className="font-display text-xl font-bold">{progress.boothFilled}</dd>
-              </div>
-              <div>
-                <dt className="text-slate-600">{t('eventCard.crewCount')}</dt>
-                <dd className="font-display text-xl font-bold">{progress.crewNeeded}</dd>
-              </div>
-            </dl>
-          </div>
-        )}
-
-        <ul className="mt-6 space-y-2 border-t border-slate-200 pt-5 text-sm text-slate-700">
-          {(['hero.card.pksReady', 'hero.card.escrowReady'] as const).map((key) => (
-            <li key={key} className="flex items-center gap-2.5">
-              <Check aria-hidden="true" className="h-4 w-4 shrink-0 text-brand-forest" />
-              {t(key)}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </article>
-  );
+/** Spiky badge outline, built once so the markup stays readable. */
+function burstPoints(spikes: number, outer: number, inner: number) {
+  const pts: string[] = [];
+  for (let i = 0; i < spikes * 2; i++) {
+    const r = i % 2 === 0 ? outer : inner;
+    const a = (Math.PI * i) / spikes - Math.PI / 2;
+    pts.push((50 + r * Math.cos(a)).toFixed(2) + ',' + (50 + r * Math.sin(a)).toFixed(2));
+  }
+  return pts.join(' ');
 }
+const BURST = burstPoints(14, 49, 40);
 
-export default function HomeHero({ featuredEvent, onOpenCreateEvent }: Props) {
+/** Scalloped edge that hands the lime field over to the navy section below. */
+function scallopPath() {
+  const period = 180;
+  let d = 'M0 90 L0 44';
+  for (let x = 0; x < 1440; x += period) {
+    d += ` Q${x + period / 4} 0 ${x + period / 2} 44 T${x + period} 44`;
+  }
+  return d + ' L1440 90 Z';
+}
+const SCALLOP = scallopPath();
+
+const BLOB =
+  'M120 300 C80 160 240 60 400 90 C560 120 720 80 760 240 C800 400 640 540 460 540 C300 540 160 460 120 300 Z';
+
+export default function HomeHero({ onOpenCreateEvent }: Props) {
   const { t } = useLanguage();
   const [activeStep, setActiveStep] = useState(0);
 
@@ -108,58 +51,108 @@ export default function HomeHero({ featuredEvent, onOpenCreateEvent }: Props) {
       aria-labelledby="home-title"
       className="-mx-5 -my-6 overflow-hidden sm:-mx-8 sm:-my-8 lg:-mx-12 2xl:-mx-16"
     >
-      <div className="bg-brand-navy px-5 py-14 text-white sm:px-8 sm:py-20 lg:px-12 lg:py-24 2xl:px-16">
-        <div
-          className={
-            'mx-auto grid max-w-[88rem] items-center gap-12 lg:gap-16 ' +
-            (featuredEvent ? 'lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]' : '')
-          }
+      <div className="relative isolate overflow-hidden bg-brand-lime text-brand-navy">
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 800 600"
+          className="absolute -left-32 bottom-0 -z-10 h-[30rem] w-[40rem] text-brand-lime-hover lg:-left-16 lg:h-[40rem] lg:w-[54rem]"
         >
-          <div>
-            <h1
-              id="home-title"
-              className="font-display text-[clamp(3rem,6.4vw,6.25rem)] font-extrabold leading-[0.98] tracking-[-0.035em]"
-            >
-              {t('hero.title')}
-              <span className="block text-brand-lime">{t('hero.titleHighlight')}</span>
-            </h1>
-            <p className="mt-6 max-w-[34ch] text-lg leading-8 text-slate-200 sm:text-xl sm:leading-9">
-              {t('hero.desc')}
-            </p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-7">
+          <path d={BLOB} fill="currentColor" />
+        </svg>
+
+        <div className="relative z-10 mx-auto max-w-[96rem] px-5 pt-10 sm:px-8 sm:pt-12 lg:min-h-[44rem] lg:px-12 lg:pb-48 lg:pt-14">
+          <h1
+            id="home-title"
+            style={{ fontVariationSettings: '"SOFT" 100' }}
+            className="font-warm text-[clamp(3.4rem,11.2vw,11.5rem)] font-black uppercase leading-[0.86] tracking-[-0.02em]"
+          >
+            <span className="block">{t('hero.title')}</span>
+            <span className="block text-white [-webkit-text-stroke:clamp(2px,0.3vw,5px)_#172D46] [paint-order:stroke_fill]">
+              {t('hero.titleHighlight')}
+            </span>
+          </h1>
+
+          <div className="relative z-30 mt-8 max-w-[34rem] lg:mt-14">
+            <p className="font-warm text-lg font-bold leading-7">{t('hero.desc')}</p>
+            <div className="mt-6 flex flex-wrap items-center gap-3">
               <button
                 type="button"
                 onClick={onOpenCreateEvent}
-                className="inline-flex min-h-14 items-center justify-between gap-6 bg-brand-lime px-6 text-left text-base font-semibold text-brand-navy transition-colors hover:bg-brand-lime-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white sm:min-w-[15rem]"
+                className="inline-flex min-h-12 items-center gap-3 rounded-full bg-brand-navy px-7 text-base font-semibold text-brand-lime transition-colors hover:bg-brand-navy-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy"
               >
-                <span>{t('hero.ctaExplore')}</span>
-                <ArrowRight aria-hidden="true" className="h-5 w-5 shrink-0" />
+                {t('hero.ctaExplore')}
+                <ArrowRight aria-hidden="true" className="h-5 w-5" />
               </button>
               <Link
                 to="/events"
-                className="inline-flex min-h-12 items-center text-base font-semibold text-white underline decoration-brand-lime decoration-2 underline-offset-8 transition-colors hover:text-brand-lime focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                className="inline-flex min-h-12 items-center rounded-full border-2 border-brand-navy px-6 text-base font-semibold transition-colors hover:bg-brand-navy hover:text-brand-lime focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy"
               >
                 {t('hero.ctaOpportunities')}
               </Link>
             </div>
           </div>
-
-          {featuredEvent && (
-            <div className="lg:justify-self-end">
-              <ProjectPanel event={featuredEvent} />
-            </div>
-          )}
         </div>
+
+        <div className="relative z-20 mx-auto -mb-8 mt-4 w-[96%] max-w-[34rem] lg:absolute lg:bottom-0 lg:right-0 lg:mx-0 lg:mb-0 lg:mt-0 lg:w-[min(56vw,54rem)] lg:max-w-none">
+          <img
+            src="/assets/event-organizer-registration-3d.png"
+            alt={t('hero.imageAlt')}
+            width={1448}
+            height={1086}
+            fetchPriority="high"
+            decoding="async"
+            draggable={false}
+            className="block w-full select-none"
+          />
+
+          <div className="absolute left-[3%] top-[30%] w-[24%] max-w-[8.5rem] -rotate-[8deg]">
+            <svg aria-hidden="true" viewBox="0 0 100 100" className="block w-full text-brand-navy">
+              <polygon points={BURST} fill="currentColor" />
+            </svg>
+            <span className="absolute inset-0 flex items-center justify-center px-2 text-center font-warm text-[clamp(0.7rem,1.5vw,1.15rem)] font-black uppercase leading-[1.05] text-brand-lime">
+              PKS
+              <br />
+              digital
+            </span>
+          </div>
+
+          <span className="absolute right-[2%] top-[17%] rotate-[11deg] rounded-md bg-brand-navy px-3 py-1.5 font-warm text-[clamp(0.7rem,1.4vw,1.05rem)] font-black uppercase leading-none text-white sm:px-4 sm:py-2">
+            Escrow Midtrans
+          </span>
+
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 100 100"
+            className="absolute right-[20%] top-[50%] w-[8%] text-white"
+          >
+            <path
+              d="M50 4 C54 34 66 46 96 50 C66 54 54 66 50 96 C46 66 34 54 4 50 C34 46 46 34 50 4 Z"
+              fill="currentColor"
+              stroke="#172D46"
+              strokeWidth="5"
+              strokeLinejoin="round"
+            />
+          </svg>
+        </div>
+
+        <svg
+          aria-hidden="true"
+          viewBox="0 0 1440 90"
+          preserveAspectRatio="none"
+          className="relative z-40 -mb-px block h-12 w-full text-brand-navy sm:h-[4.5rem]"
+        >
+          <path d={SCALLOP} fill="currentColor" />
+        </svg>
       </div>
 
-      <div className="bg-brand-lime px-5 py-10 text-brand-ink sm:px-8 sm:py-12 lg:px-12 lg:py-14 2xl:px-16">
-        <div className="mx-auto max-w-[88rem]">
-          <h2 id="event-journey-title" className="font-display text-2xl font-bold tracking-[-0.03em] sm:text-4xl">
+      <div className="bg-brand-navy px-5 pb-14 pt-6 text-white sm:px-8 sm:pb-16 lg:px-12 lg:pb-20 2xl:px-16">
+        <div className="mx-auto max-w-[96rem]">
+          <h2 id="event-journey-title" className="font-warm text-3xl font-black tracking-[-0.01em] sm:text-5xl">
             {t('hero.phase.label')}
           </h2>
           <ol
             aria-labelledby="event-journey-title"
-            className="mt-7 grid grid-cols-2 gap-x-5 gap-y-8 sm:gap-x-8 lg:grid-cols-4 lg:gap-x-10"
+            className="mt-8 grid grid-cols-2 gap-x-5 gap-y-8 sm:gap-x-8 lg:grid-cols-4 lg:gap-x-10"
           >
             {workflowSteps.map(([titleKey, descriptionKey], index) => (
               <li key={titleKey}>
@@ -167,12 +160,12 @@ export default function HomeHero({ featuredEvent, onOpenCreateEvent }: Props) {
                   type="button"
                   aria-pressed={activeStep === index}
                   onClick={() => setActiveStep(index)}
-                  className={`block min-h-12 w-full border-t-[6px] pt-4 text-left font-display text-lg font-bold tracking-[-0.03em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy sm:text-xl ${activeStep === index ? 'border-brand-navy text-brand-navy' : 'border-brand-navy/25 text-brand-ink hover:border-brand-navy/60'}`}
+                  className={`block min-h-12 w-full border-t-[6px] pt-4 text-left font-display text-lg font-bold tracking-[-0.03em] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-lime sm:text-xl ${activeStep === index ? 'border-brand-lime text-white' : 'border-white/25 text-slate-300 hover:border-white/60 hover:text-white'}`}
                 >
                   {t(titleKey)}
                 </button>
                 {activeStep === index && (
-                  <p aria-live="polite" className="mt-2 max-w-[28ch] text-base leading-7">
+                  <p aria-live="polite" className="mt-2 max-w-[28ch] text-base leading-7 text-slate-200">
                     {t(descriptionKey)}
                   </p>
                 )}
