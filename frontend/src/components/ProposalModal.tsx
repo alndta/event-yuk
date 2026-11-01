@@ -16,6 +16,7 @@ import {
 import { EventItem } from '../types/models';
 import { PartnerItem } from '../types/models';
 import { api, ApiError } from '../lib/api';
+import { useLanguage } from '../context/LanguageContext';
 
 interface Props {
   isOpen: boolean;
@@ -37,6 +38,7 @@ function ProposalModalInner({
   onClose,
   onSuccess,
 }: Props) {
+  const { t } = useLanguage();
   const dialogRef = useDialog(onClose);
   const [formData, setFormData] = useState({
     title: '',
@@ -62,7 +64,7 @@ function ProposalModalInner({
 
   if (!isOpen) return null;
 
-  const targetTitle = event ? event.title : partner ? partner.name : 'Mitra Terpilih';
+  const targetTitle = event ? event.title : partner ? partner.name : t('prm.targetFallback');
   const roleType = partner ? partner.type : 'VENDOR';
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,7 +74,7 @@ function ProposalModalInner({
     // Validate extension: pdf, doc, docx
     const ext = file.name.split('.').pop()?.toLowerCase();
     if (!['pdf', 'doc', 'docx'].includes(ext || '')) {
-      alert('Format berkas harus berupa dokumen .pdf, .doc, atau .docx');
+      alert(t('prm.fileType'));
       return;
     }
 
@@ -107,11 +109,11 @@ function ProposalModalInner({
 
     const eventId = event ? event.id : selectedEventId;
     const receiverId = event ? event.organizerId : partner?.id;
-    if (!eventId) return setError('Pilih acara yang menjadi tujuan kerja sama ini.');
-    if (!receiverId) return setError('Penerima pengajuan belum diketahui. Muat ulang halaman lalu coba lagi.');
+    if (!eventId) return setError(t('prm.needEvent'));
+    if (!receiverId) return setError(t('prm.needReceiver'));
 
     const price = parseInt(formData.offeredPrice.replace(/\D/g, ''), 10);
-    if (!price) return setError('Isi nominal penawaran.');
+    if (!price) return setError(t('prm.needPrice'));
 
     setLoading(true);
     try {
@@ -134,7 +136,7 @@ function ProposalModalInner({
       onSuccess(res.data);
       onClose();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Penawaran belum terkirim.');
+      setError(err instanceof ApiError ? err.message : t('prm.sendFail'));
     } finally {
       setLoading(false);
     }
@@ -148,13 +150,13 @@ function ProposalModalInner({
           <div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#172D46]/10 text-[#172D46] text-sm font-bold mb-1 border border-[#172D46]/20">
               <Handshake className="w-3.5 h-3.5 text-[#172D46]" />
-              {mode === 'PARTNER_TO_EO' ? 'Pengajuan Penawaran Mitra ke Acara' : 'Undangan Resmi EO ke Mitra'}
+              {mode === 'PARTNER_TO_EO' ? t('prm.hP2E') : t('prm.hE2P')}
             </div>
             <h3 className="font-extrabold text-slate-900 text-xl tracking-tight">
-              {mode === 'PARTNER_TO_EO' ? 'Ajukan Proposal & Penawaran Biaya' : 'Kirim Undangan Kerjasama Resmi'}
+              {mode === 'PARTNER_TO_EO' ? t('prm.tP2E') : t('prm.tE2P')}
             </h3>
             <p className="text-sm text-slate-500 mt-0.5">
-              Ditujukan untuk: <strong className="text-slate-800">{targetTitle}</strong>
+              {t('prm.forLabel')} <strong className="text-slate-800">{targetTitle}</strong>
             </p>
           </div>
           <button
@@ -172,7 +174,7 @@ function ProposalModalInner({
           )}
           {mode === 'EO_TO_PARTNER' && (
             <div>
-              <label htmlFor="proposal-event" className="block font-semibold text-slate-700 mb-1">Untuk acara yang mana</label>
+              <label htmlFor="proposal-event" className="block font-semibold text-slate-700 mb-1">{t('prm.01')}</label>
               <select
                 id="proposal-event"
                 required
@@ -180,7 +182,7 @@ function ProposalModalInner({
                 onChange={(e) => setSelectedEventId(e.target.value)}
                 className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 bg-white focus:ring-2 focus:ring-brand-navy/30 focus:outline-none"
               >
-                <option value="">{myEvents.length ? 'Pilih acaramu' : 'Kamu belum punya acara aktif'}</option>
+                <option value="">{myEvents.length ? t('prm.pickEvent') : t('prm.noEvents')}</option>
                 {myEvents.map((ev) => (
                   <option key={ev.id} value={ev.id}>{ev.title}</option>
                 ))}
@@ -190,12 +192,12 @@ function ProposalModalInner({
           {/* Judul */}
           <div>
             <label className="block font-semibold text-slate-700 mb-1">
-              Judul penawaran atau pekerjaan
+              {t('prm.02')}
             </label>
             <input
               type="text"
               required
-              placeholder="Contoh: Paket Panggung & Rigging 12x10m / Guest Star Penampilan 45 Menit"
+              placeholder={t('prm.03')}
               className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none text-slate-800 font-medium"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -207,12 +209,12 @@ function ProposalModalInner({
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1">
                 <DollarSign className="w-3.5 h-3.5 text-slate-400" />
-                <span>Nominal kesepakatan (Rp)</span>
+                <span>{t('prm.04')}</span>
               </label>
               <input
                 type="text"
                 required
-                placeholder="Misal: 35.000.000"
+                placeholder={t('prm.05')}
                 className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none text-slate-800 font-medium tabular-nums"
                 value={formData.offeredPrice}
                 onChange={(e) => setFormData({ ...formData, offeredPrice: e.target.value })}
@@ -221,18 +223,18 @@ function ProposalModalInner({
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1">
                 <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
-                <span>Skema Termin DP Escrow</span>
+                <span>{t('prm.06')}</span>
               </label>
               <select
                 className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none bg-white text-slate-800 font-medium"
                 value={formData.dpPercentage}
                 onChange={(e) => setFormData({ ...formData, dpPercentage: e.target.value })}
               >
-                <option value="30">DP 30% (Pelunasan 70% Pasca-BAST)</option>
-                <option value="40">DP 40% (Pelunasan 60% Pasca-BAST)</option>
-                <option value="50">DP 50% (Pelunasan 50% Pasca-BAST)</option>
-                <option value="70">DP 70% (Pelunasan 30% Pasca-BAST)</option>
-                <option value="100">100% di Muka (Tersimpan di Escrow)</option>
+                <option value="30">{t('prm.07')}</option>
+                <option value="40">{t('prm.08')}</option>
+                <option value="50">{t('prm.09')}</option>
+                <option value="70">{t('prm.10')}</option>
+                <option value="100">{t('prm.11')}</option>
               </select>
             </div>
           </div>
@@ -240,11 +242,11 @@ function ProposalModalInner({
           {/* Scope of Work */}
           <div>
             <label className="block font-semibold text-slate-700 mb-1">
-              Lingkup kerja
+              {t('prm.12')}
             </label>
             <textarea
               rows={2}
-              placeholder="Jelaskan ruang lingkup pekerjaan, jadwal loading/soundcheck, dan deliverables..."
+              placeholder={t('prm.13')}
               className="w-full px-3.5 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none text-slate-800"
               value={formData.scopeOfWork}
               onChange={(e) => setFormData({ ...formData, scopeOfWork: e.target.value })}
@@ -254,11 +256,11 @@ function ProposalModalInner({
           {/* Riders or Specs */}
           <div>
             <label className="block font-semibold text-slate-700 mb-1">
-              Spesifikasi teknis dan rider
+              {t('prm.14')}
             </label>
             <textarea
               rows={2}
-              placeholder="Contoh: Daya 40kVA, Line Array 12 Box, Microphone Wireless Shure, Ruang Tunggu Ber-AC..."
+              placeholder={t('prm.15')}
               className="w-full px-3.5 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-[#172D46] focus:outline-none tabular-nums text-sm text-slate-800"
               value={formData.ridersOrSpecs}
               onChange={(e) => setFormData({ ...formData, ridersOrSpecs: e.target.value })}
@@ -294,10 +296,10 @@ function ProposalModalInner({
                 <div>
                   <div className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
                     <FileText className="w-3.5 h-3.5 text-[#172D46]" />
-                    <span>Draf PKS Digital Otomatis</span>
+                    <span>{t('prm.16')}</span>
                   </div>
                   <p className="text-sm text-slate-500 mt-0.5 leading-snug">
-                    Sistem menerbitkan pasal baku perlindungan hukum dan termin otomatis.
+                    {t('prm.17')}
                   </p>
                 </div>
               </button>
@@ -325,10 +327,10 @@ function ProposalModalInner({
                 <div>
                   <div className="font-bold text-sm text-slate-900 flex items-center gap-1.5">
                     <UploadCloud className="w-3.5 h-3.5 text-[#5E7628]" />
-                    <span>Unggah berkas sendiri (.pdf atau .doc)</span>
+                    <span>{t('prm.18')}</span>
                   </div>
                   <p className="text-sm text-slate-500 mt-0.5 leading-snug">
-                    Gunakan draf kontrak khusus dari legal internal perusahaan kamu.
+                    {t('prm.19')}
                   </p>
                 </div>
               </button>
@@ -355,7 +357,7 @@ function ProposalModalInner({
                       <UploadCloud className="w-5 h-5" />
                     </div>
                     <span className="font-bold text-sm text-slate-800">
-                      Klik untuk memilih berkas atau seret berkas ke sini
+                      {t('prm.20')}
                     </span>
                     <span className="text-sm text-slate-500 mt-0.5">
                       Format .PDF, .DOC, atau .DOCX, maksimal 15 MB
@@ -381,13 +383,13 @@ function ProposalModalInner({
                       <div className="flex items-center gap-2 shrink-0">
                         <div className="flex items-center gap-1 text-sm font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
                           <CheckCircle2 className="w-3 h-3" />
-                          <span>Siap</span>
+                          <span>{t('prm.21')}</span>
                         </div>
                         <button
                           type="button"
                           onClick={handleRemoveFile}
                           className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition"
-                          title="Hapus berkas"
+                          title={t('prm.22')}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -412,12 +414,12 @@ function ProposalModalInner({
           <div className="p-3.5 bg-slate-50 rounded-lg border border-slate-200 text-sm space-y-1.5">
             <div className="font-bold text-slate-800 flex items-center gap-1.5">
               <FileCheck className="w-4 h-4 text-[#172D46]" />
-              <span>Kepastian hukum dan Escrow</span>
+              <span>{t('prm.23')}</span>
             </div>
             <p className="text-slate-600 leading-relaxed text-sm">
               {contractDocMode === 'UPLOAD_CUSTOM' && uploadedFile
-                ? `Berkas lampiran "${uploadedFile.name}" akan dijadikan dokumen acuan utama dan diikat ke rekening bersama Escrow Midtrans setelah disetujui kedua belah pihak.`
-                : 'Setelah kedua pihak menyepakati harga dan riders, sistem akan menerbitkan draf PKS resmi dan mengunci pembayaran ke dalam buku besar Escrow Rekening Bersama.'}
+                ? `${t('prm.noteAttach')} "${uploadedFile.name}" ${t('prm.noteUpload')}`
+                : t('prm.noteAuto')}
             </p>
           </div>
 
@@ -428,7 +430,7 @@ function ProposalModalInner({
               onClick={onClose}
               className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-lg font-medium transition text-sm"
             >
-              Batal
+              {t('prm.cancel')}
             </button>
             <button
               type="submit"
@@ -436,7 +438,7 @@ function ProposalModalInner({
               className="px-5 min-h-12 text-white rounded-full font-bold transition flex items-center gap-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed bg-brand-navy hover:bg-brand-navy-dark transition-colors"
             >
               <Send className="w-3.5 h-3.5" />
-              <span>{loading ? 'Mengirim...' : 'Kirim Penawaran & Kunci PKS'}</span>
+              <span>{loading ? t('prm.sending') : t('prm.submit')}</span>
             </button>
           </div>
         </form>

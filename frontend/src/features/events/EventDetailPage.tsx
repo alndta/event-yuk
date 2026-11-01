@@ -27,14 +27,17 @@ import { api, ApiError } from '../../lib/api';
 import useGsapReveal from '../../hooks/useGsapReveal';
 import useEnter from '../../hooks/useEnter';
 import Avatar from '../../components/Avatar';
-import { categoryLabels } from '../../components/events/EventCardLive';
+import { useLanguage } from '../../context/LanguageContext';
 
 interface Props {
   events?: EventItem[];
   onOpenProposal: (event: EventItem, roleType: 'VENDOR' | 'TALENT' | 'SPONSOR') => void;
 }
 
+const CATEGORY_KEYS: Record<string, any> = { CONCERT: 'events.concert', PENSI: 'events.pensi', BAZAAR: 'events.bazaar', EXPO: 'events.expo' };
+
 export default function EventDetailPage({ events: propEvents, onOpenProposal }: Props) {
+  const { t } = useLanguage();
   const { id } = useParams();
   const { requireAuth } = useAuth();
   const pageRef = useRef<HTMLDivElement>(null);
@@ -116,26 +119,26 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
       setSubmittingBooth(true);
       try {
         await api(`/events/${event.id}/booths/${selectedBooth.id}/register`, { method: 'POST', body: { brand_name: boothBrandName } });
-        showNotification(`Pendaftaran kaveling ${selectedBooth.booth_code} terkirim dan menunggu kurasi penyelenggara.`);
+        showNotification(`${selectedBooth.booth_code}: ${t('evd.boothOk')}`);
         setSelectedBooth(null);
         setBoothBrandName('');
       } catch (err) {
-        showNotification(err instanceof ApiError ? err.message : 'Pendaftaran booth belum berhasil.');
+        showNotification(err instanceof ApiError ? err.message : t('evd.boothFail'));
       } finally {
         setSubmittingBooth(false);
       }
-    }, 'Silakan masuk ke akun Tenant kamu untuk mendaftar kaveling booth.');
+    }, t('evd.boothLogin'));
   };
 
   const handleApplyShift = (shift: any) => {
     requireAuth(async () => {
       try {
         await api(`/events/${event.id}/shifts/${shift.id}/apply`, { method: 'POST' });
-        showNotification(`Lamaran posisi ${shift.role_title} terkirim ke koordinator.`);
+        showNotification(`${shift.role_title}: ${t('evd.shiftOk')}`);
       } catch (err) {
-        showNotification(err instanceof ApiError ? err.message : 'Lamaran belum berhasil dikirim.');
+        showNotification(err instanceof ApiError ? err.message : t('evd.shiftFail'));
       }
-    }, `Silakan masuk ke akun Kru Lapangan untuk melamar shift ${shift.role_title}.`);
+    }, `${t('evd.shiftLogin')} ${shift.role_title}.`);
   };
 
   const displayBooths = booths;
@@ -165,7 +168,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
         description: event.description || `Informasi acara ${event.title} di ${event.venue}.`,
         organizer: {
           '@type': 'Organization',
-          name: event.organizer?.name || 'Penyelenggara Acara',
+          name: event.organizer?.name || t('evd.fallbackOrg'),
         },
       }
     : undefined;
@@ -175,13 +178,13 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
   }
 
   if (!event) {
-    return <EmptyState title="Acara tidak ditemukan" body="Acara ini mungkin sudah dihapus atau belum dipublikasikan." actionLabel="Lihat semua acara" actionTo="/events" />;
+    return <EmptyState title={t('evd2.01')} body="Acara ini mungkin sudah dihapus atau belum dipublikasikan." actionLabel="Lihat semua acara" actionTo="/events" />;
   }
 
   return (
     <div ref={pageRef} className="space-y-8 pb-12 font-sans sm:space-y-10">
       <SEOHead
-        title={`${event?.title || 'Detail Acara'} — Peluang Kerjasama & Pengadaan | Event Yuk`}
+        title={`${event?.title || t('evd.detail')} — ${t('evd.titleSuffix')}`}
         description={
           event?.description
             ? `${event.description.slice(0, 150)}... Sewa booth, penawaran vendor, dan kru di ${event.venue}.`
@@ -219,20 +222,20 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
             <div className="flex flex-wrap items-center gap-2">
               <span className={'inline-flex min-h-9 items-center gap-2 rounded-full px-3.5 text-sm font-semibold text-white shadow-sm ' + (event.isPortfolio ? 'bg-slate-700' : 'bg-brand-navy')}>
                 <span aria-hidden="true" className={'h-2 w-2 rounded-full ' + (event.isPortfolio ? 'bg-slate-300' : 'bg-emerald-200')} />
-                {event.isPortfolio ? 'Sudah terlaksana' : 'Membuka kolaborasi'}
+                {event.isPortfolio ? t('evd.done') : t('evd.open')}
               </span>
               <span className="inline-flex min-h-9 items-center rounded-full bg-white/95 px-3.5 text-sm font-semibold text-slate-900 shadow-sm">
-                {categoryLabels[event.category]?.label ?? event.category}
+                {CATEGORY_KEYS[event.category] ? t(CATEGORY_KEYS[event.category]) : event.category}
               </span>
             </div>
             <span className="inline-flex min-h-9 items-center gap-2 rounded-full border border-white/30 bg-brand-ink/60 px-3.5 text-sm font-semibold text-white backdrop-blur">
               <ShieldCheck aria-hidden="true" className="h-4 w-4 text-brand-lime" />
-              Pembayaran via Escrow Midtrans
+              {t('evd2.02')}
             </span>
           </div>
 
           <div className="absolute inset-x-5 bottom-6 text-white sm:inset-x-8 sm:bottom-8">
-            <p className="text-sm font-semibold text-brand-lime">Detail acara</p>
+            <p className="text-sm font-semibold text-brand-lime">{t('evd2.03')}</p>
             <h1 id="event-detail-title" className="mt-3 max-w-4xl font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] sm:text-5xl lg:text-6xl">
               {event.title}
             </h1>
@@ -253,7 +256,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                 to="/events"
                 className="inline-flex min-h-11 items-center gap-2 rounded-full border border-white/30 px-4 text-sm font-semibold text-white transition hover:bg-white/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
-                Kembali ke acara
+                {t('evd2.04')}
               </Link>
             </div>
           </div>
@@ -275,8 +278,8 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
               />
               <div>
                 <div className="flex items-center gap-1.5 text-sm font-bold text-slate-900">
-                  <span>{event.organizer?.name || 'Promotor Event Yuk'}</span>
-                  {event.organizer?.verified && <CheckCircle2 aria-label="Organizer terverifikasi" className="h-4 w-4 text-brand-navy" />}
+                  <span>{event.organizer?.name || t('evd.fallbackPromoter')}</span>
+                  {event.organizer?.verified && <CheckCircle2 aria-label={t('evd2.05')} className="h-4 w-4 text-brand-navy" />}
                 </div>
                 <div className="mt-1 text-sm text-slate-500">
                   {event.organizer?.city || 'Jakarta'}{event.organizer?.verified ? ' · Organizer terverifikasi' : ' · Penyelenggara acara'}
@@ -288,12 +291,12 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
               to="/organizers"
               className="inline-flex min-h-10 items-center rounded-full border border-slate-300 px-4 text-sm font-semibold text-slate-700 transition hover:border-brand-navy/40 hover:bg-brand-canvas focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
             >
-              Lihat rekam jejak
+              {t('evd2.06')}
             </Link>
           </div>
 
           {/* Sub Navigation Tabs */}
-          <div role="group" aria-label="Bagian informasi acara" className="flex items-center gap-2 overflow-x-auto border-b border-slate-200 pb-3 text-sm font-semibold">
+          <div role="group" aria-label={t('evd2.07')} className="flex items-center gap-2 overflow-x-auto border-b border-slate-200 pb-3 text-sm font-semibold">
             <button
               onClick={() => setActiveTab('overview')}
               aria-pressed={activeTab === 'overview'}
@@ -301,7 +304,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                 activeTab === 'overview' ? 'bg-brand-navy text-white shadow-sm' : 'text-slate-600 hover:bg-white hover:text-slate-900'
               }`}
             >
-              Ikhtisar dan kebutuhan
+              {t('evd2.08')}
             </button>
             <button
               onClick={() => setActiveTab('booths')}
@@ -310,7 +313,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                 activeTab === 'booths' ? 'bg-brand-navy text-white shadow-sm' : 'text-slate-600 hover:bg-white hover:text-slate-900'
               }`}
             >
-              Denah kaveling booth ({displayBooths.length} unit)
+              {t('evd.tabBooths')} ({displayBooths.length} {t('evd.units')})
             </button>
             <button
               onClick={() => setActiveTab('crew')}
@@ -319,7 +322,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                 activeTab === 'crew' ? 'bg-brand-navy text-white shadow-sm' : 'text-slate-600 hover:bg-white hover:text-slate-900'
               }`}
             >
-              Lowongan kru shift ({displayShifts.length} posisi)
+              {t('evd.tabCrew')} ({displayShifts.length} {t('evd.positions')})
             </button>
             <button
               onClick={() => setActiveTab('sponsorship')}
@@ -328,7 +331,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                 activeTab === 'sponsorship' ? 'bg-brand-navy text-white shadow-sm' : 'text-slate-600 hover:bg-white hover:text-slate-900'
               }`}
             >
-              Paket sponsorship
+              {t('evd2.09')}
             </button>
           </div>
 
@@ -336,35 +339,35 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
           {activeTab === 'overview' && (
             <div data-enter className="space-y-5 rounded-lg bg-white p-6 sm:p-8">
               <div>
-                <p className="text-sm font-semibold text-brand-lime-strong">Tentang acara</p>
-                <h2 className="mt-2 font-display text-2xl font-bold tracking-[-0.025em] text-slate-950">Ikhtisar acara</h2>
+                <p className="text-sm font-semibold text-brand-lime-strong">{t('evd2.10')}</p>
+                <h2 className="mt-2 font-display text-2xl font-bold tracking-[-0.025em] text-slate-950">{t('evd2.11')}</h2>
                 <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">
-                  {event.description || 'Penyelenggara belum menambahkan deskripsi untuk acara ini.'}
+                  {event.description || t('evd.noDesc')}
                 </p>
               </div>
 
               <div className="border-t border-slate-100 pt-5">
-                <h3 className="text-sm font-bold text-slate-900">Jelajahi peluang kolaborasi</h3>
-                <p className="mt-1 text-sm leading-6 text-slate-500">Pilih jalur yang sesuai dengan layanan atau minatmu.</p>
+                <h3 className="text-sm font-bold text-slate-900">{t('evd2.12')}</h3>
+                <p className="mt-1 text-sm leading-6 text-slate-500">{t('evd2.13')}</p>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
                   <button onClick={() => onOpenProposal(event, 'VENDOR')} className="group flex min-h-[84px] items-center gap-3 rounded-lg bg-brand-cream p-4 text-left transition hover:bg-brand-lime-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy">
                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-navy/10 text-brand-navy"><Sliders aria-hidden="true" className="h-5 w-5" /></span>
-                    <span className="min-w-0"><span className="block text-sm font-bold text-slate-900">Layanan vendor</span><span className="mt-1 block text-sm leading-5 text-slate-500">Kirim penawaran kebutuhan produksi</span></span>
+                    <span className="min-w-0"><span className="block text-sm font-bold text-slate-900">{t('evd2.14')}</span><span className="mt-1 block text-sm leading-5 text-slate-500">{t('evd2.15')}</span></span>
                     <ArrowRight aria-hidden="true" className="ml-auto h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-brand-navy" />
                   </button>
                   <button onClick={() => onOpenProposal(event, 'TALENT')} className="group flex min-h-[84px] items-center gap-3 rounded-lg bg-brand-cream p-4 text-left transition hover:bg-brand-lime-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy">
                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-forest/10 text-brand-forest"><Music aria-hidden="true" className="h-5 w-5" /></span>
-                    <span className="min-w-0"><span className="block text-sm font-bold text-slate-900">Talent & performer</span><span className="mt-1 block text-sm leading-5 text-slate-500">Ajukan profil atau proposal tampil</span></span>
+                    <span className="min-w-0"><span className="block text-sm font-bold text-slate-900">{t('evd2.16')}</span><span className="mt-1 block text-sm leading-5 text-slate-500">{t('evd2.17')}</span></span>
                     <ArrowRight aria-hidden="true" className="ml-auto h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-brand-navy" />
                   </button>
                   <button onClick={() => setActiveTab('booths')} className="group flex min-h-[84px] items-center gap-3 rounded-lg bg-brand-cream p-4 text-left transition hover:bg-brand-lime-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy">
                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-lime/15 text-amber-800"><Store aria-hidden="true" className="h-5 w-5" /></span>
-                    <span className="min-w-0"><span className="block text-sm font-bold text-slate-900">Tenant & booth</span><span className="mt-1 block text-sm leading-5 text-slate-500">Lihat kaveling yang tersedia</span></span>
+                    <span className="min-w-0"><span className="block text-sm font-bold text-slate-900">{t('evd2.18')}</span><span className="mt-1 block text-sm leading-5 text-slate-500">{t('evd2.19')}</span></span>
                     <ArrowRight aria-hidden="true" className="ml-auto h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-brand-navy" />
                   </button>
                   <button onClick={() => setActiveTab('crew')} className="group flex min-h-[84px] items-center gap-3 rounded-lg bg-brand-cream p-4 text-left transition hover:bg-brand-lime-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy">
                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-slate-100 text-slate-700"><Users aria-hidden="true" className="h-5 w-5" /></span>
-                    <span className="min-w-0"><span className="block text-sm font-bold text-slate-900">Crew acara</span><span className="mt-1 block text-sm leading-5 text-slate-500">Lihat posisi dan jadwal shift</span></span>
+                    <span className="min-w-0"><span className="block text-sm font-bold text-slate-900">{t('evd2.20')}</span><span className="mt-1 block text-sm leading-5 text-slate-500">{t('evd2.21')}</span></span>
                     <ArrowRight aria-hidden="true" className="ml-auto h-4 w-4 shrink-0 text-slate-400 transition group-hover:translate-x-0.5 group-hover:text-brand-navy" />
                   </button>
                 </div>
@@ -378,10 +381,10 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
               <div className="rounded-lg bg-brand-lime-soft p-5 text-sm">
                 <div className="mb-1 flex items-center gap-2 font-bold text-slate-900">
                   <Store aria-hidden="true" className="h-4 w-4 text-brand-navy" />
-                  <span>Kaveling booth pameran dan bazaar kuliner</span>
+                  <span>{t('evd2.22')}</span>
                 </div>
                 <p className="text-sm leading-6 text-slate-600">
-                  Lihat detail ukuran dan biaya setiap kaveling. Pendaftaran akan diteruskan ke penyelenggara untuk ditinjau.
+                  {t('evd2.23')}
                 </p>
               </div>
 
@@ -394,11 +397,11 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                           {booth.booth_code}
                         </span>
                         <span className={`px-2.5 py-0.5 rounded-full text-sm font-bold ${booth.is_occupied ? 'bg-rose-100 text-rose-700' : 'bg-emerald-100 text-emerald-700'}`}>
-                          {booth.is_occupied ? 'Terisi' : 'Tersedia'}
+                          {booth.is_occupied ? t('evd.taken') : t('evd.available')}
                         </span>
                       </div>
-                      <div className="font-bold text-slate-900 text-sm">Kategori: {booth.booth_category}</div>
-                      <div className="text-sm text-slate-500">Ukuran: {booth.size_dimension || '3x3 meter'}</div>
+                      <div className="font-bold text-slate-900 text-sm">{t('evd.category')} {booth.booth_category}</div>
+                      <div className="text-sm text-slate-500">{t('evd.size')} {booth.size_dimension || '3x3 meter'}</div>
                       <div className="text-base font-extrabold text-slate-900 font-mono mt-2">
                         Rp {Number(booth.rental_price).toLocaleString('id-ID')}
                       </div>
@@ -409,7 +412,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                         onClick={() => setSelectedBooth(booth)}
                           className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-brand-navy px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-navy/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
                       >
-                        Daftar sewa kaveling ini
+                        {t('evd2.24')}
                       </button>
                     )}
                   </div>
@@ -424,10 +427,10 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
               <div className="rounded-lg bg-brand-lime-soft p-5 text-sm">
                 <div className="mb-1 flex items-center gap-2 font-bold text-slate-900">
                   <Briefcase aria-hidden="true" className="h-4 w-4 text-amber-800" />
-                  <span>Lowongan kru shift acara</span>
+                  <span>{t('evd2.25')}</span>
                 </div>
                 <p className="text-sm leading-6 text-slate-600">
-                  Tinjau peran, jadwal, dan honor sebelum mengirim lamaran. Detail berikut mengikuti informasi yang dicantumkan penyelenggara.
+                  {t('evd2.26')}
                 </p>
               </div>
 
@@ -436,14 +439,14 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                   <div key={shift.id} className="flex flex-col justify-between gap-4 rounded-lg bg-white p-5 transition hover:shadow-md sm:flex-row sm:items-center">
                     <div>
                       <div className="flex flex-wrap items-center gap-2 text-sm font-bold text-slate-900">
-                        <span>{shift.role_title === 'LO' ? 'Liaison Officer (LO) Artis' : shift.role_title === 'USHER' ? 'Usher & Tiketing Pintu Masuk' : shift.role_title === 'STAGEHAND' ? 'Stagehand & Kru Lapangan' : shift.role_title}</span>
+                        <span>{shift.role_title === 'LO' ? t('evd.loRole') : shift.role_title === 'USHER' ? t('evd.usherRole') : shift.role_title === 'STAGEHAND' ? t('evd.stageRole') : shift.role_title}</span>
                         <span className="rounded-full bg-brand-lime/20 px-2.5 py-1 text-sm font-semibold text-amber-900">
                           {shift.role_title}
                         </span>
                       </div>
                       <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-slate-500">
-                        <span className="flex items-center gap-1.5"><Clock aria-hidden="true" className="h-3.5 w-3.5" /> Shift acara: {shift.shift_date}</span>
-                        <span className="flex items-center gap-1.5"><Users aria-hidden="true" className="h-3.5 w-3.5" /> Kuota: {shift.headcount_req} personil</span>
+                        <span className="flex items-center gap-1.5"><Clock aria-hidden="true" className="h-3.5 w-3.5" /> {t('evd.shiftDate')} {shift.shift_date}</span>
+                        <span className="flex items-center gap-1.5"><Users aria-hidden="true" className="h-3.5 w-3.5" /> {t('evd.quota')} {shift.headcount_req} {t('evd.people')}</span>
                       </div>
                       <div className="mt-3 text-sm font-bold text-slate-900">
                         Honor <span className="font-display">Rp {Number(shift.rate_per_shift).toLocaleString('id-ID')}</span><span className="font-normal text-slate-500"> / shift</span>
@@ -454,7 +457,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                       onClick={() => handleApplyShift(shift)}
                       className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-brand-ink px-5 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
                     >
-                      Lamar shift ini
+                      {t('evd2.28')}
                     </button>
                   </div>
                 ))}
@@ -467,11 +470,11 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
             <div data-enter className="space-y-4">
               <div data-gsap-reveal className="rounded-lg bg-white p-6 sm:p-8">
                 <span className="inline-flex items-center gap-2 rounded-full bg-brand-navy/10 px-3 py-1.5 text-sm font-semibold text-brand-navy">
-                  <Building2 aria-hidden="true" className="h-4 w-4" /> Kemitraan brand
+                  <Building2 aria-hidden="true" className="h-4 w-4" /> {t('evd.brand')}
                 </span>
-                <h2 className="mt-4 font-display text-2xl font-bold tracking-[-0.025em] text-slate-950">Diskusikan sponsorship acara</h2>
+                <h2 className="mt-4 font-display text-2xl font-bold tracking-[-0.025em] text-slate-950">{t('evd2.29')}</h2>
                 <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-600">
-                  Informasi paket belum dicantumkan. Kirim proposal untuk membahas kebutuhan brand, bentuk eksposur, dan ruang lingkup kemitraan langsung dengan penyelenggara.
+                  {t('evd2.30')}
                 </p>
                 <button
                   onClick={() => onOpenProposal(event, 'SPONSOR')}
@@ -488,11 +491,11 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
         <div className="space-y-4 lg:sticky lg:top-24 lg:self-start">
           <div data-gsap-reveal className="space-y-4 rounded-lg bg-white p-6">
             <div>
-              <p className="text-sm font-semibold text-brand-lime-strong">Peluang kolaborasi</p>
-              <h2 className="mt-2 font-display text-xl font-bold tracking-[-0.02em] text-slate-950">Terlibat di acara ini</h2>
+              <p className="text-sm font-semibold text-brand-lime-strong">{t('evd2.31')}</p>
+              <h2 className="mt-2 font-display text-xl font-bold tracking-[-0.02em] text-slate-950">{t('evd2.32')}</h2>
             </div>
             <p className="text-sm leading-6 text-slate-600">
-              Pilih jenis kolaborasi untuk mengirim penawaran atau melihat detail peluang yang tersedia.
+              {t('evd2.33')}
             </p>
 
             <button
@@ -501,7 +504,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
             >
               <div className="flex items-center gap-2">
                 <Sliders aria-hidden="true" className="h-4 w-4 shrink-0" />
-                <span>Ajukan penawaran vendor</span>
+                <span>{t('evd2.34')}</span>
               </div>
               <ArrowRight aria-hidden="true" className="h-4 w-4 shrink-0" />
             </button>
@@ -512,7 +515,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
             >
               <div className="flex items-center gap-2">
                 <Music aria-hidden="true" className="h-4 w-4 shrink-0 text-brand-forest" />
-                <span>Ajukan proposal talent</span>
+                <span>{t('evd2.35')}</span>
               </div>
               <ArrowRight aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-400" />
             </button>
@@ -523,7 +526,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
             >
               <div className="flex items-center gap-2">
                 <Store aria-hidden="true" className="h-4 w-4 shrink-0 text-brand-navy" />
-                <span>Lihat kaveling booth</span>
+                <span>{t('evd2.36')}</span>
               </div>
               <ArrowRight aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-400" />
             </button>
@@ -534,7 +537,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
             >
               <div className="flex items-center gap-2">
                 <Users aria-hidden="true" className="h-4 w-4 shrink-0 text-amber-800" />
-                <span>Lihat posisi crew</span>
+                <span>{t('evd2.37')}</span>
               </div>
               <ArrowRight aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-400" />
             </button>
@@ -544,7 +547,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
       {/* Modal Booth Registration */}
       {selectedBooth && (
-        <Dialog onClose={() => setSelectedBooth(null)} label="Daftar booth">
+        <Dialog onClose={() => setSelectedBooth(null)} label={t('evd2.38')}>
           <div role="dialog" aria-modal="true" aria-labelledby="booth-dialog-title" className="w-full max-w-md rounded-lg bg-white p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-4">
               <h2 id="booth-dialog-title" className="font-display text-lg font-bold tracking-[-0.02em] text-slate-950">
@@ -552,7 +555,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
               </h2>
               <button
                 onClick={() => setSelectedBooth(null)}
-                aria-label="Tutup dialog pendaftaran"
+                aria-label={t('evd2.39')}
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full text-slate-500 transition hover:bg-slate-100 hover:text-slate-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
               >
                 <X aria-hidden="true" className="h-5 w-5" />
@@ -562,13 +565,13 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
             <form onSubmit={handleRegisterBooth} className="space-y-4">
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-1">
-                  Nama brand atau usaha tenant
+                  {t('evd2.40')}
                 </label>
                 <input
                   type="text"
                   required
                     autoFocus
-                  placeholder="Misal: Kopi Kenangan / Sambal Nusantara"
+                  placeholder={t('evd2.41')}
                   value={boothBrandName}
                   onChange={(e) => setBoothBrandName(e.target.value)}
                   className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/20"
@@ -577,15 +580,15 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
 
               <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-sm space-y-1">
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Kategori Booth:</span>
+                  <span className="text-slate-500">{t('evd2.42')}</span>
                   <span className="font-bold text-slate-900">{selectedBooth.booth_category}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-500">Ukuran Kaveling:</span>
+                  <span className="text-slate-500">{t('evd2.43')}</span>
                   <span className="font-bold text-slate-900">{selectedBooth.size_dimension || '3x3m'}</span>
                 </div>
                 <div className="flex justify-between pt-1 border-t border-slate-200">
-                  <span className="text-slate-700 font-bold">Biaya Sewa:</span>
+                  <span className="text-slate-700 font-bold">{t('evd2.44')}</span>
                   <span className="font-extrabold text-slate-900 font-mono">
                     Rp {Number(selectedBooth.rental_price).toLocaleString('id-ID')}
                   </span>
@@ -605,7 +608,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                   disabled={submittingBooth}
                   className="min-h-11 flex-1 rounded-full bg-brand-navy px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-navy-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {submittingBooth ? 'Mengirim...' : 'Kirim Pendaftaran'}
+                  {submittingBooth ? t('evd.sending') : t('evd.sendReg')}
                 </button>
               </div>
             </form>

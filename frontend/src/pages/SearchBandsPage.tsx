@@ -66,8 +66,8 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
   return (
     <div ref={pageRef} className="space-y-6 sm:space-y-8 font-sans">
       <SEOHead
-        title="Direktori Band, Musisi Panggung & Manajemen Artis | Event Yuk"
-        description="Booking band indie, pop, jazz, dan musisi tamu profesional untuk konser dan pensi sekolah. Transparansi rate card honor manggung, kepastian riders teknis & konsumsi, bergaransi rekening bersama Escrow."
+        title={t('bands.seoTitle')}
+        description={t('bands.seoDesc')}
         keywords="booking band pensi, artis konser musik, rate card band festival, technical riders artis, sewa musisi jakarta"
         canonicalPath="/bands"
       />
@@ -76,13 +76,13 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
       <div className="max-w-3xl">
         <p className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-brand-lime-strong">
           <Music aria-hidden="true" className="h-4 w-4" />
-          Direktori band, artis, dan musisi festival
+          {t('bands.eyebrow')}
         </p>
         <h1 key={language} data-split-title className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
           {t('bands.title')}
         </h1>
         <p className="mt-4 text-lg leading-8 text-slate-700">
-          Lihat portofolio band indie, pop, jazz, dan musisi tamu lengkap dengan rate card honor, ringkasan technical rider, dan kontrak digital PKS.
+          {t('bands.lead')}
         </p>
 
         {/* Search Input */}
@@ -105,7 +105,7 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
         <div className="flex items-center gap-2 overflow-x-auto">
           <Filter aria-hidden="true" className="mr-1 h-4 w-4 shrink-0 text-slate-600" />
           {[
-            { id: 'ALL', label: 'Semua genre' },
+            { id: 'ALL', label: t('bands.all') },
             { id: 'Indie Rock', label: 'Indie Rock' },
             { id: 'Soul & Jazz', label: 'Soul & Jazz' },
             { id: 'Pop Folk', label: 'Pop Folk' },
@@ -136,7 +136,7 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
             className="min-h-11 rounded-full border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-800 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
           >
             <option value="ALL">{t('common.allCities')}</option>
-            <option value="Jakarta">Jakarta</option>
+            <option value="Jakarta">{t('city.jakarta')}</option>
             <option value="Bandung">Bandung</option>
             <option value="Yogyakarta">Yogyakarta</option>
           </select>
@@ -202,11 +202,11 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
               {/* Rate Card Box */}
               <div className="mt-5 flex items-center justify-between gap-3 rounded-lg bg-brand-cream p-4">
                 <div>
-                  <div className="text-sm text-slate-700">Perkiraan honor manggung (rate card)</div>
+                  <div className="text-sm text-slate-700">{t('bands.fee')}</div>
                   <div className="mt-0.5 font-display text-lg font-extrabold tracking-[-0.02em] text-brand-ink">{band.priceRange}</div>
                 </div>
                 <span className="shrink-0 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-brand-forest-dark">
-                  Escrow termin
+                  {t('bands.escrow')}
                 </span>
               </div>
 
@@ -214,7 +214,7 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
               <div className="mt-4 space-y-2">
                 <div className="flex items-center gap-2 text-sm font-semibold text-slate-800">
                   <FileText aria-hidden="true" className="h-4 w-4 text-slate-600" />
-                  <span>Ringkasan technical dan hospitality rider</span>
+                  <span>{t('bands.riders')}</span>
                 </div>
                 <ul className="space-y-1.5 border-l-2 border-brand-navy/20 pl-4">
                   {band.specsOrRiders.map((item, idx) => (
@@ -237,13 +237,13 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
             {/* Bottom Action Footer */}
             <div className="flex flex-col gap-3 border-t border-slate-200 p-5 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-sm text-slate-600">
-                PKS digital dengan termin DP 50:50 atau 70:30
+                {t('bands.terms')}
               </span>
               <Link
                 to={`/bands/${band.id}`}
                 className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-brand-navy px-5 text-sm font-semibold text-white transition-colors hover:bg-brand-navy-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy"
               >
-                <span>Lihat rider dan ajukan</span>
+                <span>{t('bands.view')}</span>
                 <ArrowRight aria-hidden="true" className="h-4 w-4" />
               </Link>
             </div>

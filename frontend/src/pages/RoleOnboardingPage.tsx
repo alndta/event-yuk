@@ -19,22 +19,19 @@ import {
   LogOut,
   ArrowLeft,
 } from 'lucide-react';
-import { UserRole } from '../components/RoleOnboardingModal';
+import { UserRole } from '../types/models';
 import { useAuth } from '../context/AuthContext';
 import { SEOHead } from '../components/SEOHead';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function RoleOnboardingPage() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { user, setAccountRole, logout } = useAuth();
 
-  // If user already has an active permanent role, redirect directly to their dashboard
-  if (user && user.activeRole) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
   const [selectedRole, setSelectedRole] = useState<UserRole>('VENDOR');
   const [businessName, setBusinessName] = useState(user?.fullName || '');
-  const [cityRegion, setCityRegion] = useState('Jakarta Selatan');
+  const [cityRegion, setCityRegion] = useState('');
   const [category, setCategory] = useState('');
   const [phoneWa, setPhoneWa] = useState(user?.phoneWa || '');
   const [bioDescription, setBioDescription] = useState('');
@@ -45,84 +42,89 @@ export default function RoleOnboardingPage() {
   const roleDefinitions = [
     {
       id: 'VENDOR' as UserRole,
-      title: 'Vendor produksi dan peralatan',
-      badge: 'Penyedia alat konser',
+      title: t('onb.VENDOR.title'),
+      badge: t('onb.VENDOR.badge'),
       icon: Sliders,
       color: 'bg-brand-lime-soft text-brand-navy border-brand-navy/15',
       activeColor: 'ring-2 ring-brand-navy bg-brand-lime-soft border-brand-navy',
-      desc: 'Penyedia Sound System, Tata Lampu, LED Screen, Stage Rigging, dan Genset.',
-      catalogTitle: 'Katalog alat produksi',
-      placeholderCategory: 'Contoh: Line Array & Lighting Moving Beam',
-      nameLabel: 'Nama usaha atau rental produksi',
+      desc: t('onb.VENDOR.desc'),
+      catalogTitle: t('onb.VENDOR.catalog'),
+      placeholderCategory: t('onb.VENDOR.ph'),
+      nameLabel: t('onb.VENDOR.name'),
     },
     {
       id: 'TALENT' as UserRole,
-      title: 'Musisi dan manajemen band',
-      badge: 'Artis dan guest star',
+      title: t('onb.TALENT.title'),
+      badge: t('onb.TALENT.badge'),
       icon: Music,
       color: 'bg-brand-lime-soft text-brand-navy border-brand-navy/15',
       activeColor: 'ring-2 ring-brand-navy bg-brand-lime-soft border-brand-navy',
-      desc: 'Band indie, musisi solois, DJ, MC, dan manajemen talenta pertunjukan live.',
-      catalogTitle: 'Rate card dan rider manggung',
-      placeholderCategory: 'Contoh: Indie Pop / Pop Rock 5 Personel',
-      nameLabel: 'Nama band atau artis panggung',
+      desc: t('onb.TALENT.desc'),
+      catalogTitle: t('onb.TALENT.catalog'),
+      placeholderCategory: t('onb.TALENT.ph'),
+      nameLabel: t('onb.TALENT.name'),
     },
     {
       id: 'TENANT' as UserRole,
-      title: 'Tenant kuliner dan pameran',
-      badge: 'Penyewa kaveling bazaar',
+      title: t('onb.TENANT.title'),
+      badge: t('onb.TENANT.badge'),
       icon: Store,
       color: 'bg-brand-lime-soft text-brand-navy border-brand-navy/15',
       activeColor: 'ring-2 ring-brand-navy bg-brand-lime-soft border-brand-navy',
-      desc: 'Brand F&B, UMKM kuliner, merchandise musik, dan retail kreatif di arena bazaar.',
-      catalogTitle: 'Menu dan produk bazaar',
-      placeholderCategory: 'Contoh: Artisan Coffee & Korean Street Food',
-      nameLabel: 'Nama brand atau merek tenant',
+      desc: t('onb.TENANT.desc'),
+      catalogTitle: t('onb.TENANT.catalog'),
+      placeholderCategory: t('onb.TENANT.ph'),
+      nameLabel: t('onb.TENANT.name'),
     },
     {
       id: 'EO' as UserRole,
-      title: 'Event organizer dan promotor',
-      badge: 'Penyelenggara acara',
+      title: t('onb.EO.title'),
+      badge: t('onb.EO.badge'),
       icon: Calendar,
       color: 'bg-brand-lime-soft text-brand-navy border-brand-navy/15',
       activeColor: 'ring-2 ring-brand-navy bg-brand-lime-soft border-brand-navy',
-      desc: 'Promotor musik, panitia pensi kampus/sekolah, dan pengelola festival.',
-      catalogTitle: 'Proyek acara dan pengadaan',
-      placeholderCategory: 'Contoh: Festival Musik Tahunan & Pensi Sekolah',
-      nameLabel: 'Nama organizer atau lembaga promotor',
+      desc: t('onb.EO.desc'),
+      catalogTitle: t('onb.EO.catalog'),
+      placeholderCategory: t('onb.EO.ph'),
+      nameLabel: t('onb.EO.name'),
     },
     {
       id: 'SPONSOR' as UserRole,
-      title: 'Sponsor brand dan korporasi',
-      badge: 'Brand partner dan agensi',
+      title: t('onb.SPONSOR.title'),
+      badge: t('onb.SPONSOR.badge'),
       icon: Building2,
       color: 'bg-brand-lime-soft text-brand-navy border-brand-navy/15',
       activeColor: 'ring-2 ring-brand-navy bg-brand-lime-soft border-brand-navy',
-      desc: 'Brand manager, media planner, dan korporasi penyedia dana sponsorship.',
-      catalogTitle: 'Paket sponsorship dan stan',
-      placeholderCategory: 'Contoh: FMCG / Telekomunikasi / Fintech',
-      nameLabel: 'Nama perusahaan atau brand sponsor',
+      desc: t('onb.SPONSOR.desc'),
+      catalogTitle: t('onb.SPONSOR.catalog'),
+      placeholderCategory: t('onb.SPONSOR.ph'),
+      nameLabel: t('onb.SPONSOR.name'),
     },
     {
       id: 'CREW' as UserRole,
-      title: 'Kru harian acara',
-      badge: 'Tenaga kerja lapangan',
+      title: t('onb.CREW.title'),
+      badge: t('onb.CREW.badge'),
       icon: Users,
       color: 'bg-brand-lime-soft text-brand-navy border-brand-navy/15',
       activeColor: 'ring-2 ring-brand-navy bg-brand-lime-soft border-brand-navy',
-      desc: 'Liaison Officer (LO), stagehand, ticket gate crew, dan logistik lapangan.',
-      catalogTitle: 'Kualifikasi shift dan honor',
-      placeholderCategory: 'Contoh: Hospitality LO Artis & Sound Assistant',
-      nameLabel: 'Nama lengkap kru lapangan',
+      desc: t('onb.CREW.desc'),
+      catalogTitle: t('onb.CREW.catalog'),
+      placeholderCategory: t('onb.CREW.ph'),
+      nameLabel: t('onb.CREW.name'),
     },
   ];
 
   const activeDef = roleDefinitions.find((r) => r.id === selectedRole)!;
 
+  // Hooks above must always run, so the redirect for accounts that already have a role sits after them.
+  if (user && user.activeRole) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   const handleSubmitRole = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!agreeTerms) {
-      setErrorMessage('Kamu wajib menyetujui ketentuan peran permanen 1 akun.');
+      setErrorMessage(t('onb.agreeErr'));
       return;
     }
 
@@ -143,15 +145,15 @@ export default function RoleOnboardingPage() {
     if (result.success) {
       navigate('/dashboard', { replace: true });
     } else {
-      setErrorMessage(result.error || 'Gagal menyimpan profil peran akun.');
+      setErrorMessage(result.error || t('onb.saveFail'));
     }
   };
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans pb-16 sm:pb-24">
       <SEOHead
-        title="Aktivasi Peran Akun Permanen | Event Yuk"
-        description="Lengkapi dan tentukan 1 peran tetap kamu di ekosistem kolaborasi Event Yuk."
+        title={t('onb.01')}
+        description={t('onb.02')}
         noIndex={true}
       />
       {/* 1. Dedicated Top Navigation Bar */}
@@ -160,7 +162,7 @@ export default function RoleOnboardingPage() {
           <Link to="/" className="flex items-center gap-2.5 shrink-0 group">
             <img
               src="/logo-event-yuk.png"
-              alt="Event Yuk Logo"
+              alt={t('onb.03')}
               className="h-8 sm:h-9 w-auto object-contain rounded-lg group-hover:scale-105 transition-transform"
             />
             <div className="flex flex-col">
@@ -168,7 +170,7 @@ export default function RoleOnboardingPage() {
                 Event Yuk
               </span>
               <span className="text-sm font-medium text-slate-400 mt-0.5 leading-none">
-                Onboarding Peran
+                {t('onb.eyebrow')}
               </span>
             </div>
           </Link>
@@ -179,16 +181,16 @@ export default function RoleOnboardingPage() {
               className="hidden sm:inline-flex items-center gap-1.5 text-sm font-bold text-slate-600 hover:text-[#172D46] transition px-3 py-1.5 rounded-lg hover:bg-slate-100"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Kembali ke Beranda</span>
+              <span>{t('onb.04')}</span>
             </Link>
 
             <button
               onClick={logout}
               className="text-sm font-bold text-slate-500 hover:text-rose-600 transition flex items-center gap-1.5 px-3 py-1.5 rounded-lg hover:bg-rose-50 border border-slate-200 hover:border-rose-200"
-              title="Keluar dari akun ini"
+              title={t('onb.05')}
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">Keluar Akun</span>
+              <span className="hidden md:inline">{t('onb.06')}</span>
             </button>
           </div>
         </div>
@@ -203,22 +205,22 @@ export default function RoleOnboardingPage() {
           <div className="relative z-10 space-y-3 sm:space-y-4">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-lime text-brand-navy text-sm font-semibold">
               <ShieldCheck aria-hidden="true" className="w-4 h-4" />
-              <span>Aktivasi ruang kerja akun</span>
+              <span>{t('onb.07')}</span>
             </div>
 
             <h1 className="font-display text-4xl sm:text-5xl font-extrabold tracking-[-0.04em] leading-[1.02]">
-              Pilih peran utama akunmu
+              {t('onb.08')}
             </h1>
 
             <p className="text-base sm:text-lg text-slate-200 max-w-2xl leading-8">
-              Halo, <strong className="text-white">{user?.fullName || 'Sobat Event'}</strong>. Setiap akun Event Yuk punya <strong className="text-white">satu peran tetap</strong>. Itu yang menjaga keabsahan kontrak kerja sama (PKS), keamanan dompet Escrow, dan rekam jejak reputasi bisnismu.
+              {t('onb.hello')} <strong className="text-white">{user?.fullName || t('onb.friend')}</strong>. {t('onb.helloTail1')} <strong className="text-white">{t('onb.fixedStrong')}</strong>. {t('onb.helloTail2')}
             </p>
 
             {/* 1 Account = 1 Role Callout */}
             <div className="mt-4 p-4 sm:p-5 rounded-lg bg-brand-navy-dark flex items-start gap-3.5 text-base text-slate-100">
               <AlertTriangle aria-hidden="true" className="w-5 h-5 text-brand-lime shrink-0 mt-0.5" />
               <div className="leading-7">
-                <strong className="text-brand-lime">Satu akun, satu peran tetap.</strong> Setelah dikonfirmasi, peran ini tidak bisa diubah ke kategori lain. Kamu langsung mendapat dashboard khusus untuk mengunggah katalog dan bertransaksi lewat PKS yang sah.
+                <strong className="text-brand-lime">{t('onb.calloutStrong')}</strong> {t('onb.calloutBody')}
               </div>
             </div>
           </div>
@@ -231,10 +233,10 @@ export default function RoleOnboardingPage() {
               <span className="w-7 h-7 rounded-lg bg-[#172D46] text-white text-sm font-extrabold flex items-center justify-center shrink-0">
                 1
               </span>
-              <span>Pilih satu peran yang cocok dengan bisnismu</span>
+              <span>{t('onb.09')}</span>
             </h2>
             <span className="text-sm text-slate-500 font-medium pl-9 sm:pl-0">
-              Klik satu kartu untuk memilih
+              {t('onb.10')}
             </span>
           </div>
 
@@ -261,7 +263,7 @@ export default function RoleOnboardingPage() {
                       {isSelected ? (
                         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-brand-navy text-white text-sm font-semibold">
                           <CheckCircle2 aria-hidden="true" className="w-4 h-4 text-brand-lime" />
-                          <span>Terpilih</span>
+                          <span>{t('onb.11')}</span>
                         </span>
                       ) : (
                         <span className="w-5 h-5 rounded-full border border-slate-300 bg-white" />
@@ -282,7 +284,7 @@ export default function RoleOnboardingPage() {
                   </div>
 
                   <div className="mt-5 pt-3.5 border-t border-slate-100 flex items-center justify-between text-sm font-bold">
-                    <span className="text-slate-600">Dashboard:</span>
+                    <span className="text-slate-600">{t('onb.12')}</span>
                     <span className="text-brand-ink text-right">
                       {role.catalogTitle}
                     </span>
@@ -306,11 +308,11 @@ export default function RoleOnboardingPage() {
                   2
                 </span>
                 <h2 className="font-display text-2xl font-extrabold tracking-[-0.03em] text-brand-ink">
-                  Lengkapi profil dan identitas usaha: {activeDef.title}
+                  {t('onb.step2')} {activeDef.title}
                 </h2>
               </div>
               <p className="text-sm sm:text-sm text-slate-500 leading-relaxed pl-9">
-                Data identitas ini akan dicantumkan secara resmi di lembar dokumen PKS digital dan ditampilkan pada profil publik direktori Event Yuk.
+                {t('onb.13')}
               </p>
             </div>
 
@@ -335,7 +337,7 @@ export default function RoleOnboardingPage() {
                   required
                   value={businessName}
                   onChange={(e) => setBusinessName(e.target.value)}
-                  placeholder="Masukkan nama resmi usaha / rental / band / lembaga promotor kamu"
+                  placeholder={t('onb.14')}
                   className="w-full px-4 py-3 sm:py-3.5 rounded-lg sm:rounded-lg border border-slate-300 text-sm sm:text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-[#172D46] focus:border-transparent focus:outline-none transition"
                 />
               </div>
@@ -344,14 +346,14 @@ export default function RoleOnboardingPage() {
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
                   <MapPin className="w-3.5 h-3.5 text-[#456B39]" />
-                  <span>Kota domisili operasional *</span>
+                  <span>{t('onb.15')}</span>
                 </label>
                 <input
                   type="text"
                   required
                   value={cityRegion}
                   onChange={(e) => setCityRegion(e.target.value)}
-                  placeholder="Contoh: Jakarta Selatan, Bandung, Surabaya"
+                  placeholder={t('onb.16')}
                   className="w-full px-4 py-3 sm:py-3.5 rounded-lg sm:rounded-lg border border-slate-300 text-sm sm:text-sm font-semibold text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-[#172D46] focus:border-transparent focus:outline-none transition"
                 />
               </div>
@@ -360,7 +362,7 @@ export default function RoleOnboardingPage() {
               <div className="space-y-2">
                 <label className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
                   <Phone className="w-3.5 h-3.5 text-slate-600" />
-                  <span>Nomor WhatsApp aktif *</span>
+                  <span>{t('onb.17')}</span>
                 </label>
                 <input
                   type="tel"
@@ -376,7 +378,7 @@ export default function RoleOnboardingPage() {
               <div className="space-y-2 sm:col-span-2">
                 <label className="text-sm font-semibold text-slate-800 flex items-center gap-1.5">
                   <FileText className="w-3.5 h-3.5 text-slate-600" />
-                  <span>Kategori layanan atau dagangan</span>
+                  <span>{t('onb.18')}</span>
                 </label>
                 <input
                   type="text"
@@ -390,13 +392,13 @@ export default function RoleOnboardingPage() {
               {/* Bio / Description */}
               <div className="space-y-2 sm:col-span-2">
                 <label className="text-sm font-semibold text-slate-800">
-                  Deskripsi singkat dan rekam jejak
+                  {t('onb.19')}
                 </label>
                 <textarea
                   rows={3}
                   value={bioDescription}
                   onChange={(e) => setBioDescription(e.target.value)}
-                  placeholder="Tuliskan pengalaman, portofolio acara sebelumnya, atau keunggulan layanan yang kamu sediakan..."
+                  placeholder={t('onb.20')}
                   className="w-full px-4 py-3 sm:py-3.5 rounded-lg sm:rounded-lg border border-slate-300 text-sm sm:text-sm font-medium text-slate-800 placeholder:text-slate-400 focus:ring-2 focus:ring-[#172D46] focus:border-transparent focus:outline-none transition resize-none"
                 />
               </div>
@@ -411,7 +413,7 @@ export default function RoleOnboardingPage() {
                 className="w-4 h-4 rounded border-slate-300 text-[#172D46] focus:ring-[#172D46] mt-0.5 shrink-0"
               />
               <span className="text-sm text-slate-600 leading-relaxed font-medium">
-                Saya mengonfirmasi bahwa <strong className="text-slate-900">{activeDef.title}</strong> adalah peran tetap akun ini. Saya memahami bahwa 1 akun hanya dapat memiliki 1 peran dan tidak dapat dipindahkan setelah formulir aktivasi ini diserahkan.
+                {t('onb.agree1')} <strong className="text-slate-900">{activeDef.title}</strong> {t('onb.agree2')}
               </span>
             </label>
 
@@ -421,7 +423,7 @@ export default function RoleOnboardingPage() {
                 to="/"
                 className="text-sm font-bold text-slate-500 hover:text-slate-900 transition text-center sm:text-left order-2 sm:order-1"
               >
-                Nanti saja, jelajahi sebagai pengunjung
+                {t('onb.21')}
               </Link>
 
               <button
@@ -432,11 +434,11 @@ export default function RoleOnboardingPage() {
                 {loading ? (
                   <>
                     <RotateCw className="w-4 h-4 animate-spin" />
-                    <span>Mengaktifkan peran...</span>
+                    <span>{t('onb.22')}</span>
                   </>
                 ) : (
                   <>
-                    <span>Aktifkan peran dan masuk ke dashboard</span>
+                    <span>{t('onb.23')}</span>
                     <ArrowRight className="w-4 h-4" />
                   </>
                 )}

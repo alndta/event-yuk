@@ -17,6 +17,7 @@ export interface EventItem {
   description: string;
   bannerImage: string;
   isPortfolio: boolean;
+  sponsorshipPackages?: { id: string; tier: string; name: string; price: number; boothSize: string | null; benefits: string[]; slotsLeft: number }[];
   // Khusus Live In Making
   progress?: {
     stage: string;
@@ -67,3 +68,5 @@ export interface OrganizerItem {
   phone: string;
   pastHighlightEvents: string[];
 }
+
+export type UserRole = 'EO' | 'VENDOR' | 'TALENT' | 'TENANT' | 'SPONSOR' | 'CREW';

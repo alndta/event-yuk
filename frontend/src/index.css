@@ -268,3 +268,5 @@
 .dark [class*="text-brand-ink/"],
 .dark [class*="text-slate-900/"],
 .dark [class*="text-slate-700/"] { color: var(--d-text-2); }
+.dark [class*="bg-white/9"],
+.dark [class*="bg-white/8"] { background-color: rgba(20, 33, 47, 0.92); }

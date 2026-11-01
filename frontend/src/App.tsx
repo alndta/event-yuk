@@ -22,7 +22,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
 // Modals
-import { UserRole } from './components/RoleOnboardingModal';
+import { UserRole } from './types/models';
 import CreateEventModal from './components/CreateEventModal';
 import UploadPortfolioModal from './components/UploadPortfolioModal';
 import ProposalModal from './components/ProposalModal';
@@ -77,6 +77,9 @@ function AppContent() {
       gsap.set(el, { clearProps: 'transform,opacity,visibility' });
     };
   }, [location.pathname]);
+  // Workspace pages (signed-in tools) have no footer; it stays on public pages.
+  const WORKSPACE_PATHS = ['/dashboard', '/profile', '/contracts', '/admin/kyc'];
+  const isWorkspacePage = WORKSPACE_PATHS.some((p) => location.pathname === p || location.pathname.startsWith(p + '/'));
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/onboarding-role';
 
   const {
@@ -126,13 +129,13 @@ function AppContent() {
   const handleOpenCreateEventGuarded = () => {
     requireAuth(() => {
       setIsCreateEventModalOpen(true);
-    }, 'Yuk, masuk ke akun Event Organizer kamu untuk mempublikasikan proyek acara baru.');
+    }, t('app.needCreate'));
   };
 
   const handleOpenUploadPortfolioGuarded = () => {
     requireAuth(() => {
       setIsUploadPortfolioModalOpen(true);
-    }, 'Yuk, masuk ke akun Event Organizer kamu untuk menambahkan rekam jejak portofolio.');
+    }, t('app.needPortfolio'));
   };
 
   const handleEventAction = (action: string, ev: EventItem) => {
@@ -142,17 +145,17 @@ function AppContent() {
         setProposalTargetPartner(null);
         setProposalMode('PARTNER_TO_EO');
         setIsProposalModalOpen(true);
-      }, `Tertarik mengajukan penawaran terbaikmu untuk ${ev.title}? Masuk dulu agar proposalmu langsung sampai ke pihak EO.`);
+      }, `${t('app.needOffer')} ${ev.title}? ${t('app.needOfferTail')}`);
     } else if (action === 'booth') {
       requireAuth(() => {
         navigate(`/events/${ev.id}`);
-        showToast(`Pendaftaran Kaveling Booth dibuka untuk: ${ev.title}`);
-      }, `Tertarik buka booth di ${ev.title}? Yuk masuk ke akun Tenant kamu untuk memilih denah kaveling!`);
+        showToast(`${t('app.toastBooth')} ${ev.title}`);
+      }, `${t('app.needBooth')} ${ev.title}? ${t('app.needBoothTail')}`);
     } else if (action === 'crew') {
       requireAuth(() => {
         navigate(`/events/${ev.id}`);
-        showToast(`Papan lowongan shift kru dibuka untuk: ${ev.title}`);
-      }, `Siap terjun ke lapangan di ${ev.title}? Masuk ke akun Kru kamu untuk memilih shift dan mengunci jadwal kerja!`);
+        showToast(`${t('app.toastCrew')} ${ev.title}`);
+      }, `${t('app.needCrew')} ${ev.title}? ${t('app.needCrewTail')}`);
     }
   };
 
@@ -162,7 +165,7 @@ function AppContent() {
       setProposalTargetPartner(partner);
       setProposalMode('EO_TO_PARTNER');
       setIsProposalModalOpen(true);
-    }, `Ingin mengajak ${partner.name} berkolaborasi? Yuk masuk sebagai Event Organizer untuk mengirim undangan resmi.`);
+    }, `${t('app.needInvite')} ${partner.name} ${t('app.needInviteTail')}`);
   };
 
   const handleViewEventDetails = (ev: EventItem) => {
@@ -170,7 +173,7 @@ function AppContent() {
   };
 
   const handleProposalSubmitted = () => {
-    showToast('Penawaran terkirim. Pantau jawabannya di halaman Kontrak.');
+    showToast(t('app.toastSent'));
     navigate('/contracts');
   };
 
@@ -236,7 +239,7 @@ function AppContent() {
                     setProposalTargetPartner(null);
                     setProposalMode('PARTNER_TO_EO');
                     setIsProposalModalOpen(true);
-                  }, `Silakan masuk untuk mengajukan penawaran ke acara ${ev.title}.`);
+                  }, `${t('app.needOfferEvent')} ${ev.title}.`);
                 }}
               />
             }
@@ -247,8 +250,8 @@ function AppContent() {
               <SearchOrganizersPage
                 onInviteOrganizer={(eo) => {
                   requireAuth(() => {
-                    showToast(`Mengirim ajakan kolaborasi ke promotor: ${eo.name}`);
-                  }, `Silakan masuk untuk mengajak kolaborasi promotor ${eo.name}.`);
+                    showToast(`${t('app.toastInvite')} ${eo.name}`);
+                  }, `${t('app.needInviteEo')} ${eo.name}.`);
                 }}
               />
             }
@@ -287,15 +290,15 @@ function AppContent() {
                         receiver_id: event.organizerId,
                         proposal_type: 'SPONSOR',
                         direction: 'PARTNER_TO_EO',
-                        title: `Proposal sponsorship ${tier} - ${event.title}`,
+                        title: `Proposal sponsorship ${tier || 'custom'} - ${event.title}`,
                         offered_price: Number(budget),
                         dp_percentage: 50,
                         scope_of_work: `Kemitraan sponsorship paket ${tier} untuk ${event.title}.`,
                       },
                     })
-                      .then(() => showToast(`Proposal sponsorship paket ${tier} terkirim ke ${event.title}.`))
-                      .catch((err) => showToast(err instanceof ApiError ? err.message : 'Proposal belum terkirim.'));
-                  }, `Tertarik menjadi mitra brand di ${event.title}? Yuk masuk dulu untuk mengajukan paket sponsorship resmi.`);
+                      .then(() => showToast(`${t('app.toastSponsor1')} ${tier || t('app.custom')} ${t('app.toastSponsor2')} ${event.title}.`))
+                      .catch((err) => showToast(err instanceof ApiError ? err.message : t('app.sponsorFail')));
+                  }, `${t('app.needSponsor')} ${event.title}? ${t('app.needSponsorTail')}`);
                 }}
               />
             }
@@ -374,8 +377,8 @@ function AppContent() {
         </Suspense>
       </main>
 
-      {/* Footer (Hidden on Login & Register full pages) */}
-      {!isAuthPage && <Footer />}
+      {/* Footer (hidden on login/register and on workspace pages) */}
+      {!isAuthPage && !isWorkspacePage && <Footer />}
 
       {/* Auth Prompt Modal (For Unauthenticated Guests attempting guarded actions) */}
       <AuthPromptModal
@@ -390,7 +393,7 @@ function AppContent() {
         onSuccess={() => {
           fetchLiveEvents();
           setIsCreateEventModalOpen(false);
-          showToast("Proyek acara baru berhasil dipublikasikan.");
+          showToast(t('app.toastEvent'));
         }}
       />
 
@@ -400,7 +403,7 @@ function AppContent() {
         onSuccess={() => {
           fetchLiveEvents();
           setIsUploadPortfolioModalOpen(false);
-          showToast("Rekam jejak berhasil ditambahkan ke portofolio.");
+          showToast(t('app.toastPortfolio'));
         }}
       />
 

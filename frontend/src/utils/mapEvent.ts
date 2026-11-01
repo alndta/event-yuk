@@ -20,6 +20,15 @@ export function mapBackendEvent(ev: any): EventItem {
     description: ev.description || '',
     bannerImage: ev.banner_image || '/assets/hero-concert.jpg',
     isPortfolio: Boolean(ev.is_portfolio),
+    sponsorshipPackages: (ev.sponsorship_packages || []).map((x: any) => ({
+      id: x.id,
+      tier: x.tier,
+      name: x.package_name,
+      price: Number(x.price) || 0,
+      boothSize: x.booth_size ?? null,
+      benefits: Array.isArray(x.benefits) ? x.benefits.map(String) : x.benefits && typeof x.benefits === 'object' ? Object.values(x.benefits).map(String) : [],
+      slotsLeft: Math.max(0, (x.slots_total || 0) - (x.slots_booked || 0)),
+    })),
     progress: ev.is_portfolio
       ? undefined
       : {

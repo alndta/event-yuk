@@ -67,8 +67,8 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
   return (
     <div ref={pageRef} className="space-y-6 sm:space-y-8 font-sans">
       <SEOHead
-        title="Vendor Sound System, Lighting, LED & Rigging Panggung | Event Yuk"
-        description="Katalog vendor perlengkapan konser dan panggung terverifikasi di Indonesia. Sewa sound system line array, panggung rigging aluminium, lighting bergerak, videotron LED screen, dan genset silent bergaransi BAST."
+        title={t('vend.seoTitle')}
+        description={t('vend.seoDesc')}
         keywords="sewa sound system konser, rental led screen videotron, sewa panggung rigging, rental genset silent jakarta, vendor konser"
         canonicalPath="/vendors"
       />
@@ -208,7 +208,7 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
                 </div>
                 <span className="flex shrink-0 items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-brand-forest-dark">
                   <ShieldCheck aria-hidden="true" className="h-4 w-4" />
-                  <span>Escrow BAST</span>
+                  <span>{t('vend.escrow')}</span>
                 </span>
               </div>
 
@@ -231,7 +231,7 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
             {/* Bottom Action Footer */}
             <div className="flex flex-col gap-3 border-t border-slate-200 p-5 sm:flex-row sm:items-center sm:justify-between">
               <span className="text-sm text-slate-600">
-                DP 30-50% cair lewat surat jalan, pelunasan lewat BAST digital
+                {t('vend.terms')}
               </span>
               <div className="flex items-center gap-2">
                 <Link

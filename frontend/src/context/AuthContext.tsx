@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { UserRole } from '../components/RoleOnboardingModal';
+import { UserRole } from '../types/models';
 import { supabase } from '../lib/supabase';
 import { api, ApiError, TOKEN_KEY, UNAUTHORIZED_EVENT } from '../lib/api';
 
@@ -39,6 +39,15 @@ interface AuthContextType {
   authPromptMessage: string;
   closeAuthPrompt: () => void;
 }
+
+/** Messages here are produced outside the language provider, so they follow the saved language choice. */
+const L = (id: string, en: string) => {
+  try {
+    return localStorage.getItem('eventyuk_lang_pref') === 'en' ? en : id;
+  } catch {
+    return id;
+  }
+};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -139,7 +148,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setToken(data.token);
       return { success: true, activeRole: role };
     } catch (err) {
-      return { success: false, error: err instanceof ApiError ? err.message : 'Gagal masuk. Coba lagi.' };
+      return { success: false, error: err instanceof ApiError ? err.message : L('Gagal masuk. Coba lagi.', 'Could not sign in. Please try again.') };
     } finally {
       setIsLoading(false);
     }
@@ -158,7 +167,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     phone_wa?: string;
     bio_description?: string;
   }) => {
-    if (!user) return { success: false, error: 'Kamu belum masuk.' };
+    if (!user) return { success: false, error: L('Kamu belum masuk.', 'You are not signed in.') };
     setIsLoading(true);
     try {
       const data = await api('/users/roles/set-role', {
@@ -168,7 +177,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(toSession(data.user, roleData.role_type, user.avatarUrl));
       return { success: true };
     } catch (err) {
-      return { success: false, error: err instanceof ApiError ? err.message : 'Gagal menyimpan peran akun.' };
+      return { success: false, error: err instanceof ApiError ? err.message : L('Gagal menyimpan peran akun.', 'Could not save your account role.') };
     } finally {
       setIsLoading(false);
     }
@@ -190,7 +199,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return { success: true };
     } catch (err: any) {
       setIsLoading(false);
-      return { success: false, error: err.message || 'Gagal memulai autentikasi Google.' };
+      return { success: false, error: err.message || L('Gagal memulai autentikasi Google.', 'Could not start Google sign-in.') };
     }
   };
 
@@ -199,7 +208,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     clearSession();
   };
 
-  const requireAuth = (action: () => void, promptMessage = 'Aksi ini memerlukan akun terdaftar.') => {
+  const requireAuth = (action: () => void, promptMessage = L('Aksi ini memerlukan akun terdaftar.', 'This action needs an account.')) => {
     if (user && token) {
       action();
       return true;

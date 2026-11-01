@@ -87,7 +87,7 @@ export default function ContractsPage({ onShowToast }: Props) {
           counterAmount: p.counter_price ? Number(p.counter_price) : undefined,
           counterDpPercentage: p.counter_dp_percentage ? Number(p.counter_dp_percentage) : undefined,
           counterNotes: p.counter_notes || undefined,
-          lastUpdatedBy: p.last_action_by === myId ? 'Kamu' : 'Pihak lain',
+          lastUpdatedBy: p.last_action_by === myId ? t('con.you') : t('con.other'),
           // Only the party who did not act last can counter or accept.
           myTurn: p.last_action_by !== myId,
           attachedFileName: p.attached_file_name || null,
@@ -99,7 +99,7 @@ export default function ContractsPage({ onShowToast }: Props) {
       })
       .catch((err) => {
         setProposals([]);
-        setLoadError(err instanceof ApiError ? err.message : 'Daftar kontrak belum bisa dimuat.');
+        setLoadError(err instanceof ApiError ? err.message : t('con.loadFail'));
       })
       .finally(() => setLoadingList(false));
   };
@@ -133,7 +133,7 @@ export default function ContractsPage({ onShowToast }: Props) {
       onShowToast?.(success);
       return true;
     } catch (err) {
-      onShowToast?.(err instanceof ApiError ? err.message : 'Aksi belum berhasil. Coba lagi.');
+      onShowToast?.(err instanceof ApiError ? err.message : t('con.actionFail'));
       return false;
     }
   };
@@ -143,7 +143,7 @@ export default function ContractsPage({ onShowToast }: Props) {
     if (!counterTarget) return;
     const ok = await run(
       () => api(`/proposals/${counterTarget.id}/counter`, { method: 'POST', body: { counter_price: counterPrice, counter_dp_percentage: counterDp, counter_notes: counterNotes || undefined } }),
-      'Penawaran balik terkirim ke mitra.'
+      t('con.counterSent')
     );
     if (ok) setCounterTarget(null);
   };
@@ -166,7 +166,7 @@ export default function ContractsPage({ onShowToast }: Props) {
       const data = await api(`/payments/proposals/${selectedForPks.id}/checkout`, { method: 'POST' });
       window.location.href = data.redirect_url;
     } catch (err) {
-      onShowToast?.(err instanceof ApiError ? err.message : 'Pembayaran belum bisa dimulai.');
+      onShowToast?.(err instanceof ApiError ? err.message : t('con.payFail'));
     }
   };
 
@@ -176,35 +176,35 @@ export default function ContractsPage({ onShowToast }: Props) {
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold bg-brand-forest-light text-brand-forest-dark">
             <ShieldCheck aria-hidden="true" className="w-4 h-4" />
-            <span>Escrow terproteksi</span>
+            <span>{t('con.01')}</span>
           </span>
         );
       case 'CONTRACT_SIGNED':
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold bg-brand-lime text-brand-navy">
             <FileCheck aria-hidden="true" className="w-4 h-4" />
-            <span>PKS disepakati (siap bayar)</span>
+            <span>{t('con.02')}</span>
           </span>
         );
       case 'COUNTER_OFFER':
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold bg-amber-100 text-amber-900">
             <RotateCcw aria-hidden="true" className="w-4 h-4" />
-            <span>Negosiasi ulang (counter)</span>
+            <span>{t('con.03')}</span>
           </span>
         );
       case 'SUBMITTED':
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold bg-brand-clay text-brand-ink">
             <Clock aria-hidden="true" className="w-4 h-4" />
-            <span>Menunggu respons awal</span>
+            <span>{t('con.04')}</span>
           </span>
         );
       case 'REJECTED':
         return (
           <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-semibold bg-rose-100 text-rose-900">
             <XCircle aria-hidden="true" className="w-4 h-4" />
-            <span>Penawaran ditolak</span>
+            <span>{t('con.05')}</span>
           </span>
         );
     }
@@ -213,21 +213,21 @@ export default function ContractsPage({ onShowToast }: Props) {
   return (
     <div className="space-y-6 sm:space-y-8 font-sans">
       <SEOHead
-        title="Surat Perjanjian Kerjasama (PKS) & Escrow | Event Yuk"
-        description="Kelola draf negosiasi kontrak PKS digital, termin pembayaran, dan proteksi Rekening Bersama Escrow Midtrans."
+        title={t('con.06')}
+        description={t('con.07')}
         noIndex={true}
       />
       {/* Header */}
       <div className="max-w-3xl">
         <p className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-brand-lime-strong">
           <Handshake aria-hidden="true" className="h-4 w-4" />
-          Ruang negosiasi dan kontrak PKS digital
+          {t('con.08')}
         </p>
         <h1 className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
-          Kelola penawaran, kesepakatan, dan PKS
+          {t('con.09')}
         </h1>
         <p className="mt-4 text-lg leading-8 text-slate-700">
-          Ajukan tawaran, sesuaikan harga lewat counter-offer, pilih skema termin (70:30 atau 50:50), lalu kunci dananya di rekening bersama Escrow.
+          {t('con.10')}
         </p>
 
         {loadError && (
@@ -241,8 +241,8 @@ export default function ContractsPage({ onShowToast }: Props) {
           <Search aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
           <input
             type="search"
-            aria-label="Cari kontrak"
-            placeholder="Cari nomor PKS, nama acara, vendor, band, atau sponsor"
+            aria-label={t('con.11')}
+            placeholder={t('con.12')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="min-h-14 w-full rounded-full border border-slate-300 bg-white pl-12 pr-5 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
@@ -253,12 +253,12 @@ export default function ContractsPage({ onShowToast }: Props) {
       {/* Filter Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-6 border-b border-slate-200">
         {[
-          { id: 'ALL', label: 'Semua status' },
-          { id: 'SUBMITTED', label: 'Pengajuan baru' },
-          { id: 'COUNTER_OFFER', label: 'Negosiasi ulang (counter)' },
-          { id: 'CONTRACT_SIGNED', label: 'Disepakati (PKS siap)' },
-          { id: 'ESCROW_FUNDED', label: 'Escrow aktif' },
-          { id: 'REJECTED', label: 'Ditolak' },
+          { id: 'ALL', label: t('con.fAll') },
+          { id: 'SUBMITTED', label: t('con.fNew') },
+          { id: 'COUNTER_OFFER', label: t('con.fCounter') },
+          { id: 'CONTRACT_SIGNED', label: t('con.fSigned') },
+          { id: 'ESCROW_FUNDED', label: t('con.fFunded') },
+          { id: 'REJECTED', label: t('con.fRejected') },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -306,7 +306,7 @@ export default function ContractsPage({ onShowToast }: Props) {
                       {item.contractNumber}
                     </span>
                     {getStatusBadge(item.status)}
-                    <span className="text-sm text-slate-400">• Diperbarui oleh: {item.lastUpdatedBy}</span>
+                    <span className="text-sm text-slate-400">• {t('con.updatedBy')} {item.lastUpdatedBy}</span>
                   </div>
 
                   <div>
@@ -324,14 +324,14 @@ export default function ContractsPage({ onShowToast }: Props) {
                   </div>
 
                   <p className="text-sm text-slate-600 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-100">
-                    <strong className="text-slate-800">Lingkup kerja:</strong> {item.scopeOfWork}
+                    <strong className="text-slate-800">{t('con.13')}</strong> {item.scopeOfWork}
                   </p>
 
                   {/* Custom Attached Contract File */}
                   {item.attachedFileName && (
                     <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-300 text-amber-950 text-sm">
                       <Paperclip className="w-3.5 h-3.5 text-[#5E7628] shrink-0" />
-                      <span className="font-semibold text-slate-700">Berkas PKS mandiri:</span>
+                      <span className="font-semibold text-slate-700">{t('con.14')}</span>
                       <span className="font-bold text-slate-900 truncate">{item.attachedFileName}</span>
                       <span className="text-slate-500 tabular-nums text-sm shrink-0">({item.attachedFileSize || 'File'})</span>
                     </div>
@@ -342,7 +342,7 @@ export default function ContractsPage({ onShowToast }: Props) {
                     <div className="p-3 bg-amber-50 rounded-lg border border-amber-200 text-sm text-amber-900">
                       <div className="font-bold flex items-center gap-1 text-amber-800 mb-0.5">
                         <MessageSquare className="w-3.5 h-3.5" />
-                        <span>Catatan negosiasi ulang:</span>
+                        <span>{t('con.15')}</span>
                       </div>
                       <p>{item.counterNotes}</p>
                     </div>
@@ -351,7 +351,7 @@ export default function ContractsPage({ onShowToast }: Props) {
                   {/* Financial & Payment Scheme Details */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
                     <div className="p-3 bg-brand-cream rounded-lg">
-                      <div className="text-sm font-medium text-slate-600">Total kesepakatan</div>
+                      <div className="text-sm font-medium text-slate-600">{t('con.16')}</div>
                       <div className="text-sm sm:text-sm font-extrabold text-slate-900 tabular-nums mt-0.5">
                         Rp {currentPrice.toLocaleString('id-ID')}
                       </div>
@@ -363,27 +363,27 @@ export default function ContractsPage({ onShowToast }: Props) {
                     </div>
 
                     <div className="p-3 bg-brand-cream rounded-lg">
-                      <div className="text-sm font-medium text-slate-600">Skema termin</div>
+                      <div className="text-sm font-medium text-slate-600">{t('con.17')}</div>
                       <div className="text-sm font-extrabold text-[#172D46] mt-0.5">
                         {currentDpRatio} : {currentSettlementRatio}
                       </div>
-                      <div className="text-sm text-slate-500">DP : Pelunasan BAST</div>
+                      <div className="text-sm text-slate-500">{t('con.18')}</div>
                     </div>
 
                     <div className="p-3 bg-brand-cream rounded-lg">
-                      <div className="text-sm font-medium text-slate-600">Nominal DP ({currentDpRatio}%)</div>
+                      <div className="text-sm font-medium text-slate-600">{t('con.dpLabel')} ({currentDpRatio}%)</div>
                       <div className="text-sm font-extrabold text-brand-forest-dark tabular-nums mt-0.5">
                         Rp {dpRupiah.toLocaleString('id-ID')}
                       </div>
-                      <div className="text-sm text-slate-500">Escrow awal</div>
+                      <div className="text-sm text-slate-500">{t('con.19')}</div>
                     </div>
 
                     <div className="p-3 bg-brand-cream rounded-lg">
-                      <div className="text-sm font-medium text-slate-600">Pelunasan ({currentSettlementRatio}%)</div>
+                      <div className="text-sm font-medium text-slate-600">{t('con.balance')} ({currentSettlementRatio}%)</div>
                       <div className="text-sm font-extrabold text-slate-700 tabular-nums mt-0.5">
                         Rp {settlementRupiah.toLocaleString('id-ID')}
                       </div>
-                      <div className="text-sm text-slate-500">Setelah BAST</div>
+                      <div className="text-sm text-slate-500">{t('con.20')}</div>
                     </div>
                   </div>
                 </div>
@@ -395,7 +395,7 @@ export default function ContractsPage({ onShowToast }: Props) {
                     <>
                       {item.myTurn === false && (
                         <p className="w-full rounded-2xl bg-brand-sand px-4 py-3 text-center text-sm font-semibold text-brand-ink">
-                          Menunggu jawaban pihak lain
+                          {t('con.21')}
                         </p>
                       )}
                       {item.myTurn !== false && <button
@@ -403,7 +403,7 @@ export default function ContractsPage({ onShowToast }: Props) {
                         className="w-full min-h-12 px-5 rounded-full text-sm font-semibold bg-brand-navy hover:bg-brand-navy-dark text-white flex items-center justify-center gap-2 transition-colors"
                       >
                         <CheckCircle2 aria-hidden="true" className="w-5 h-5 text-brand-lime" />
-                        <span>Setujui kesepakatan</span>
+                        <span>{t('con.22')}</span>
                       </button>}
 
                       {item.myTurn !== false && <button
@@ -411,14 +411,14 @@ export default function ContractsPage({ onShowToast }: Props) {
                         className="w-full min-h-12 px-5 rounded-full text-sm font-semibold border-2 border-brand-navy/30 hover:border-brand-navy text-brand-ink flex items-center justify-center gap-2 transition-colors"
                       >
                         <RotateCcw aria-hidden="true" className="w-5 h-5" />
-                        <span>Ajukan perubahan (counter)</span>
+                        <span>{t('con.23')}</span>
                       </button>}
 
                       <button
                         onClick={() => handleRejectProposal(item)}
                         className="w-full min-h-12 px-5 rounded-full text-sm font-semibold text-rose-700 hover:bg-rose-50 border-2 border-rose-200 transition-colors"
                       >
-                        <span>Tolak penawaran</span>
+                        <span>{t('con.24')}</span>
                       </button>
                     </>
                   )}
@@ -430,7 +430,7 @@ export default function ContractsPage({ onShowToast }: Props) {
                       className="w-full min-h-12 px-5 rounded-full text-sm font-semibold bg-brand-navy hover:bg-brand-navy-dark text-white flex items-center justify-center gap-2 transition-colors"
                     >
                       <FileCheck aria-hidden="true" className="w-5 h-5 text-brand-lime" />
-                      <span>Buka PKS dan bayar DP escrow</span>
+                      <span>{t('con.25')}</span>
                     </button>
                   )}
 
@@ -441,13 +441,13 @@ export default function ContractsPage({ onShowToast }: Props) {
                       className="w-full min-h-12 px-5 rounded-full text-sm font-semibold bg-brand-navy hover:bg-brand-navy-dark text-white flex items-center justify-center gap-2 transition-colors"
                     >
                       <ShieldCheck aria-hidden="true" className="w-5 h-5 text-brand-lime" />
-                      <span>Lihat dokumen PKS aktif</span>
+                      <span>{t('con.26')}</span>
                     </button>
                   )}
 
                   {item.status === 'REJECTED' && (
                     <div className="text-sm text-rose-800 font-semibold px-4 py-2 bg-rose-50 rounded-full">
-                      Penawaran dibatalkan
+                      {t('con.27')}
                     </div>
                   )}
                 </div>
@@ -459,12 +459,12 @@ export default function ContractsPage({ onShowToast }: Props) {
 
       {/* Counter-Offer Negotiation Modal */}
       {counterTarget && (
-        <Dialog onClose={() => setCounterTarget(null)} label="Ajukan perubahan kontrak">
+        <Dialog onClose={() => setCounterTarget(null)} label={t('con.28')}>
           <div className="bg-white rounded-lg max-w-lg w-full border border-slate-200 overflow-hidden flex flex-col">
             <div className="p-6 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
               <div>
                 <span className="text-sm tabular-nums text-slate-500 font-semibold">{counterTarget.contractNumber}</span>
-                <h3 className="font-extrabold text-slate-900 text-base">Ajukan perubahan (counter-offer)</h3>
+                <h3 className="font-extrabold text-slate-900 text-base">{t('con.29')}</h3>
               </div>
               <button
                 onClick={() => setCounterTarget(null)}
@@ -477,7 +477,7 @@ export default function ContractsPage({ onShowToast }: Props) {
             <form onSubmit={handleSubmitCounter} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-1">
-                  Nominal penawaran baru (Rp)
+                  {t('con.30')}
                 </label>
                 <input
                   type="number"
@@ -490,13 +490,13 @@ export default function ContractsPage({ onShowToast }: Props) {
 
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-1">
-                  Skema termin Pembayaran Bersama (DP : Pelunasan BAST)
+                  {t('con.31')}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
                   {[
-                    { dp: 50, label: '50 : 50', desc: 'Standar' },
-                    { dp: 70, label: '70 : 30', desc: 'Prioritas Produksi' },
-                    { dp: 30, label: '30 : 70', desc: 'Garansi Pelunasan' },
+                    { dp: 50, label: '50 : 50', desc: t('con.rStd') },
+                    { dp: 70, label: '70 : 30', desc: t('con.rProd') },
+                    { dp: 30, label: '30 : 70', desc: t('con.rGuar') },
                   ].map((ratio) => (
                     <button
                       key={ratio.dp}
@@ -520,12 +520,12 @@ export default function ContractsPage({ onShowToast }: Props) {
 
               <div>
                 <label className="block text-sm font-bold text-slate-700 mb-1">
-                  Alasan penyesuaian dan catatan teknis
+                  {t('con.32')}
                 </label>
                 <textarea
                   rows={3}
                   required
-                  placeholder="Jelaskan penyesuaian yang diajukan (misal: pengurangan unit speaker, penambahan durasi tampil band, dll)..."
+                  placeholder={t('con.33')}
                   value={counterNotes}
                   onChange={(e) => setCounterNotes(e.target.value)}
                   className="w-full px-4 py-2 rounded-lg border border-slate-300 text-sm focus:ring-2 focus:ring-[#172D46] focus:outline-none"
@@ -545,7 +545,7 @@ export default function ContractsPage({ onShowToast }: Props) {
                   className="px-5 py-2.5 rounded-lg text-sm font-bold bg-[#172D46] hover:bg-[#163a50] text-white flex items-center gap-1.5"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
-                  <span>Kirim Counter-Offer</span>
+                  <span>{t('con.34')}</span>
                 </button>
               </div>
             </form>

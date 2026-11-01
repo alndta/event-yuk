@@ -79,8 +79,8 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
   return (
     <div ref={pageRef} className="space-y-6 sm:space-y-8 font-sans">
       <SEOHead
-        title="Direktori Event Organizer & Promotor Terverifikasi | Event Yuk"
-        description="Daftar promotor dan event organizer berlisensi resmi di Indonesia dengan rekam jejak terverifikasi e-KYC. Akses pagu anggaran acara, peluang kemitraan vendor, audisi musisi, dan rekrutmen kru."
+        title={t('orgs.seoTitle')}
+        description={t('orgs.seoDesc')}
         keywords="event organizer terpercaya, promotor konser jakarta, eo pensi sekolah, profil eo indonesia, escrow pks acara"
         canonicalPath="/organizers"
       />
@@ -89,13 +89,13 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
       <div className="max-w-3xl">
         <p className="mb-3 inline-flex items-center gap-2 text-sm font-semibold text-brand-lime-strong">
           <Calendar aria-hidden="true" className="h-4 w-4" />
-          Direktori promotor dan event organizer
+          {t('orgs.eyebrow')}
         </p>
         <h1 key={language} data-split-title className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
           {t('orgs.title')}
         </h1>
         <p className="mt-4 text-lg leading-8 text-slate-700">
-          Penyelenggara festival musik, pensi sekolah, dan pameran dengan rekam jejak, pagu anggaran, dan ulasan yang bisa kamu lihat sebelum menghubungi.
+          {t('orgs.lead')}
         </p>
 
         {/* Search Bar */}
@@ -117,11 +117,11 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
         <div className="flex items-center gap-2 overflow-x-auto">
           <Filter aria-hidden="true" className="mr-1 h-4 w-4 shrink-0 text-slate-600" />
           {[
-            { id: 'ALL', label: 'Semua kategori' },
-            { id: 'CONCERT', label: 'Festival musik' },
-            { id: 'PENSI', label: 'Pensi sekolah' },
-            { id: 'EXPO', label: 'Pameran dan bazaar' },
-            { id: 'CORPORATE', label: 'Corporate MICE' },
+            { id: 'ALL', label: t('orgs.fAll') },
+            { id: 'CONCERT', label: t('orgs.fMusic') },
+            { id: 'PENSI', label: t('orgs.fPensi') },
+            { id: 'EXPO', label: t('orgs.fExpo') },
+            { id: 'CORPORATE', label: t('orgs.fCorp') },
           ].map((cat) => (
             <button
               key={cat.id}
@@ -201,7 +201,7 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
                 {eo.verified && (
                   <span className="mt-10 inline-flex items-center gap-1.5 rounded-full bg-brand-forest-light px-3 py-1 text-xs font-semibold text-brand-forest-dark">
                     <CheckCircle2 aria-hidden="true" className="h-4 w-4" />
-                    <span>e-KYC terverifikasi</span>
+                    <span>{t('orgs.kycOk')}</span>
                   </span>
                 )}
               </div>
@@ -225,14 +225,10 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
               </p>
 
               {/* Stats Bar */}
-              <dl className="mt-5 grid grid-cols-2 gap-4 rounded-lg bg-brand-cream p-4">
+              <dl className="mt-5 grid grid-cols-1 gap-4 rounded-lg bg-brand-cream p-4">
                 <div>
-                  <dt className="text-sm text-slate-700">Proyek selesai</dt>
-                  <dd className="mt-0.5 font-display text-lg font-extrabold tracking-[-0.02em] text-brand-ink">{eo.totalEventsCompleted} acara sukses</dd>
-                </div>
-                <div>
-                  <dt className="text-sm text-slate-700">Total audiens</dt>
-                  <dd className="mt-0.5 font-display text-lg font-extrabold tracking-[-0.02em] text-brand-ink">{eo.totalAttendeesServed} pengunjung</dd>
+                  <dt className="text-sm text-slate-700">{t('orgs.doneLabel')}</dt>
+                  <dd className="mt-0.5 font-display text-lg font-extrabold tracking-[-0.02em] text-brand-ink">{eo.totalEventsCompleted} {t("orgs.done")}</dd>
                 </div>
               </dl>
 
@@ -248,26 +244,18 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
                 ))}
               </div>
 
-              {/* Highlight Projects */}
-              <div className="mt-5 border-t border-slate-200 pt-4">
-                <p className="text-sm font-semibold text-slate-800">Portofolio unggulan</p>
-                <p className="mt-1 text-sm leading-6 text-slate-700">
-                  {eo.pastHighlightEvents.join(' • ')}
-                </p>
-              </div>
-
               {/* Contact & Invite Action */}
               <div className="mt-5 flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex min-w-0 items-center gap-2 text-sm text-slate-600">
                   <Mail aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-600" />
-                  <span className="truncate">{eo.contactEmail}</span>
+                  <span className="truncate">{eo.city}</span>
                 </div>
 
                 <Link
                   to={`/organizers/${eo.id}`}
                   className="inline-flex min-h-11 shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-brand-navy px-5 text-sm font-semibold text-white transition-colors hover:bg-brand-navy-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy"
                 >
-                  <span>Lihat rekam jejak</span>
+                  <span>{t('orgs.track')}</span>
                   <ArrowRight aria-hidden="true" className="h-4 w-4" />
                 </Link>
               </div>

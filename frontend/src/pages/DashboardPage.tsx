@@ -23,7 +23,7 @@ import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
 import type { TranslationKey } from '../i18n/translations';
 import { api, ApiError } from '../lib/api';
-import { UserRole } from '../components/RoleOnboardingModal';
+import { UserRole } from '../types/models';
 import { SEOHead } from '../components/SEOHead';
 import { DashboardSkeleton } from '../components/skeletons/DashboardSkeleton';
 

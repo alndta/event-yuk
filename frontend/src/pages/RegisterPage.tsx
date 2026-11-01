@@ -23,11 +23,13 @@ import {
   Eye,
   EyeOff,
 } from 'lucide-react';
-import { UserRole } from '../components/RoleOnboardingModal';
+import { UserRole } from '../types/models';
 import { useAuth } from '../context/AuthContext';
 import { SEOHead } from '../components/SEOHead';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function RegisterPage() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const { login, signInWithGoogle } = useAuth();
 
@@ -74,63 +76,63 @@ export default function RegisterPage() {
   }[] = [
     {
       id: 'EO',
-      name: 'Event Organizer & Promotor',
-      badge: 'Penyelenggara Acara',
-      desc: 'Buka proyek acara, kelola pagu anggaran, kurasi kaveling booth, dan buka shift kru lapangan.',
+      name: t('role.EO.name'),
+      badge: t('role.EO.badge'),
+      desc: t('role.EO.desc'),
       icon: Calendar,
       color: 'bg-brand-lime-soft text-brand-navy',
       borderColor: 'border-brand-navy',
-      features: ['Kendali Pagu Anggaran', 'Kurasi Kaveling Booth', 'Negosiasi Termin Fleksibel'],
+      features: [t('role.EO.f1'), t('role.EO.f2'), t('role.EO.f3')],
     },
     {
       id: 'VENDOR',
-      name: 'Vendor Produksi & Rigging',
-      badge: 'Penyedia Alat',
-      desc: 'Pajang katalog Sound System, Tata Lampu, Rigging Panggung, LED Screen, dan Genset.',
+      name: t('role.VENDOR.name'),
+      badge: t('role.VENDOR.badge'),
+      desc: t('role.VENDOR.desc'),
       icon: Sliders,
       color: 'bg-brand-lime-soft text-brand-navy',
       borderColor: 'border-brand-navy',
-      features: ['Garansi DP 50% di Escrow', 'Smart Calendar Otomatis', 'Klaim Pelunasan via BAST'],
+      features: [t('role.VENDOR.f1'), t('role.VENDOR.f2'), t('role.VENDOR.f3')],
     },
     {
       id: 'TALENT',
-      name: 'Musisi & Manajemen Band',
-      badge: 'Artis & Talenta',
-      desc: 'Kelola jadwal manggung festival/pensi, tentukan rate card honor, dan kunci technical riders.',
+      name: t('role.TALENT.name'),
+      badge: t('role.TALENT.badge'),
+      desc: t('role.TALENT.desc'),
       icon: Music,
       color: 'bg-brand-lime-soft text-brand-navy',
       borderColor: 'border-brand-navy',
-      features: ['Rate Card Transparan', 'Hospitality Riders Terkunci', 'PKS Sah Anti-Cancel'],
+      features: [t('role.TALENT.f1'), t('role.TALENT.f2'), t('role.TALENT.f3')],
     },
     {
       id: 'TENANT',
-      name: 'Tenant Kuliner & Pameran',
-      badge: 'Penyewa Kaveling',
-      desc: 'Pilih nomor kaveling denah festival, upload foto menu untuk kurasi, dan peroleh Exhibitor Pass.',
+      name: t('role.TENANT.name'),
+      badge: t('role.TENANT.badge'),
+      desc: t('role.TENANT.desc'),
       icon: Store,
       color: 'bg-brand-lime-soft text-brand-navy',
       borderColor: 'border-brand-navy',
-      features: ['Denah Interaktif Akurat', 'Seleksi Kurasi Terbuka', 'Faktur Resmi Sewa Booth'],
+      features: [t('role.TENANT.f1'), t('role.TENANT.f2'), t('role.TENANT.f3')],
     },
     {
       id: 'SPONSOR',
-      name: 'Sponsor Brand & Korporasi',
-      badge: 'Brand & Agensi',
-      desc: 'Akses data demografi audiens terverifikasi, beli paket aktivasi berjenjang, dan amankan hak eksklusif.',
+      name: t('role.SPONSOR.name'),
+      badge: t('role.SPONSOR.badge'),
+      desc: t('role.SPONSOR.desc'),
       icon: Building2,
       color: 'bg-brand-lime-soft text-brand-navy',
       borderColor: 'border-brand-navy',
-      features: ['Database Audiens Riil', 'Paket Aktivasi Eksklusif', 'Laporan Tayang & Audit'],
+      features: [t('role.SPONSOR.f1'), t('role.SPONSOR.f2'), t('role.SPONSOR.f3')],
     },
     {
       id: 'CREW',
-      name: 'Event Crew & Kru Lapangan',
-      badge: 'Tenaga Kerja Lepas',
-      desc: 'Lamar lowongan shift harian anti-bentrok jam kerja, lakukan presensi QR GPS, dan honor instan.',
+      name: t('role.CREW.name'),
+      badge: t('role.CREW.badge'),
+      desc: t('role.CREW.desc'),
       icon: Users,
       color: 'bg-brand-lime-soft text-brand-navy',
       borderColor: 'border-brand-navy',
-      features: ['Shift Anti-Bentrok Jadwal', 'Absensi QR GPS Geofencing', 'Honor Cair Otomatis'],
+      features: [t('role.CREW.f1'), t('role.CREW.f2'), t('role.CREW.f3')],
     },
   ];
 
@@ -144,7 +146,7 @@ export default function RegisterPage() {
     setErrorMessage(null);
 
     if (formData.password && formData.password !== formData.confirmPassword) {
-      setErrorMessage('Kata sandi dan konfirmasi kata sandi tidak cocok.');
+      setErrorMessage(t('reg.mismatch'));
       setLoading(false);
       return;
     }
@@ -153,10 +155,10 @@ export default function RegisterPage() {
       const data = await api('/auth/send-otp', { method: 'POST', anonymous: true, body: { email: formData.email } });
       setStep('OTP');
       setOtpCountdown(60);
-      setSuccessMessage(`Kode verifikasi 6 angka sudah dikirim ke ${formData.email}`);
+      setSuccessMessage(`${t('reg.otpSent')} ${formData.email}`);
       if (import.meta.env.DEV && data.otp_preview) setPreviewOtp(data.otp_preview);
     } catch (err) {
-      setErrorMessage(err instanceof ApiError ? err.message : 'Gagal mengirim kode.');
+      setErrorMessage(err instanceof ApiError ? err.message : t('reg.sendFail'));
     } finally {
       setLoading(false);
     }
@@ -180,11 +182,11 @@ export default function RegisterPage() {
           otp_code: otpCode,
         },
       });
-      setSuccessMessage('Pendaftaran berhasil. Membuka dashboard...');
+      setSuccessMessage(t('reg.done'));
       await login(formData.email, formData.password);
       setTimeout(() => navigate('/dashboard'), 800);
     } catch (err) {
-      setErrorMessage(err instanceof ApiError ? err.message : 'Kode tidak cocok atau sudah kedaluwarsa.');
+      setErrorMessage(err instanceof ApiError ? err.message : t('reg.badOtp'));
     } finally {
       setLoading(false);
     }
@@ -195,8 +197,8 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen w-full bg-brand-canvas flex flex-col justify-between font-sans">
       <SEOHead
-        title="Daftar Akun Mitra Baru | Event Yuk"
-        description="Daftar akun ekosistem acara Event Yuk untuk Event Organizer, Vendor Peralatan, Band Musisi, Tenant Bazaar, Sponsor Brand, atau Kru Lapangan."
+        title={t('reg.01')}
+        description={t('reg.02')}
         noIndex={true}
       />
       {/* Top Header Navigation */}
@@ -217,7 +219,7 @@ export default function RegisterPage() {
               className="hidden sm:inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-slate-900 transition"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Beranda</span>
+              <span>{t('reg.03')}</span>
             </Link>
           </div>
 
@@ -233,7 +235,7 @@ export default function RegisterPage() {
               <span className="h-5 w-5 rounded-full bg-white/20 flex items-center justify-center text-xs">
                 1
               </span>
-              <span className="hidden sm:inline">Pilih peran</span>
+              <span className="hidden sm:inline">{t('reg.04')}</span>
             </div>
 
             <span className="text-slate-300 font-bold text-xs">→</span>
@@ -250,7 +252,7 @@ export default function RegisterPage() {
               <span className="h-5 w-5 rounded-full bg-white/20 flex items-center justify-center text-xs">
                 2
               </span>
-              <span className="hidden sm:inline">Data akun</span>
+              <span className="hidden sm:inline">{t('reg.05')}</span>
             </div>
 
             <span className="text-slate-300 font-bold text-xs">→</span>
@@ -265,15 +267,15 @@ export default function RegisterPage() {
               <span className="h-5 w-5 rounded-full bg-white/20 flex items-center justify-center text-xs">
                 3
               </span>
-              <span className="hidden sm:inline">Verifikasi OTP</span>
+              <span className="hidden sm:inline">{t('reg.06')}</span>
             </div>
           </div>
 
           {/* Login Link */}
           <div className="text-sm text-slate-600">
-            <span className="hidden md:inline">Sudah punya akun? </span>
+            <span className="hidden md:inline">{t('reg.haveAccount')} </span>
             <Link to="/login" className="font-semibold text-brand-navy underline underline-offset-4">
-              Masuk
+              {t('reg.signIn')}
             </Link>
           </div>
         </div>
@@ -302,13 +304,13 @@ export default function RegisterPage() {
             <div className="text-center max-w-2xl mx-auto space-y-3">
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-brand-lime-soft text-brand-navy text-sm font-semibold border border-brand-navy/15">
                 <Layers className="w-3.5 h-3.5 text-[#172D46]" />
-                <span>Langkah 1 dari 3: pilih satu peran</span>
+                <span>{t('reg.07')}</span>
               </div>
               <h2 className="font-display text-3xl sm:text-4xl font-extrabold text-slate-950 tracking-[-0.03em]">
-                Kamu terlibat di acara sebagai apa?
+                {t('reg.08')}
               </h2>
               <p className="text-base text-slate-600 leading-7">
-                Setiap akun punya satu peran tetap, supaya dokumen PKS dan rekening bersama Escrow punya dasar hukum yang jelas.
+                {t('reg.09')}
               </p>
 
               {/* Fast Google Auth Option */}
@@ -338,11 +340,11 @@ export default function RegisterPage() {
                       d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
                     />
                   </svg>
-                  <span>Daftar lebih cepat dengan Google</span>
+                  <span>{t('reg.10')}</span>
                 </button>
                 <div className="flex items-center gap-3 my-4 max-w-md mx-auto">
                   <div className="flex-1 h-px bg-slate-200" />
-                  <span className="text-sm text-slate-600">atau daftar lewat email dan OTP</span>
+                  <span className="text-sm text-slate-600">{t('reg.11')}</span>
                   <div className="flex-1 h-px bg-slate-200" />
                 </div>
               </div>
@@ -425,7 +427,7 @@ export default function RegisterPage() {
                 onClick={() => setStep('FORM')}
                 className="min-h-12 px-8 rounded-lg bg-brand-navy hover:bg-brand-navy-dark text-white font-semibold text-base transition-colors flex items-center gap-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy"
               >
-                <span>Lanjut ke data akun</span>
+                <span>{t('reg.12')}</span>
                 <ArrowRight aria-hidden="true" className="w-5 h-5" />
               </button>
             </div>
@@ -443,13 +445,13 @@ export default function RegisterPage() {
                 className="inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-slate-600 hover:text-slate-900 transition mb-3"
               >
                 <ArrowLeft aria-hidden="true" className="h-4 w-4" />
-                <span>Ubah pilihan peran</span>
+                <span>{t('reg.13')}</span>
               </button>
               <h2 className="font-display text-3xl font-extrabold tracking-[-0.03em] text-brand-ink sm:text-4xl">
-                Lengkapi data penanggung jawab
+                {t('reg.14')}
               </h2>
               <p className="mt-2 text-base leading-7 text-slate-600">
-                Data ini digunakan untuk penerbitan dokumen PKS resmi dan otentikasi akunmu.
+                {t('reg.15')}
               </p>
             </div>
 
@@ -460,7 +462,7 @@ export default function RegisterPage() {
                   <activeRoleDetail.icon aria-hidden="true" className="h-5 w-5" />
                 </div>
                 <div>
-                  <div className="text-sm text-slate-600">Peran akun utama</div>
+                  <div className="text-sm text-slate-600">{t('reg.16')}</div>
                   <div className="font-display text-lg font-extrabold text-brand-ink">{activeRoleDetail.name}</div>
                 </div>
               </div>
@@ -469,7 +471,7 @@ export default function RegisterPage() {
                 onClick={() => setStep('SELECT_ROLE')}
                 className="min-h-11 shrink-0 text-sm font-semibold text-brand-navy underline underline-offset-4"
               >
-                Ganti peran
+                {t('reg.17')}
               </button>
             </div>
 
@@ -477,14 +479,14 @@ export default function RegisterPage() {
             <form onSubmit={handleSendOtp} className="space-y-5 rounded-lg bg-white p-6 font-sans sm:p-8">
               <div>
                 <label htmlFor="reg-fullName" className="mb-2 block text-sm font-semibold text-slate-800">
-                  Nama lengkap penanggung jawab atau pimpinan
+                  {t('reg.18')}
                 </label>
                 <div className="relative">
                   <User aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
                   <input
                     type="text"
                     required
-                    id="reg-fullName" autoComplete="name" placeholder="Contoh: Raden Satria Pamungkas"
+                    id="reg-fullName" autoComplete="name" placeholder={t('reg.19')}
                     value={formData.fullName}
                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                     className="min-h-12 w-full rounded-lg border border-slate-300 bg-white pl-11 pr-4 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
@@ -494,14 +496,14 @@ export default function RegisterPage() {
 
               <div>
                 <label htmlFor="reg-business" className="mb-2 block text-sm font-semibold text-slate-800">
-                  Nama entitas, perusahaan, atau nama panggung
+                  {t('reg.20')}
                 </label>
                 <div className="relative">
                   <Building2 aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
                   <input
                     type="text"
                     required
-                    id="reg-business" autoComplete="organization" placeholder="Contoh: Kreasi Panggung Nusantara / Senja Di Batavia"
+                    id="reg-business" autoComplete="organization" placeholder={t('reg.21')}
                     value={formData.businessName}
                     onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
                     className="min-h-12 w-full rounded-lg border border-slate-300 bg-white pl-11 pr-4 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
@@ -512,14 +514,14 @@ export default function RegisterPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="reg-email" className="mb-2 block text-sm font-semibold text-slate-800">
-                    Email aktif
+                    {t('reg.22')}
                   </label>
                   <div className="relative">
                     <Mail aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
                     <input
                       type="email"
                       required
-                      id="reg-email" autoComplete="email" placeholder="kontak@perusahaan.id"
+                      id="reg-email" autoComplete="email" placeholder={t('reg.23')}
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="min-h-12 w-full rounded-lg border border-slate-300 bg-white pl-11 pr-4 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
@@ -529,7 +531,7 @@ export default function RegisterPage() {
 
                 <div>
                   <label htmlFor="reg-phone" className="mb-2 block text-sm font-semibold text-slate-800">
-                    Nomor telepon atau WhatsApp aktif
+                    {t('reg.24')}
                   </label>
                   <div className="relative">
                     <Phone aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
@@ -548,14 +550,14 @@ export default function RegisterPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label htmlFor="reg-password" className="mb-2 block text-sm font-semibold text-slate-800">
-                    Kata sandi akun
+                    {t('reg.25')}
                   </label>
                   <div className="relative">
                     <Lock aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
-                      id="reg-password" autoComplete="new-password" placeholder="Minimal 8 karakter"
+                      id="reg-password" autoComplete="new-password" placeholder={t('reg.26')}
                       value={formData.password}
                       onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       className="min-h-12 w-full rounded-lg border border-slate-300 bg-white pl-11 pr-12 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
@@ -573,14 +575,14 @@ export default function RegisterPage() {
 
                 <div>
                   <label htmlFor="reg-confirm" className="mb-2 block text-sm font-semibold text-slate-800">
-                    Konfirmasi kata sandi
+                    {t('reg.27')}
                   </label>
                   <div className="relative">
                     <Lock aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />
                     <input
                       type={showPassword ? 'text' : 'password'}
                       required
-                      id="reg-confirm" autoComplete="new-password" placeholder="Ulangi kata sandi"
+                      id="reg-confirm" autoComplete="new-password" placeholder={t('reg.28')}
                       value={formData.confirmPassword}
                       onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                       className="min-h-12 w-full rounded-lg border border-slate-300 bg-white pl-11 pr-4 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30"
@@ -599,7 +601,7 @@ export default function RegisterPage() {
                   className="mt-1 h-5 w-5 rounded border-slate-400 text-brand-navy focus:ring-brand-navy"
                 />
                 <label htmlFor="agreeTerms" className="cursor-pointer text-base leading-7 text-slate-700">
-                  Saya menyetujui <span className="font-semibold text-brand-navy underline underline-offset-4">Syarat dan Ketentuan Layanan</span> serta klausul otomatisasi <span className="font-semibold text-brand-navy underline underline-offset-4">Rekening Bersama Escrow dan PKS Digital</span> Event Yuk.
+                  {t('reg.agree1')} <span className="font-semibold text-brand-navy underline underline-offset-4">{t('reg.29')}</span> {t('reg.agree2')} <span className="font-semibold text-brand-navy underline underline-offset-4">{t('reg.30')}</span> {t('reg.agree3')}
                 </label>
               </div>
 
@@ -621,12 +623,12 @@ export default function RegisterPage() {
                   {loading ? (
                     <>
                       <RotateCw aria-hidden="true" className="h-5 w-5 animate-spin" />
-                      <span>Mengirim OTP...</span>
+                      <span>{t('reg.31')}</span>
                     </>
                   ) : (
                     <>
                       <KeyRound aria-hidden="true" className="h-5 w-5" />
-                      <span>Kirim kode OTP</span>
+                      <span>{t('reg.32')}</span>
                     </>
                   )}
                 </button>
@@ -643,17 +645,17 @@ export default function RegisterPage() {
                 <KeyRound aria-hidden="true" className="h-7 w-7" />
               </div>
               <h2 className="font-display text-3xl font-extrabold tracking-[-0.03em] text-brand-ink">
-                Verifikasi kode OTP
+                {t('reg.33')}
               </h2>
               <p className="mt-2 text-base leading-7 text-slate-600">
-                Masukkan kode verifikasi 6 digit yang dikirim ke email{' '}
+                {t('reg.enterCode')}{' '}
                 <strong className="text-brand-ink">{formData.email}</strong>.
               </p>
             </div>
 
             {previewOtp && (
               <div className="flex items-center justify-between rounded-lg bg-brand-lime-soft p-4 text-base text-brand-ink">
-                <span>Kode verifikasi</span>
+                <span>{t('reg.34')}</span>
                 <span className="font-mono text-xl font-bold tracking-widest text-brand-navy">
                   {previewOtp}
                 </span>
@@ -663,7 +665,7 @@ export default function RegisterPage() {
             <form onSubmit={handleVerifyOtp} className="space-y-5 rounded-lg bg-white p-6 font-sans sm:p-8">
               <div>
                 <label htmlFor="reg-otp" className="mb-2 block text-center text-sm font-semibold text-slate-800">
-                  Kode verifikasi 6 digit
+                  {t('reg.35')}
                 </label>
                 <input
                   id="reg-otp"
@@ -682,14 +684,14 @@ export default function RegisterPage() {
               {/* Timer & Resend */}
               <div className="text-center text-base text-slate-600">
                 {otpCountdown > 0 ? (
-                  <span>Kirim ulang kode dalam <strong className="font-mono text-brand-navy">{otpCountdown} detik</strong></span>
+                  <span>{t('reg.resendIn')} <strong className="font-mono text-brand-navy">{otpCountdown} {t('reg.seconds')}</strong></span>
                 ) : (
                   <button
                     type="button"
                     onClick={handleSendOtp}
                     className="min-h-11 font-semibold text-brand-navy underline underline-offset-4"
                   >
-                    Kirim ulang kode OTP
+                    {t('reg.36')}
                   </button>
                 )}
               </div>
@@ -704,12 +706,12 @@ export default function RegisterPage() {
                   {loading ? (
                     <>
                       <RotateCw aria-hidden="true" className="h-5 w-5 animate-spin" />
-                      <span>Memverifikasi...</span>
+                      <span>{t('reg.37')}</span>
                     </>
                   ) : (
                     <>
                       <CheckCircle2 aria-hidden="true" className="h-5 w-5" />
-                      <span>Verifikasi dan masuk</span>
+                      <span>{t('reg.38')}</span>
                     </>
                   )}
                 </button>
@@ -719,7 +721,7 @@ export default function RegisterPage() {
                   onClick={() => setStep('FORM')}
                   className="min-h-11 w-full text-base font-semibold text-slate-600 hover:text-slate-950"
                 >
-                  Kembali ke data akun
+                  {t('reg.39')}
                 </button>
               </div>
             </form>
@@ -732,7 +734,7 @@ export default function RegisterPage() {
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <div className="flex items-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Pendaftaran resmi Event Yuk</span>
+            <span>{t('reg.40')}</span>
           </div>
           <div>© {new Date().getFullYear()} Event Yuk. Seluruh data terenkripsi dan terlindungi.</div>
         </div>

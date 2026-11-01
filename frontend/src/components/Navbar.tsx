@@ -12,7 +12,7 @@ import {
   User,
   X,
 } from 'lucide-react';
-import { UserRole } from './RoleOnboardingModal';
+import { UserRole } from '../types/models';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useLanguage } from '../context/LanguageContext';

@@ -1,12 +1,11 @@
 import useDialog from '../hooks/useDialog';
-import { useState } from 'react';
+import { useLanguage } from '../context/LanguageContext';
 import {
   X,
   FileCheck,
   ShieldCheck,
   Printer,
   CheckCircle2,
-  Download,
   Paperclip,
   Lock,
 } from 'lucide-react';
@@ -32,32 +31,13 @@ interface Props {
 }
 
 function ContractModalInner({ isOpen, contractData, onClose, onSignAndFund }: Props) {
+  const { t } = useLanguage();
   const dialogRef = useDialog(onClose);
-  const [downloadSuccess, setDownloadSuccess] = useState(false);
 
   if (!isOpen) return null;
 
   const dpAmount = (contractData.totalAmount * contractData.dpPercentage) / 100;
   const settlementAmount = contractData.totalAmount - dpAmount;
-
-  const handleSimulateDownload = (fileName: string) => {
-    setDownloadSuccess(true);
-    // Create a mock text file download to simulate realistic file retrieval
-    const dummyBlob = new Blob(
-      [
-        `SURAT PERJANJIAN KERJASAMA (PKS)\nNo: ${contractData.contractNumber}\nAcara: ${contractData.eventTitle}\nPihak 1: ${contractData.partyOne}\nPihak 2: ${contractData.partyTwo}\nTotal: Rp ${contractData.totalAmount.toLocaleString('id-ID')}\nStatus: Terverifikasi Escrow Event Yuk`
-      ],
-      { type: 'text/plain;charset=utf-8' }
-    );
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(dummyBlob);
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-
-    setTimeout(() => setDownloadSuccess(false), 3000);
-  };
 
   return (
     <div ref={dialogRef} className="fixed inset-0 !mt-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-sm animate-fadeIn">
@@ -96,25 +76,17 @@ function ContractModalInner({ isOpen, contractData, onClose, onSignAndFund }: Pr
                 </div>
                 <div className="min-w-0">
                   <div className="inline-flex items-center gap-1 text-sm font-bold text-[#5E7628]">
-                    <span>Dokumen kontrak mandiri terlampir</span>
+                    <span>{t('cm.attached')}</span>
                   </div>
                   <p className="font-bold text-slate-900 text-sm truncate">
                     {contractData.attachedFileName}
                   </p>
                   <p className="text-sm text-slate-500">
-                    {contractData.attachedFileSize || '2.4 MB'} • Format Dokumen Resmi
+                    {contractData.attachedFileSize || ''}
                   </p>
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={() => handleSimulateDownload(contractData.attachedFileName || 'dokumen-pks.pdf')}
-                className="px-3.5 py-2 rounded-lg bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-sm flex items-center gap-1.5 hover:shadow transition shrink-0"
-              >
-                <Download className="w-3.5 h-3.5 text-[#172D46]" />
-                <span>{downloadSuccess ? 'Tersimpan' : 'Unduh Berkas'}</span>
-              </button>
             </div>
           )}
 
@@ -225,17 +197,8 @@ function ContractModalInner({ isOpen, contractData, onClose, onSignAndFund }: Pr
               className="px-3 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-lg transition flex items-center gap-1.5"
             >
               <Printer className="w-3.5 h-3.5" />
-              <span>Cetak PKS</span>
+              <span>{t('cm.print')}</span>
             </button>
-            {contractData.attachedFileName && (
-              <button
-                onClick={() => handleSimulateDownload(contractData.attachedFileName || 'berkas-pks.pdf')}
-                className="px-3 py-2 text-sm font-semibold text-[#172D46] hover:bg-[#172D46]/10 rounded-lg transition flex items-center gap-1.5"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span>Unduh berkas lampiran</span>
-              </button>
-            )}
           </div>
 
           <div className="flex items-center gap-2">
@@ -243,14 +206,14 @@ function ContractModalInner({ isOpen, contractData, onClose, onSignAndFund }: Pr
               onClick={onClose}
               className="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-200 rounded-lg transition"
             >
-              Tutup
+              {t('cm.close')}
             </button>
             <button
               onClick={onSignAndFund}
               className="px-5 min-h-12 text-white rounded-full font-bold text-sm transition flex items-center gap-2 bg-brand-navy hover:bg-brand-navy-dark transition-colors"
             >
               <ShieldCheck className="w-4 h-4" />
-              <span>Tanda tangani dan lanjut ke Escrow Midtrans</span>
+              <span>{t('cm.sign')}</span>
             </button>
           </div>
         </div>

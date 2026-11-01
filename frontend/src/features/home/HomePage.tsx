@@ -6,7 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { SEOHead } from '../../components/SEOHead';
 import RoleContextBar from '../../components/RoleContextBar';
-import { UserRole } from '../../components/RoleOnboardingModal';
+import { UserRole } from '../../types/models';
 import { cachedFetch } from '../../utils/apiCache';
 import HomeHero from './components/HomeHero';
 import HomeRoleSection from './components/HomeRoleSection';

@@ -15,6 +15,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { api, ApiError } from '../lib/api';
+import { useLanguage } from '../context/LanguageContext';
 
 interface Props {
   isOpen: boolean;
@@ -23,6 +24,7 @@ interface Props {
 }
 
 function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
+  const { t } = useLanguage();
   const dialogRef = useDialog(onClose);
   const [formData, setFormData] = useState({
     title: '',
@@ -71,7 +73,7 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
       onSuccess();
       onClose();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Acara belum bisa disimpan.');
+      setError(err instanceof ApiError ? err.message : t('cev.saveFail'));
     } finally {
       setLoading(false);
     }
@@ -84,13 +86,13 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
         <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
           <div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800 text-sm font-bold mb-1">
-              <Layers className="w-3.5 h-3.5 text-sky-600" /> Ruang kerja proyek acara
+              <Layers className="w-3.5 h-3.5 text-sky-600" /> {t('cev.eyebrow')}
             </div>
             <h3 className="font-extrabold text-slate-900 text-xl tracking-tight">
-              Buat proyek acara baru
+              {t('cev.01')}
             </h3>
             <p className="text-sm text-slate-500 mt-0.5">
-              Tentukan parameter acara dan atur izin pengajuan penawaran untuk vendor, band, tenant, serta kru.
+              {t('cev.02')}
             </p>
           </div>
           <button
@@ -108,11 +110,11 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
           )}
 
           <div>
-            <label className="block font-semibold text-slate-700 mb-1">Judul acara</label>
+            <label className="block font-semibold text-slate-700 mb-1">{t('cev.03')}</label>
             <input
               type="text"
               required
-              placeholder="Contoh: Pentas Seni SMA 1 Jakarta / Nusantara Jazz Festival"
+              placeholder={t('cev.04')}
               className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -121,25 +123,25 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Kategori Acara</label>
+              <label className="block font-semibold text-slate-700 mb-1">{t('cev.05')}</label>
               <select
                 className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none bg-white"
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
               >
-                <option value="CONCERT">Konser Musik</option>
-                <option value="PENSI">Pentas Seni (Pensi)</option>
-                <option value="BAZAAR">Bazaar dan festival kuliner</option>
-                <option value="EXPO">Pameran dan expo</option>
+                <option value="CONCERT">{t('cev.06')}</option>
+                <option value="PENSI">{t('cev.07')}</option>
+                <option value="BAZAAR">{t('cev.08')}</option>
+                <option value="EXPO">{t('cev.09')}</option>
               </select>
             </div>
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1">
-                <DollarSign className="w-3.5 h-3.5 text-slate-400" /> Pagu anggaran (Rp)
+                <DollarSign className="w-3.5 h-3.5 text-slate-400" /> {t('cev.budget')}
               </label>
               <input
                 type="text"
-                placeholder="Misal: 350.000.000"
+                placeholder={t('cev.10')}
                 className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                 value={formData.budget}
                 onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
@@ -150,12 +152,12 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-slate-400" /> Lokasi atau venue
+                <MapPin className="w-3.5 h-3.5 text-slate-400" /> {t('cev.venue')}
               </label>
               <input
                 type="text"
                 required
-                placeholder="Misal: Istora Senayan, Jakarta"
+                placeholder={t('cev.11')}
                 className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                 value={formData.venue}
                 onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
@@ -163,13 +165,13 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
             </div>
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-slate-400" /> Tanggal Pelaksanaan
+                <Calendar className="w-3.5 h-3.5 text-slate-400" /> {t('cev.dates')}
               </label>
               <div className="grid grid-cols-2 gap-2">
                 <input
                   type="date"
                   required
-                  aria-label="Tanggal mulai"
+                  aria-label={t('cev.12')}
                   className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                   value={formData.startDate}
                   onChange={(e) => setFormData({ ...formData, startDate: e.target.value, endDate: formData.endDate && formData.endDate < e.target.value ? e.target.value : formData.endDate })}
@@ -177,7 +179,7 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
                 <input
                   type="date"
                   required
-                  aria-label="Tanggal selesai"
+                  aria-label={t('cev.13')}
                   min={formData.startDate}
                   className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                   value={formData.endDate}
@@ -188,10 +190,10 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
           </div>
 
           <div>
-            <label className="block font-semibold text-slate-700 mb-1">Deskripsi dan kebutuhan acara</label>
+            <label className="block font-semibold text-slate-700 mb-1">{t('cev.14')}</label>
             <textarea
               rows={2}
-              placeholder="Jelaskan konsep acara, target pengunjung, dan kebutuhan pengadaan panggung/talent..."
+              placeholder={t('cev.15')}
               className="w-full px-3.5 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -202,9 +204,9 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
           <div className="bg-slate-50 p-4 rounded-lg border border-slate-200 space-y-3">
             <div className="flex items-center justify-between">
               <span className="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-                <Sliders className="w-3.5 h-3.5 text-sky-600" /> Izin pengajuan mitra
+                <Sliders className="w-3.5 h-3.5 text-sky-600" /> {t('cev.perm')}
               </span>
-              <span className="text-sm text-slate-500 font-medium">Aturan penerimaan</span>
+              <span className="text-sm text-slate-500 font-medium">{t('cev.16')}</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
@@ -218,9 +220,9 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
                 />
                 <div>
                   <div className="font-bold text-slate-800 flex items-center gap-1">
-                    <Sliders className="w-3.5 h-3.5 text-indigo-600" /> Terima pengajuan vendor
+                    <Sliders className="w-3.5 h-3.5 text-indigo-600" /> {t('cev.vendors')}
                   </div>
-                  <div className="text-sm text-slate-500">Vendor luar boleh mengajukan penawaran harga alat</div>
+                  <div className="text-sm text-slate-500">{t('cev.17')}</div>
                 </div>
               </label>
 
@@ -234,9 +236,9 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
                 />
                 <div>
                   <div className="font-bold text-slate-800 flex items-center gap-1">
-                    <Music className="w-3.5 h-3.5 text-purple-600" /> Terima pengajuan band
+                    <Music className="w-3.5 h-3.5 text-purple-600" /> {t('cev.bands')}
                   </div>
-                  <div className="text-sm text-slate-500">Manajer band/musisi boleh mengajukan proposal manggung</div>
+                  <div className="text-sm text-slate-500">{t('cev.18')}</div>
                 </div>
               </label>
 
@@ -250,9 +252,9 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
                 />
                 <div>
                   <div className="font-bold text-slate-800 flex items-center gap-1">
-                    <Store className="w-3.5 h-3.5 text-emerald-600" /> Buka kaveling tenant
+                    <Store className="w-3.5 h-3.5 text-emerald-600" /> {t('cev.tenants')}
                   </div>
-                  <div className="text-sm text-slate-500">Buka pendaftaran booth bazaar dan pameran</div>
+                  <div className="text-sm text-slate-500">{t('cev.19')}</div>
                 </div>
               </label>
 
@@ -266,9 +268,9 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
                 />
                 <div>
                   <div className="font-bold text-slate-800 flex items-center gap-1">
-                    <Users className="w-3.5 h-3.5 text-rose-600" /> Buka rekrutmen kru
+                    <Users className="w-3.5 h-3.5 text-rose-600" /> {t('cev.crew')}
                   </div>
-                  <div className="text-sm text-slate-500">Membuka lowongan kru shift lapangan</div>
+                  <div className="text-sm text-slate-500">{t('cev.20')}</div>
                 </div>
               </label>
             </div>
@@ -284,12 +286,12 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
                   )}
                   <div>
                     <div className="font-bold text-sm text-slate-900">
-                      {formData.isInviteOnly ? 'Mode Acara Tertutup (Invite Only)' : 'Mode Acara Terbuka (Public Listing)'}
+                      {formData.isInviteOnly ? t('cev.closed') : t('cev.open')}
                     </div>
                     <div className="text-sm text-slate-500">
                       {formData.isInviteOnly
-                        ? 'Hanya mitra yang diundang langsung oleh EO yang dapat bekerjasama'
-                        : 'Acara tampil di beranda dan terbuka untuk penawaran mitra terkurasi'}
+                        ? t('cev.closedNote')
+                        : t('cev.openNote')}
                     </div>
                   </div>
                 </div>
@@ -318,7 +320,7 @@ function CreateEventModalInner({ isOpen, onClose, onSuccess }: Props) {
               className="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white rounded-lg font-bold transition flex items-center gap-2"
             >
               <CheckCircle2 className="w-4 h-4" />
-              <span>{loading ? 'Mempublikasikan...' : 'Publikasikan Proyek Acara'}</span>
+              <span>{loading ? t('cev.publishing') : t('cev.publish')}</span>
             </button>
           </div>
         </form>

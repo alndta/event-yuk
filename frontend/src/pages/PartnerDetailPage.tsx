@@ -16,7 +16,6 @@ import {
   Wrench,
   Volume2,
   Users,
-  Clock,
   Building2,
 } from 'lucide-react';
 import EmptyState from '../components/EmptyState';
@@ -26,12 +25,14 @@ import { SEOHead } from '../components/SEOHead';
 import { DetailSkeleton } from '../components/skeletons/DetailSkeleton';
 import { cachedFetch } from '../utils/apiCache';
 import Avatar from '../components/Avatar';
+import { useLanguage } from '../context/LanguageContext';
 
 interface Props {
   onProposePartner: (partner: PartnerItem) => void;
 }
 
 export default function PartnerDetailPage({ onProposePartner }: Props) {
+  const { t } = useLanguage();
   const { id } = useParams();
   const { requireAuth } = useAuth();
 
@@ -66,7 +67,7 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
         city: partner.city,
         rating: partner.rating,
         avatar: partner.avatar,
-        priceRange: partner.priceRange || 'Sesuai Kesepakatan',
+        priceRange: partner.priceRange || null,
         specsOrRiders: partner.specsOrRiders || [],
         description: partner.description || '',
         completedGigs: partner.completedGigs || 0,
@@ -76,7 +77,6 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
 
   const isVendor = partner?.type === 'VENDOR';
   const isTalent = partner?.type === 'TALENT';
-  const isEO = partner?.type === 'EO';
 
   const packages = partner?.packages || [];
   const talentProfile = partner?.talentProfile;
@@ -110,8 +110,8 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
   }
 
   const backTo = isVendor ? '/vendors' : isTalent ? '/bands' : '/organizers';
-  const backLabel = isVendor ? 'Kembali ke direktori vendor' : isTalent ? 'Kembali ke direktori band' : 'Kembali ke direktori mitra';
-  const ctaLabel = isVendor ? 'Ajukan sewa alat' : isTalent ? 'Ajukan tawaran manggung' : 'Ajak kolaborasi';
+  const backLabel = isVendor ? t('pd.backV') : isTalent ? t('pd.backT') : t('pd.backO');
+  const ctaLabel = isVendor ? t('pd.ctaV') : isTalent ? t('pd.ctaT') : t('pd.ctaO');
   const contactPhone: string | undefined = partner.managerContact;
   const contactEmail: string | undefined = partner.contactEmail;
 
@@ -132,7 +132,7 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
   );
 
   if (!partner) {
-    return <EmptyState title="Mitra tidak ditemukan" body="Profil ini mungkin sudah tidak aktif." actionLabel="Lihat direktori mitra" actionTo="/vendors" />;
+    return <EmptyState title={t('pd2.01')} body="Profil ini mungkin sudah tidak aktif." actionLabel="Lihat direktori mitra" actionTo="/vendors" />;
   }
 
   return (
@@ -160,7 +160,7 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
         </Link>
         <span className="inline-flex items-center gap-2 rounded-full bg-brand-forest-light px-4 py-1.5 text-sm font-semibold text-brand-forest-dark">
           <ShieldCheck aria-hidden="true" className="h-4 w-4" />
-          Mitra terverifikasi e-KYC dan Escrow
+          {t('pd2.02')}
         </span>
       </div>
 
@@ -186,7 +186,7 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
               </p>
               <h1 className="mt-3 flex items-center gap-2 font-display text-3xl font-extrabold leading-tight tracking-[-0.04em] sm:text-5xl">
                 {partner.name}
-                <CheckCircle2 aria-label="Terverifikasi" className="h-7 w-7 shrink-0 text-brand-lime" />
+                {partner.verified && <CheckCircle2 aria-label={t('pd2.03')} className="h-7 w-7 shrink-0 text-brand-lime" />}
               </h1>
               <p className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-base text-slate-200">
                 <span className="inline-flex items-center gap-1.5">
@@ -216,23 +216,26 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
         <div className="space-y-5 lg:col-span-2">
           <Card>
-            <CardTitle icon={<FileText className="h-5 w-5" />}>Tentang mitra</CardTitle>
+            <CardTitle icon={<FileText className="h-5 w-5" />}>{t('pd2.04')}</CardTitle>
             <p className="text-base leading-7 text-slate-700">
-              {partner.description ||
-                'Mitra terverifikasi resmi dalam ekosistem Event Yuk dengan jaminan kepatuhan teknis, transparansi biaya, dan kontrak digital yang mengikat secara hukum.'}
+              {partner.description || t('pd.noDesc')}
             </p>
             <dl className="grid grid-cols-1 gap-3 border-t border-slate-200 pt-5 sm:grid-cols-3">
-              <Fact label="Pengalaman kerja" value={(partner.experienceYears || 6) + ' tahun di industri'} />
               <Fact
-                label="Status verifikasi"
+                label={t('pd2.05')}
                 value={
-                  <span className="inline-flex items-center gap-1.5">
-                    <CheckCircle2 aria-hidden="true" className="h-4 w-4 text-brand-forest" />
-                    e-KYC lolos
-                  </span>
+                  partner.verified ? (
+                    <span className="inline-flex items-center gap-1.5">
+                      <CheckCircle2 aria-hidden="true" className="h-4 w-4 text-brand-forest" />
+                      {t('pd.kycPass')}
+                    </span>
+                  ) : (
+                    t('pd.unverified')
+                  )
                 }
               />
-              <Fact label="Garansi escrow" value="Pencairan bertahap" />
+              <Fact label={t('pd2.06')} value={String(partner.completedGigs || 0)} />
+              <Fact label={t('pd2.07')} value="Pencairan bertahap" />
             </dl>
           </Card>
 
@@ -240,10 +243,7 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
             <>
               <Card>
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <CardTitle icon={<Wrench className="h-5 w-5" />}>Paket dan inventaris peralatan</CardTitle>
-                  <span className="rounded-full bg-brand-lime-soft px-3 py-1 text-sm font-semibold text-brand-navy">
-                    Standar keselamatan K3
-                  </span>
+                  <CardTitle icon={<Wrench className="h-5 w-5" />}>{t('pd2.08')}</CardTitle>
                 </div>
 
                 {packages.length > 0 ? (
@@ -254,13 +254,13 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
                           <h3 className="font-display text-xl font-extrabold tracking-[-0.02em] text-brand-ink">{pkg.package_name}</h3>
                           <span className="font-display text-xl font-extrabold text-brand-ink">
                             Rp {Number(pkg.base_price).toLocaleString('id-ID')}
-                            <span className="text-sm font-normal text-slate-600"> / hari</span>
+                            <span className="text-sm font-normal text-slate-600"> {t("pd2.day")}</span>
                           </span>
                         </div>
 
                         {pkg.tech_specs && (
                           <div className="space-y-2 rounded-lg bg-white p-4 text-base">
-                            <p className="text-sm font-semibold text-slate-800">Spesifikasi teknis alat</p>
+                            <p className="text-sm font-semibold text-slate-800">{t('pd2.10')}</p>
                             {Object.entries(pkg.tech_specs).map(([key, val]) => (
                               <div key={key} className="flex justify-between gap-4 text-slate-700">
                                 <span className="capitalize text-slate-600">{key.replace('_', ' ')}</span>
@@ -279,7 +279,7 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
                             onClick={handleProposeClick}
                             className="inline-flex min-h-11 items-center justify-center rounded-full bg-brand-navy px-5 text-sm font-semibold text-white transition-colors hover:bg-brand-navy-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy"
                           >
-                            Pilih paket ini
+                            {t('pd2.11')}
                           </button>
                         </div>
                       </div>
@@ -293,7 +293,6 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
                         className="flex flex-col justify-between gap-1 rounded-lg bg-brand-cream p-4 sm:flex-row sm:items-center"
                       >
                         <span className="text-base font-medium text-brand-ink">{spec}</span>
-                        <span className="text-sm font-semibold text-brand-forest-dark">Tersedia untuk acara</span>
                       </li>
                     ))}
                   </ul>
@@ -303,7 +302,7 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
               <div data-gsap-reveal className="space-y-3 rounded-lg bg-brand-navy p-6 text-white sm:p-8">
                 <p className="flex items-center gap-2 font-display text-xl font-extrabold">
                   <ShieldCheck aria-hidden="true" className="h-5 w-5 text-brand-lime" />
-                  Jaminan BAST digital dan pencairan DP yang aman
+                  {t('pd2.12')}
                 </p>
                 <p className="text-base leading-7 text-slate-200">
                   Vendor ini mematuhi standar kerja Event Yuk: DP 30%–50% ditahan di Rekening Bersama Escrow dan baru dicairkan saat surat jalan atau alat tiba di lokasi. Sisa pelunasan dicairkan setelah Berita Acara Serah Terima (BAST) digital ditandatangani kedua belah pihak pasca-acara selesai.
@@ -316,21 +315,19 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
             <>
               <Card>
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <CardTitle icon={<Volume2 className="h-5 w-5" />}>Technical dan sound rider panggung</CardTitle>
+                  <CardTitle icon={<Volume2 className="h-5 w-5" />}>{t('pd2.13')}</CardTitle>
                   <span className="rounded-full bg-brand-lime-soft px-3 py-1 text-sm font-semibold text-brand-navy">
-                    Genre: {talentProfile?.genre || 'Indie Pop-Rock'}
+                    {talentProfile?.genre ? t('pd.genre') + ' ' + talentProfile.genre : ''}
                   </span>
                 </div>
 
                 {talentProfile?.technical_riders ? (
                   <dl className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <Fact label="Kebutuhan channel mixer FOH" value={(talentProfile.technical_riders.channels || 24) + ' channel digital'} />
-                    <Fact label="Sistem monitor panggung" value={talentProfile.technical_riders.monitors || '4 IEM Wireless + 2 Wedges'} />
-                    <Fact
-                      wide
-                      label="Backline amplifier pilihan"
-                      value={talentProfile.technical_riders.amps || 'Fender Twin Reverb (Gitar) & Ampeg SVT-CL (Bass)'}
-                    />
+                    {talentProfile.technical_riders.channels && (
+                      <Fact label={t('pd2.14')} value={talentProfile.technical_riders.channels + ' channel'} />
+                    )}
+                    {talentProfile.technical_riders.monitors && <Fact label={t('pd2.15')} value={String(talentProfile.technical_riders.monitors)} />}
+                    {talentProfile.technical_riders.amps && <Fact wide label={t('pd2.16')} value={String(talentProfile.technical_riders.amps)} />}
                   </dl>
                 ) : (
                   <ul className="space-y-2">
@@ -343,52 +340,40 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
                 )}
               </Card>
 
-              <Card>
-                <CardTitle icon={<Users className="h-5 w-5" />}>Hospitality dan ruang artis</CardTitle>
-                <dl className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-                  <Fact label="Ruang tunggu backstage" value={talentProfile?.hospitality_riders?.rooms || '1 Ruang VIP AC Bersih'} />
-                  <Fact label="Konsumsi personel" value={talentProfile?.hospitality_riders?.meals || '15 Box Bento & Buah'} />
-                  <Fact label="Transportasi lokal" value={talentProfile?.hospitality_riders?.transfers || '2 Unit Van / HiAce'} />
-                </dl>
-              </Card>
+              {talentProfile?.hospitality_riders && typeof talentProfile.hospitality_riders === 'object' && Object.keys(talentProfile.hospitality_riders).length > 0 && (
+                <Card>
+                  <CardTitle icon={<Users className="h-5 w-5" />}>{t('pd2.17')}</CardTitle>
+                  <dl className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    {talentProfile.hospitality_riders.rooms && <Fact label={t('pd2.18')} value={String(talentProfile.hospitality_riders.rooms)} />}
+                    {talentProfile.hospitality_riders.meals && <Fact label={t('pd2.19')} value={String(talentProfile.hospitality_riders.meals)} />}
+                    {talentProfile.hospitality_riders.transfers && <Fact label={t('pd2.20')} value={String(talentProfile.hospitality_riders.transfers)} />}
+                  </dl>
+                </Card>
+              )}
 
               <div data-gsap-reveal className="space-y-3 rounded-lg bg-brand-navy p-6 text-white sm:p-8">
                 <p className="flex items-center gap-2 font-display text-xl font-extrabold">
                   <ShieldCheck aria-hidden="true" className="h-5 w-5 text-brand-lime" />
-                  PKS sah dan kebijakan anti-cancel sepihak
+                  {t('pd2.21')}
                 </p>
                 <p className="text-base leading-7 text-slate-200">
-                  Semua penawaran manggung wajib dituangkan ke dalam PKS digital resmi. DP terkunci aman di Escrow dan hanya cair sesuai termin kesepakatan (50% saat PKS ditandatangani, 50% setelah soundcheck/tampil).
+                  {t('pd2.22')}
                 </p>
               </div>
             </>
           )}
 
-          {isEO && (
-            <Card>
-              <CardTitle icon={<Building2 className="h-5 w-5" />}>Standar produksi dan manajemen acara</CardTitle>
-              <p className="text-base leading-7 text-slate-700">
-                Penyelenggara acara resmi dengan rekam jejak penyelenggaraan festival terbuka, pensi kampus/sekolah, dan bazaar tematik. Mengedepankan standarisasi keselamatan massa, perizinan lengkap, dan ketepatan waktu pembayaran vendor & kru.
-              </p>
-              <div className="rounded-lg bg-brand-lime-soft p-5">
-                <p className="text-base font-semibold text-brand-ink">Membuka kemitraan</p>
-                <p className="mt-1 text-base leading-7 text-slate-700">
-                  Vendor sound & lighting, tenant kuliner/bazaar, serta kru lapangan untuk proyek acara aktif.
-                </p>
-              </div>
-            </Card>
-          )}
         </div>
 
         <aside>
           <div data-gsap-reveal className="sticky top-24 space-y-6 rounded-lg bg-white p-6 sm:p-8">
             <div>
-              <p className="text-sm text-slate-700">Perkiraan honor / tarif</p>
+              <p className="text-sm text-slate-700">{t('pd2.23')}</p>
               <p className="mt-1 font-display text-3xl font-extrabold tracking-[-0.04em] text-brand-ink">
-                {partner.priceRange || 'Rp 25.000.000'}
+                {partner.priceRange || t('pd.negotiable')}
               </p>
               <p className="mt-2 text-sm leading-6 text-slate-600">
-                Bisa dinegosiasikan lewat fitur Counter-Offer di ruang kerja PKS.
+                {t('pd2.24')}
               </p>
             </div>
 
@@ -398,27 +383,23 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
               className="flex min-h-14 w-full items-center justify-center gap-2 rounded-full bg-brand-navy px-6 text-base font-semibold text-white transition-colors hover:bg-brand-navy-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-navy"
             >
               <Send aria-hidden="true" className="h-5 w-5 text-brand-lime" />
-              {isVendor ? 'Ajukan tawaran sewa alat' : isTalent ? 'Ajukan jadwal manggung' : 'Ajak kolaborasi proyek'}
+              {isVendor ? t('pd.btnV') : isTalent ? t('pd.btnT') : t('pd.btnO')}
             </button>
 
             <ul className="space-y-3 border-t border-slate-200 pt-5 text-base text-slate-700">
               <li className="flex items-start gap-3">
                 <ShieldCheck aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-brand-forest" />
-                Dana DP 50% terlindungi di Escrow Midtrans
+                {t('pd.depositNote')}
               </li>
               <li className="flex items-start gap-3">
                 <FileText aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-brand-forest" />
-                Surat Perjanjian Kerja Sama (PKS) digital resmi
-              </li>
-              <li className="flex items-start gap-3">
-                <Clock aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-brand-forest" />
-                Respons kurasi rata-rata dalam 1x24 jam
+                {t('pd2.25')}
               </li>
             </ul>
 
             {(contactPhone || contactEmail) && (
               <div className="space-y-2 rounded-lg bg-brand-cream p-4">
-                <p className="text-sm font-semibold text-slate-800">Kontak</p>
+                <p className="text-sm font-semibold text-slate-800">{t('pd2.26')}</p>
                 {contactPhone && (
                   <p className="flex items-center gap-2 text-base font-semibold text-brand-ink">
                     <Phone aria-hidden="true" className="h-4 w-4 shrink-0 text-slate-600" />

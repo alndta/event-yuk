@@ -2,6 +2,7 @@ import useDialog from '../hooks/useDialog';
 import React, { useState } from 'react';
 import { X, UploadCloud, Film, Users, DollarSign, Calendar, MapPin, FileCheck } from 'lucide-react';
 import { api, ApiError } from '../lib/api';
+import { useLanguage } from '../context/LanguageContext';
 
 interface Props {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface Props {
 }
 
 function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
+  const { t } = useLanguage();
   const dialogRef = useDialog(onClose);
   const [formData, setFormData] = useState({
     title: '',
@@ -53,7 +55,7 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
       onSuccess();
       onClose();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Portofolio belum bisa disimpan.');
+      setError(err instanceof ApiError ? err.message : t('upf.saveFail'));
     } finally {
       setLoading(false);
     }
@@ -69,8 +71,8 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
               <FileCheck className="w-5 h-5 text-amber-600" />
             </span>
             <div>
-              <h3 className="font-extrabold text-slate-900 text-lg">Unggah portofolio acara</h3>
-              <p className="text-sm text-slate-500">Tampilkan rekam jejak event yang pernah kamu laksanakan ke dalam katalog publik</p>
+              <h3 className="font-extrabold text-slate-900 text-lg">{t('upf.01')}</h3>
+              <p className="text-sm text-slate-500">{t('upf.02')}</p>
             </div>
           </div>
           <button
@@ -88,11 +90,11 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
           )}
 
           <div>
-            <label className="block font-semibold text-slate-700 mb-1">Nama acara</label>
+            <label className="block font-semibold text-slate-700 mb-1">{t('upf.03')}</label>
             <input
               type="text"
               required
-              placeholder="Contoh: Pentas Seni SMAN 1 Jakarta 2026"
+              placeholder={t('upf.04')}
               className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
@@ -101,23 +103,23 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Kategori Event</label>
+              <label className="block font-semibold text-slate-700 mb-1">{t('upf.05')}</label>
               <select
                 className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white"
                 value={formData.category}
                 onChange={(e) => setFormData({ ...formData, category: e.target.value as any })}
               >
-                <option value="CONCERT">Konser Musik</option>
-                <option value="PENSI">Pentas Seni (Pensi)</option>
-                <option value="BAZAAR">Festival kuliner dan bazaar</option>
-                <option value="EXPO">Pameran / Expo</option>
+                <option value="CONCERT">{t('upf.06')}</option>
+                <option value="PENSI">{t('upf.07')}</option>
+                <option value="BAZAAR">{t('upf.08')}</option>
+                <option value="EXPO">{t('upf.09')}</option>
               </select>
             </div>
             <div>
-              <label className="block font-semibold text-slate-700 mb-1">Nama tim atau EO</label>
+              <label className="block font-semibold text-slate-700 mb-1">{t('upf.10')}</label>
               <input
                 type="text"
-                placeholder="Nama Organisasi / EO"
+                placeholder={t('upf.11')}
                 className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none"
                 value={formData.organizerName}
                 onChange={(e) => setFormData({ ...formData, organizerName: e.target.value })}
@@ -128,12 +130,12 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1">
-                <MapPin className="w-3.5 h-3.5 text-slate-400" /> Lokasi / Venue
+                <MapPin className="w-3.5 h-3.5 text-slate-400" /> {t('upf.venue')}
               </label>
               <input
                 type="text"
                 required
-                placeholder="Misal: Istora Senayan, Jakarta"
+                placeholder={t('upf.12')}
                 className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none"
                 value={formData.venue}
                 onChange={(e) => setFormData({ ...formData, venue: e.target.value })}
@@ -141,13 +143,13 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
             </div>
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1">
-                <Calendar className="w-3.5 h-3.5 text-slate-400" /> Waktu Pelaksanaan
+                <Calendar className="w-3.5 h-3.5 text-slate-400" /> {t('upf.dates')}
               </label>
               <div className="grid grid-cols-2 gap-2">
                 <input
                   type="date"
                   required
-                  aria-label="Tanggal mulai"
+                  aria-label={t('upf.13')}
                   className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                   value={formData.startDate}
                   onChange={(e) => setFormData({ ...formData, startDate: e.target.value, endDate: formData.endDate && formData.endDate < e.target.value ? e.target.value : formData.endDate })}
@@ -155,7 +157,7 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
                 <input
                   type="date"
                   required
-                  aria-label="Tanggal selesai"
+                  aria-label={t('upf.14')}
                   min={formData.startDate}
                   className="w-full px-3.5 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                   value={formData.endDate}
@@ -169,11 +171,11 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
           <div className="grid grid-cols-2 gap-3 bg-amber-50/50 p-3 rounded-lg border border-amber-200/60">
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1 text-sm">
-                <Users className="w-3.5 h-3.5 text-amber-600" /> Total penonton atau pengunjung
+                <Users className="w-3.5 h-3.5 text-amber-600" /> {t('upf.audience')}
               </label>
               <input
                 type="text"
-                placeholder="Misal: 10.000"
+                placeholder={t('upf.15')}
                 className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white text-sm"
                 value={formData.attendees}
                 onChange={(e) => setFormData({ ...formData, attendees: e.target.value })}
@@ -181,11 +183,11 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
             </div>
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1 text-sm">
-                <DollarSign className="w-3.5 h-3.5 text-amber-600" /> Estimasi biaya produksi
+                <DollarSign className="w-3.5 h-3.5 text-amber-600" /> {t('upf.cost')}
               </label>
               <input
                 type="text"
-                placeholder="Misal: 450.000.000"
+                placeholder={t('upf.16')}
                 className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none bg-white text-sm"
                 value={formData.budget}
                 onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
@@ -194,10 +196,10 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
           </div>
 
           <div>
-            <label className="block font-semibold text-slate-700 mb-1">Cerita singkat dan hasil acara</label>
+            <label className="block font-semibold text-slate-700 mb-1">{t('upf.17')}</label>
             <textarea
               rows={3}
-              placeholder="Ceritakan keseruan artis pengisi, kepuasan tenant, dan kelancaran produksi..."
+              placeholder={t('upf.18')}
               className="w-full px-3.5 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-amber-500 focus:outline-none"
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -219,7 +221,7 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
             </div>
             <div>
               <label className="block font-semibold text-slate-700 mb-1 flex items-center gap-1">
-                <Film className="w-3.5 h-3.5 text-slate-400" /> Tautan video aftermovie
+                <Film className="w-3.5 h-3.5 text-slate-400" /> {t('upf.film')}
               </label>
               <input
                 type="url"
@@ -245,7 +247,7 @@ function UploadPortfolioModalInner({ isOpen, onClose, onSuccess }: Props) {
               disabled={loading}
               className="px-5 min-h-12 text-white rounded-full font-bold transition flex items-center gap-2 bg-brand-navy hover:bg-brand-navy-dark transition-colors"
             >
-              {loading ? 'Menyimpan...' : 'Tayangkan ke Katalog'}
+              {loading ? t('upf.saving') : t('upf.publish')}
             </button>
           </div>
         </form>

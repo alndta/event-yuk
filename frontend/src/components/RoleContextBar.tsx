@@ -1,4 +1,8 @@
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
+import { api } from '../lib/api';
+import type { TranslationKey } from '../i18n/translations';
 import {
   Calendar,
   Sliders,
@@ -11,10 +15,9 @@ import {
   DollarSign,
   FileCheck,
   Clock,
-  Award,
   ArrowRight,
 } from 'lucide-react';
-import { UserRole } from './RoleOnboardingModal';
+import { UserRole } from '../types/models';
 
 interface Props {
   currentRole: UserRole;
@@ -28,98 +31,39 @@ export default function RoleContextBar({
   onOpenUploadPortfolio,
 }: Props) {
   const navigate = useNavigate();
+  const { t } = useLanguage();
+  const [figures, setFigures] = useState<{ open: number; funded: number; escrow: number; balance: number } | null>(null);
 
-  const getRoleDetails = () => {
-    switch (currentRole) {
-      case 'EO':
-        return {
-          title: 'Event Organizer & Promotor',
-          badgeText: 'Akses penuh pengadaan dan escrow acara',
-          icon: Calendar,
-          stats: [
-            { label: 'Proyek Acara Aktif', value: '2 Acara', icon: Calendar },
-            { label: 'Total Pagu Produksi', value: 'Rp 750 Jt', icon: DollarSign },
-            { label: 'Pengajuan Vendor & Band', value: '3 Masuk', icon: FileCheck },
-            { label: 'Jaminan Escrow Tersimpan', value: 'Rp 280 Jt', icon: ShieldCheck },
-          ],
-          primaryActionText: 'Buat event baru',
-          onPrimaryAction: onOpenCreateEvent || (() => navigate('/dashboard')),
-        };
-      case 'VENDOR':
-        return {
-          title: 'Vendor Produksi & Peralatan',
-          badgeText: 'Katalog Alat, Smart Calendar, & Klaim BAST',
-          icon: Sliders,
-          stats: [
-            { label: 'Paket Peralatan Aktif', value: '4 Paket', icon: Sliders },
-            { label: 'Kalender Terkunci', value: '2 Tanggal', icon: Clock },
-            { label: 'Penawaran Berjalan', value: '1 Menunggu SPK', icon: FileCheck },
-            { label: 'Saldo Siap Tarik (Bank)', value: 'Rp 42.500.000', icon: DollarSign },
-          ],
-          primaryActionText: 'Kelola Katalog Alat',
-          onPrimaryAction: () => navigate('/dashboard'),
-        };
-      case 'TALENT':
-        return {
-          title: 'Talenta & Manajemen Band Musik',
-          badgeText: 'Jadwal Manggung, Riders Teknis, & PKS Manggung',
-          icon: Music,
-          stats: [
-            { label: 'Jadwal Tampil (Confirmed)', value: '1 Pensi', icon: Calendar },
-            { label: 'Status Technical Riders', value: 'Terverifikasi', icon: ShieldCheck },
-            { label: 'Penawaran Masuk dari EO', value: '2 Acara', icon: FileCheck },
-            { label: 'Honor Tertahan di Escrow', value: 'Rp 35.000.000', icon: DollarSign },
-          ],
-          primaryActionText: 'Kelola Riders & Rate Card',
-          onPrimaryAction: () => navigate('/dashboard'),
-        };
-      case 'TENANT':
-        return {
-          title: 'Tenant Bazaar & Pameran',
-          badgeText: 'Pemilihan Kaveling, Kurasi Merek, & QR Pass',
-          icon: Store,
-          stats: [
-            { label: 'Booth Tersewa', value: '1 Booth (FNB-04)', icon: Store },
-            { label: 'Status Kurasi Produk', value: 'Disetujui EO', icon: ShieldCheck },
-            { label: 'Digital Exhibitor Pass', value: 'Aktif Ber-QR', icon: FileCheck },
-            { label: 'Jaminan Dana Sewa', value: '100% Escrow', icon: ShieldCheck },
-          ],
-          primaryActionText: 'Kelola Menu & Produk Tenant',
-          onPrimaryAction: () => navigate('/dashboard'),
-        };
-      case 'SPONSOR':
-        return {
-          title: 'Sponsor & Mitra Brand',
-          badgeText: 'Paket Sponsorship, Aktivasi Stan, & Laporan Acara',
-          icon: Building2,
-          stats: [
-            { label: 'Event yang Didukung', value: '1 Konser', icon: Calendar },
-            { label: 'Ukuran Stan Aktivasi', value: '6x6 Meter', icon: Building2 },
-            { label: 'Status Kontrak MoU', value: 'Ditandatangani', icon: FileCheck },
-            { label: 'Estimasi Impresi Audiens', value: '15.000 Pax', icon: Users },
-          ],
-          primaryActionText: 'Kelola Paket Sponsorship',
-          onPrimaryAction: () => navigate('/dashboard'),
-        };
-      case 'CREW':
-        return {
-          title: 'Event Crew Lapangan',
-          badgeText: 'Lowongan Shift Anti-Bentrok & Presensi QR GPS',
-          icon: Users,
-          stats: [
-            { label: 'Shift Diterima (Hired)', value: '2 Shift (LO & Usher)', icon: Calendar },
-            { label: 'Presensi QR Lokasi Acara', value: 'Radius < 50m', icon: ShieldCheck },
-            { label: 'Honor Siap Cair Pasca-Shift', value: 'Rp 750.000', icon: DollarSign },
-            { label: 'Rating Kehadiran Kru', value: '5.0 / 5.0', icon: Award },
-          ],
-          primaryActionText: 'Kelola Keahlian & Shift',
-          onPrimaryAction: () => navigate('/dashboard'),
-        };
-    }
-  };
+  // Real numbers from the account itself; nothing here is a sample.
+  useEffect(() => {
+    Promise.all([api('/proposals'), api('/payments/wallet')])
+      .then(([proposals, wallet]) => {
+        const list: { status: string }[] = proposals.data || [];
+        setFigures({
+          open: list.filter((p) => p.status === 'SUBMITTED' || p.status === 'COUNTER_OFFER').length,
+          funded: list.filter((p) => p.status === 'ESCROW_FUNDED').length,
+          escrow: Number(wallet.wallet.escrow_locked) || 0,
+          balance: Number(wallet.wallet.available_bal) || 0,
+        });
+      })
+      .catch(() => setFigures(null));
+  }, [currentRole]);
 
-  const details = getRoleDetails();
-  const RoleIcon = details.icon;
+  const ICONS = { EO: Calendar, VENDOR: Sliders, TALENT: Music, TENANT: Store, SPONSOR: Building2, CREW: Users } as const;
+  const RoleIcon = ICONS[currentRole];
+  const key = (field: string) => `rcb.${currentRole}.${field}` as TranslationKey;
+  const rupiah = (n: number) => 'Rp ' + n.toLocaleString('id-ID');
+  const primaryAction =
+    currentRole === 'EO' ? onOpenCreateEvent || (() => navigate('/dashboard')) : currentRole === 'TENANT' || currentRole === 'CREW' || currentRole === 'SPONSOR' ? () => navigate('/events') : () => navigate('/dashboard');
+
+  const stats = figures
+    ? [
+        { label: t('rcb.sActive'), value: String(figures.open), icon: FileCheck },
+        { label: t('rcb.sFunded'), value: String(figures.funded), icon: ShieldCheck },
+        { label: t('rcb.sEscrow'), value: rupiah(figures.escrow), icon: Clock },
+        { label: t('rcb.sBalance'), value: rupiah(figures.balance), icon: DollarSign },
+      ]
+    : [];
 
   return (
     <div data-gsap-reveal className="rounded-lg bg-brand-navy p-6 text-white sm:p-8">
@@ -128,19 +72,17 @@ export default function RoleContextBar({
           <div className="flex flex-wrap items-center gap-2">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-lime px-3 py-1 text-sm font-semibold text-brand-navy">
               <RoleIcon aria-hidden="true" className="h-4 w-4" />
-              <span>{details.title}</span>
+              <span>{t(key('title'))}</span>
             </span>
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-sm font-medium text-white">
               <ShieldCheck aria-hidden="true" className="h-4 w-4 text-brand-lime" />
-              <span>1 akun, 1 peran tetap</span>
+              <span>{t('rcb.fixed')}</span>
             </span>
           </div>
 
-          <h2 className="font-display text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">
-            Ruang kerja peranmu
-          </h2>
+          <h2 className="font-display text-3xl font-extrabold tracking-[-0.03em] sm:text-4xl">{t('rcb.heading')}</h2>
           <p className="max-w-xl text-base leading-7 text-slate-200">
-            {details.badgeText}. Fitur, izin pengajuan, dan akses transaksi menyesuaikan peran yang sedang kamu pakai.
+            {t(key('badge'))}. {t('rcb.tail')}
           </p>
         </div>
 
@@ -151,7 +93,7 @@ export default function RoleContextBar({
             className="inline-flex min-h-12 items-center gap-2 rounded-full border-2 border-white/40 px-6 text-base font-semibold text-white transition-colors hover:border-white"
           >
             <LayoutDashboard aria-hidden="true" className="h-5 w-5 text-brand-lime" />
-            <span>Buka dashboard</span>
+            <span>{t('rcb.dashboard')}</span>
             <ArrowRight aria-hidden="true" className="h-4 w-4" />
           </button>
 
@@ -162,34 +104,36 @@ export default function RoleContextBar({
               className="inline-flex min-h-12 items-center gap-2 rounded-full border-2 border-white/40 px-6 text-base font-semibold text-white transition-colors hover:border-white"
             >
               <FileCheck aria-hidden="true" className="h-5 w-5 text-brand-lime" />
-              <span>Unggah portofolio</span>
+              <span>{t('rcb.portfolio')}</span>
             </button>
           )}
 
           <button
             type="button"
-            onClick={details.onPrimaryAction}
+            onClick={primaryAction}
             className="inline-flex min-h-12 items-center gap-2 rounded-full bg-brand-lime px-6 text-base font-semibold text-brand-navy transition-colors hover:bg-brand-lime-hover"
           >
-            <span>{details.primaryActionText}</span>
+            <span>{t(key('action'))}</span>
           </button>
         </div>
       </div>
 
-      <dl className="mt-6 grid grid-cols-2 gap-3 border-t border-white/15 pt-6 md:grid-cols-4">
-        {details.stats.map((s, idx) => {
-          const SIcon = s.icon;
-          return (
-            <div key={idx} className="rounded-lg bg-brand-navy-dark p-4">
-              <dt className="mb-1 flex items-center gap-2 text-sm text-slate-300">
-                <SIcon aria-hidden="true" className="h-4 w-4 shrink-0 text-brand-lime" />
-                <span>{s.label}</span>
-              </dt>
-              <dd className="font-display text-xl font-extrabold tracking-[-0.02em] text-white tabular-nums">{s.value}</dd>
-            </div>
-          );
-        })}
-      </dl>
+      {stats.length > 0 && (
+        <dl className="ey-fade-in mt-6 grid grid-cols-2 gap-3 border-t border-white/15 pt-6 md:grid-cols-4">
+          {stats.map((s) => {
+            const SIcon = s.icon;
+            return (
+              <div key={s.label} className="rounded-lg bg-brand-navy-dark p-4">
+                <dt className="mb-1 flex items-center gap-2 text-sm text-slate-300">
+                  <SIcon aria-hidden="true" className="h-4 w-4 shrink-0 text-brand-lime" />
+                  <span>{s.label}</span>
+                </dt>
+                <dd className="font-display text-xl font-extrabold tracking-[-0.02em] text-white tabular-nums">{s.value}</dd>
+              </div>
+            );
+          })}
+        </dl>
+      )}
     </div>
   );
 }

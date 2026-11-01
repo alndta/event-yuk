@@ -12,9 +12,10 @@ import {
   ShieldCheck,
   ArrowRight,
 } from 'lucide-react';
-import { UserRole } from '../components/RoleOnboardingModal';
+import { UserRole } from '../types/models';
 import { SEOHead } from '../components/SEOHead';
 import './RolesGuidePage.css';
+import { useLanguage } from '../context/LanguageContext';
 
 interface RoleGuideDetail {
   role: UserRole;
@@ -379,26 +380,37 @@ export const ROLES_GUIDE_DATA: Record<UserRole, RoleGuideDetail> = {
   },
 };
 
+const EN_HEADS: Record<UserRole, { name: string; badge: string; tagline: string; overview: string }> = {
+  EO: { name: 'Event organizer & promoter', badge: 'Event organizer', tagline: 'Manage projects, find partners, and coordinate the event team.', overview: 'As an organizer you manage the schedule and budget, production vendors, tenants, talent, and crew. This guide covers what to prepare from publishing to event day.' },
+  VENDOR: { name: 'Production equipment & stage vendor', badge: 'Production & equipment', tagline: 'Show your production services and handle requests from organizers.', overview: 'As a production vendor you supply technical gear such as sound, rigging, lighting, video walls, or generators. State specs, availability, and rental terms clearly.' },
+  TALENT: { name: 'Band, musician & artist management', badge: 'Talent & entertainment', tagline: 'Set up your profile, riders, and performance offers for a band or musician.', overview: 'As a band, musician, or talent manager you prepare your profile, rates, schedule, and stage and hospitality needs. Put the details in writing before agreeing to an event offer.' },
+  TENANT: { name: 'Bazaar, food & apparel tenant', badge: 'Bazaar & SMEs', tagline: 'Find events, submit your products, and pick a bazaar booth.', overview: "As a tenant you can open a booth at a bazaar, food festival, or expo. Check each event's map and terms before choosing a booth." },
+  SPONSOR: { name: 'Sponsor, FMCG & brand partner', badge: 'Sponsor & corporate', tagline: 'Find partnership opportunities and agree on brand activation rights.', overview: 'As a sponsor or agency you look for events that match your brand targets and planned activations. Compare the information available, then agree on rights and deliverables in writing.' },
+  CREW: { name: 'Daily field event crew', badge: 'Freelance workforce', tagline: 'Find fitting shifts and understand the tasks before applying.', overview: 'As field crew you help run events as LO, usher, stagehand, ticketing, or runner. Check the schedule, location, tasks, and pay before applying.' },
+};
+
 export default function RolesGuidePage() {
+  const { t, language } = useLanguage();
   const [selectedRole, setSelectedRole] = useState<UserRole>('EO');
   const pageRef = useRef<HTMLDivElement>(null);
   useGsapReveal(pageRef);
-  const activeGuide = ROLES_GUIDE_DATA[selectedRole];
+  // The long guide text stays in Indonesian; the role headings follow the language switch.
+  const activeGuide = { ...ROLES_GUIDE_DATA[selectedRole], ...(language === 'en' ? EN_HEADS[selectedRole] : {}) };
 
   const roleOptions: { id: UserRole; label: string; icon: any; image: string; alt: string }[] = [
-    { id: 'EO', label: 'Penyelenggara', icon: Calendar, image: '/assets/crowd-festival.jpg', alt: 'Pengunjung menikmati acara musik' },
-    { id: 'VENDOR', label: 'Vendor produksi', icon: Sliders, image: '/assets/vendor-sound.jpg', alt: 'Konsol audio dan perlengkapan produksi musik' },
-    { id: 'TALENT', label: 'Musisi & band', icon: Music, image: '/assets/band-jazz.jpg', alt: 'Pemain musik tampil bersama di panggung' },
-    { id: 'TENANT', label: 'Tenant bazaar', icon: Store, image: '/assets/tenant-bazaar.jpg', alt: 'Tangan mengangkat beberapa cangkir minuman' },
-    { id: 'SPONSOR', label: 'Mitra sponsor', icon: Building2, image: '/assets/sponsor-activation.jpg', alt: 'Ruang acara yang disiapkan untuk kegiatan bersama' },
-    { id: 'CREW', label: 'Kru acara', icon: Users, image: '/assets/crew-production.jpg', alt: 'Tim berdiskusi sambil bekerja dengan laptop' },
+    { id: 'EO', label: t('gd.lbl.EO'), icon: Calendar, image: '/assets/crowd-festival.jpg', alt: 'Pengunjung menikmati acara musik' },
+    { id: 'VENDOR', label: t('gd.lbl.VENDOR'), icon: Sliders, image: '/assets/vendor-sound.jpg', alt: 'Konsol audio dan perlengkapan produksi musik' },
+    { id: 'TALENT', label: t('gd.lbl.TALENT'), icon: Music, image: '/assets/band-jazz.jpg', alt: 'Pemain musik tampil bersama di panggung' },
+    { id: 'TENANT', label: t('gd.lbl.TENANT'), icon: Store, image: '/assets/tenant-bazaar.jpg', alt: 'Tangan mengangkat beberapa cangkir minuman' },
+    { id: 'SPONSOR', label: t('gd.lbl.SPONSOR'), icon: Building2, image: '/assets/sponsor-activation.jpg', alt: 'Ruang acara yang disiapkan untuk kegiatan bersama' },
+    { id: 'CREW', label: t('gd.lbl.CREW'), icon: Users, image: '/assets/crew-production.jpg', alt: 'Tim berdiskusi sambil bekerja dengan laptop' },
   ];
 
   return (
     <div ref={pageRef} className="guide-page -mx-5 -mt-6 -mb-[6.5rem] sm:-mx-8 sm:-mt-8 sm:-mb-28 lg:-mx-12 2xl:-mx-16 font-sans">
       <SEOHead
-        title="Panduan Peran di Ekosistem Acara | Event Yuk"
-        description="Kenali enam peran di Event Yuk, lihat cara kerja tiap mitra, dan ikuti tiga langkah pendaftaran akun."
+        title={t('gd.01')}
+        description={t('gd.02')}
         keywords="panduan peran event organizer, vendor acara, musisi, tenant bazaar, sponsor, kru acara"
         canonicalPath="/roles-guide"
       />
@@ -406,34 +418,34 @@ export default function RolesGuidePage() {
       <section className="guide-chapter guide-hero">
         <div className="guide-shell guide-hero__layout">
           <div className="guide-hero__copy">
-            <h1 data-split-title><span>Pilih peranmu</span><span>di dunia acara</span></h1>
-            <p>Kenali enam peran, lihat alurnya, lalu daftar dengan langkah yang jelas.</p>
+            <h1 data-split-title><span>{t('gd.03')}</span><span>{t('gd.04')}</span></h1>
+            <p>{t('gd.05')}</p>
             <a className="guide-action guide-action--lime" href="#peran">
-              Lihat peran <ArrowRight aria-hidden="true" />
+              {t('gd.seeRoles')} <ArrowRight aria-hidden="true" />
             </a>
           </div>
 
-          <div data-gsap-reveal className="guide-hero__scene" aria-label="Pratinjau alur pendaftaran Event Yuk">
+          <div data-gsap-reveal className="guide-hero__scene" aria-label={t('gd.06')}>
             <img
               className="guide-hero__photo"
               src="/assets/crew-production.jpg"
-              alt="Tim berdiskusi sambil bekerja dengan laptop"
+              alt={t('gd.07')}
               width="800"
               height="534"
             />
             <div className="guide-register-card" data-ui="true">
               <div className="guide-register-card__head">
                 <span>Event Yuk</span>
-                <strong>Daftar akun</strong>
+                <strong>{t('gd.08')}</strong>
               </div>
               <ol className="guide-register-steps">
-                <li className="is-current"><span>1</span><strong>Pilih peran</strong></li>
-                <li><span>2</span><strong>Isi data akun</strong></li>
-                <li><span>3</span><strong>Verifikasi email</strong></li>
+                <li className="is-current"><span>1</span><strong>{t('gd.09')}</strong></li>
+                <li><span>2</span><strong>{t('gd.10')}</strong></li>
+                <li><span>3</span><strong>{t('gd.11')}</strong></li>
               </ol>
-              <p>Pilih jalur yang paling sesuai dengan pekerjaanmu di acara.</p>
+              <p>{t('gd.12')}</p>
             </div>
-            <p className="guide-hero__caption">Kolaborasi acara dimulai dari orang-orangnya.</p>
+            <p className="guide-hero__caption">{t('gd.13')}</p>
           </div>
         </div>
       </section>
@@ -441,11 +453,11 @@ export default function RolesGuidePage() {
       <section id="peran" className="guide-chapter guide-roles">
         <div className="guide-shell">
           <div className="guide-section-heading">
-            <h2 data-split-title>Peranmu dalam acara</h2>
-            <p>Pilih satu peran untuk melihat tanggung jawab, fitur, dan alur kerjanya.</p>
+            <h2 data-split-title>{t('gd.14')}</h2>
+            <p>{t('gd.15')}</p>
           </div>
 
-          <div data-gsap-reveal className="guide-role-grid" role="group" aria-label="Pilih peran">
+          <div data-gsap-reveal className="guide-role-grid" role="group" aria-label={t('gd.09')}>
             {roleOptions.map((option) => {
               const Icon = option.icon;
               const isSelected = selectedRole === option.id;
@@ -475,7 +487,7 @@ export default function RolesGuidePage() {
             <div className="guide-role-summary__detail">
               <p>{activeGuide.overview}</p>
               <Link to="/register" className="guide-text-link">
-                Buka formulir pendaftaran <ArrowRight aria-hidden="true" />
+                {t('gd.openForm')} <ArrowRight aria-hidden="true" />
               </Link>
             </div>
           </div>
@@ -485,7 +497,7 @@ export default function RolesGuidePage() {
       <section className="guide-chapter guide-features">
         <div className="guide-shell">
           <div className="guide-section-heading">
-            <h2 data-split-title>Yang bisa kamu kerjakan</h2>
+            <h2 data-split-title>{t('gd.16')}</h2>
             <p>Fitur untuk {activeGuide.badge.toLowerCase()}.</p>
           </div>
           <ul className="guide-feature-list">
@@ -505,8 +517,8 @@ export default function RolesGuidePage() {
       <section className="guide-chapter guide-workflow">
         <div className="guide-shell">
           <div className="guide-section-heading">
-            <h2 data-split-title>Alur kerja di lapangan</h2>
-            <p>Dari persiapan sampai acara selesai, setiap peran punya urutan kerja yang berbeda.</p>
+            <h2 data-split-title>{t('gd.17')}</h2>
+            <p>{t('gd.18')}</p>
           </div>
           <ol className="guide-workflow-list">
             {activeGuide.workflow.map((item, index) => (
@@ -524,9 +536,9 @@ export default function RolesGuidePage() {
         <div className="guide-shell guide-agreements__layout">
           <div>
             <ShieldCheck aria-hidden="true" className="guide-agreements__icon" />
-            <h2 data-split-title>Pastikan kesepakatan jelas</h2>
+            <h2 data-split-title>{t('gd.19')}</h2>
             <p className="guide-agreements__intro">
-              Cek isi kontrak, termin pembayaran, dan tanggung jawab masing-masing sebelum menyetujui kerja sama.
+              {t('gd.20')}
             </p>
             <ul data-gsap-reveal className="guide-agreement-list">
               {activeGuide.legalAndEscrow.map((item) => (
@@ -536,7 +548,7 @@ export default function RolesGuidePage() {
           </div>
 
           <div className="guide-faq">
-            <h2 data-split-title>Pertanyaan umum</h2>
+            <h2 data-split-title>{t('gd.21')}</h2>
             {activeGuide.faqs.map((faq, index) => (
               <details key={faq.q} data-gsap-reveal open={index === 0}>
                 <summary>{faq.q}</summary>
@@ -549,10 +561,10 @@ export default function RolesGuidePage() {
 
       <section className="guide-chapter guide-cta">
         <div className="guide-shell guide-cta__layout">
-          <h2 data-split-title>Mulai dari peranmu</h2>
-          <p>Pilih peran, isi data akun, lalu verifikasi email untuk masuk.</p>
+          <h2 data-split-title>{t('gd.22')}</h2>
+          <p>{t('gd.23')}</p>
           <Link to="/register" className="guide-action guide-action--navy">
-            Daftar akun <ArrowRight aria-hidden="true" />
+            {t('gd.signUp')} <ArrowRight aria-hidden="true" />
           </Link>
         </div>
       </section>
