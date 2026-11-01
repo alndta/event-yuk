@@ -4,7 +4,9 @@ import { asyncHandler } from '../../shared/http/asyncHandler';
 import { currentAuth, type AuthGuards } from '../../shared/http/auth';
 import { validate } from '../../shared/http/validate';
 import {
+  applicationParams,
   boothParams,
+  decisionSchema,
   createEventSchema,
   createPortfolioSchema,
   eventParams,
@@ -25,6 +27,39 @@ export function createEventsRouter(service: EventsService, guards: AuthGuards, c
     asyncHandler(async (req, res) => {
       const data = await service.list(req.query as { type?: 'portfolio' | 'live'; category?: never; q?: string; city?: string });
       res.json({ success: true, count: data.length, data });
+    })
+  );
+
+  // Registered before '/:id' so "applications" is not read as an event id.
+  router.get(
+    '/applications',
+    guards.requireAuth,
+    guards.requireRole('EO'),
+    asyncHandler(async (req, res) => {
+      res.json({ success: true, data: await service.applicants(currentAuth(req).userId) });
+    })
+  );
+
+  router.post(
+    '/applications/tenant/:id',
+    guards.requireAuth,
+    guards.requireRole('EO'),
+    validate({ params: applicationParams, body: decisionSchema }),
+    asyncHandler(async (req, res) => {
+      await service.decideTenant(currentAuth(req).userId, req.params.id as string, req.body.decision === 'APPROVE');
+      cache.invalidate(CACHE_PREFIX);
+      res.json({ success: true, message: 'Keputusan tersimpan.' });
+    })
+  );
+
+  router.post(
+    '/applications/crew/:id',
+    guards.requireAuth,
+    guards.requireRole('EO'),
+    validate({ params: applicationParams, body: decisionSchema }),
+    asyncHandler(async (req, res) => {
+      await service.decideCrew(currentAuth(req).userId, req.params.id as string, req.body.decision === 'APPROVE');
+      res.json({ success: true, message: 'Keputusan tersimpan.' });
     })
   );
 

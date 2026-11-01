@@ -60,7 +60,7 @@ export function createApp(deps: AppDeps): Express {
   const identity = createIdentityModule({ users: deps.users, otps: deps.otps, kyc: deps.kyc, documents: deps.documents, google: deps.google, mailer: deps.mailer, tokens, bus, env });
   const guards = createAuthGuards(identity.api, env.adminEmails);
 
-  const events = createEventsModule({ repo: deps.events, identity: identity.api, cache });
+  const events = createEventsModule({ repo: deps.events, identity: identity.api, cache, bus });
   const proposals = createProposalsModule({ repo: deps.proposals, identity: identity.api, events: events.api, bus });
   const catalog = createCatalogModule({ repo: deps.catalog, identity: identity.api, events: events.api, proposals: proposals.api, cache });
   const payments = createPaymentsModule({ repo: deps.payments, gateway: deps.gateway, proposals: proposals.api, events: events.api, identity: identity.api, bus, env });

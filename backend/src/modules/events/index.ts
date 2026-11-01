@@ -1,4 +1,5 @@
 import type { ResponseCache } from '../../shared/cache/memoryCache';
+import type { EventBus } from '../../shared/events/bus';
 import type { AuthGuards } from '../../shared/http/auth';
 import type { IdentityApi } from '../identity';
 import type { EventRepository } from './ports';
@@ -15,8 +16,8 @@ export interface EventsApi {
   activityFor(userId: string, role: 'EO' | 'TENANT' | 'CREW'): Promise<unknown[]>;
 }
 
-export function createEventsModule(deps: { repo: EventRepository; identity: IdentityApi; cache: ResponseCache }) {
-  const service = new EventsService(deps.repo, deps.identity);
+export function createEventsModule(deps: { repo: EventRepository; identity: IdentityApi; cache: ResponseCache; bus?: EventBus }) {
+  const service = new EventsService(deps.repo, deps.identity, deps.bus);
   const api: EventsApi = {
     getSummary: (id) => service.getSummary(id),
     activityFor: (userId, role) => service.activityFor(userId, role),

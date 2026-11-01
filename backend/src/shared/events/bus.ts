@@ -9,6 +9,7 @@ export interface DomainEvents {
   'proposals.created': { proposalId: string; title: string; senderId: string; receiverId: string };
   'proposals.countered': { proposalId: string; title: string; actorId: string; otherId: string };
   'proposals.responded': { proposalId: string; title: string; actorId: string; otherId: string; action: 'ACCEPT' | 'REJECT' };
+  'events.application_decided': { userId: string; kind: 'booth' | 'shift'; approved: boolean; eventTitle: string; label: string };
   'payments.escrow_held': { proposalId: string; payerId: string; payeeId: string; amount: number };
   'payments.bast_submitted': { proposalId: string; payerId: string; payeeId: string };
   'payments.escrow_released': { proposalId: string; payerId: string; payeeId: string; amount: number };

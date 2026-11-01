@@ -6,6 +6,8 @@ import type {
   EventRecord,
   EventRepository,
   NewEvent,
+  ApplicantRecord,
+  DecidedApplicant,
   ShiftRecord,
   SponsorshipPackageRecord,
 } from '../ports';
@@ -189,5 +191,98 @@ export class SupabaseEventRepository implements EventRepository {
     const { data, error } = await this.db.from('crew_applications').select('*, crew_shifts (*, events (title, venue_name, start_date))').eq('crew_user_id', crewId);
     if (error) fail(error);
     return data ?? [];
+  }
+
+  // The review screens read a few joined tables; the generated types do not model those joins, so they are addressed loosely.
+  private get raw() {
+    return this.db as any;
+  }
+
+  private async ownEvents(organizerId: string): Promise<Map<string, string>> {
+    const { data, error } = await this.raw.from('events').select('id, title').eq('organizer_id', organizerId);
+    if (error) fail(error);
+    return new Map((data ?? []).map((e: any) => [e.id, e.title]));
+  }
+
+  async listApplicants(organizerId: string) {
+    const events = await this.ownEvents(organizerId);
+    const ids = [...events.keys()];
+    if (ids.length === 0) return { tenants: [], crew: [] };
+
+    const [tenantRes, crewRes] = await Promise.all([
+      this.raw.from('tenant_registrations').select('id, brand_name, curation_status, created_at, tenant_user_id, tenant:tenant_user_id (full_name), booth:booth_id (event_id, booth_code, booth_category)').order('created_at', { ascending: false }).limit(300),
+      this.raw.from('crew_applications').select('id, selection_status, created_at, crew_user_id, crew:crew_user_id (full_name), shift:shift_id (event_id, role_title, shift_date)').order('created_at', { ascending: false }).limit(300),
+    ]);
+    if (tenantRes.error) fail(tenantRes.error);
+    if (crewRes.error) fail(crewRes.error);
+
+    const tenants: ApplicantRecord[] = (tenantRes.data ?? [])
+      .filter((r: any) => r.booth && events.has(r.booth.event_id))
+      .map((r: any) => ({
+        id: r.id,
+        userId: r.tenant_user_id,
+        name: r.brand_name || r.tenant?.full_name || '',
+        status: r.curation_status,
+        eventId: r.booth.event_id,
+        eventTitle: events.get(r.booth.event_id) ?? '',
+        label: r.booth.booth_code,
+        detail: r.tenant?.full_name ?? null,
+        createdAt: r.created_at,
+      }));
+    const crew: ApplicantRecord[] = (crewRes.data ?? [])
+      .filter((r: any) => r.shift && events.has(r.shift.event_id))
+      .map((r: any) => ({
+        id: r.id,
+        userId: r.crew_user_id,
+        name: r.crew?.full_name ?? '',
+        status: r.selection_status,
+        eventId: r.shift.event_id,
+        eventTitle: events.get(r.shift.event_id) ?? '',
+        label: r.shift.role_title,
+        detail: r.shift.shift_date,
+        createdAt: r.created_at,
+      }));
+    return { tenants, crew };
+  }
+
+  async decideTenant(input: { organizerId: string; registrationId: string; approve: boolean }): Promise<DecidedApplicant | null> {
+    const events = await this.ownEvents(input.organizerId);
+    const { data: reg, error } = await this.raw.from('tenant_registrations').select('id, tenant_user_id, curation_status, booth_id, booth:booth_id (event_id, booth_code)').eq('id', input.registrationId).maybeSingle();
+    if (error) fail(error);
+    if (!reg || !reg.booth || !events.has(reg.booth.event_id) || reg.curation_status !== 'PENDING') return null;
+
+    // Conditional on PENDING, so two quick clicks cannot decide twice.
+    const { data: done, error: updateError } = await this.raw
+      .from('tenant_registrations')
+      .update({ curation_status: input.approve ? 'APPROVED' : 'REJECTED' })
+      .eq('id', input.registrationId)
+      .eq('curation_status', 'PENDING')
+      .select('id');
+    if (updateError) fail(updateError);
+    if (!done || done.length === 0) return null;
+    if (!input.approve) await this.raw.from('tenant_booths').update({ is_occupied: false }).eq('id', reg.booth_id);
+    return { userId: reg.tenant_user_id, eventTitle: events.get(reg.booth.event_id) ?? '', label: reg.booth.booth_code };
+  }
+
+  async decideCrew(input: { organizerId: string; applicationId: string; approve: boolean }): Promise<DecidedApplicant | null> {
+    const events = await this.ownEvents(input.organizerId);
+    const { data: app, error } = await this.raw.from('crew_applications').select('id, crew_user_id, selection_status, shift_id, shift:shift_id (event_id, role_title, headcount_req)').eq('id', input.applicationId).maybeSingle();
+    if (error) fail(error);
+    if (!app || !app.shift || !events.has(app.shift.event_id) || app.selection_status !== 'APPLIED') return null;
+
+    if (input.approve) {
+      const { count, error: countError } = await this.raw.from('crew_applications').select('id', { count: 'exact', head: true }).eq('shift_id', app.shift_id).eq('selection_status', 'HIRED');
+      if (countError) fail(countError);
+      if ((count ?? 0) >= app.shift.headcount_req) throw conflict('Kuota shift ini sudah penuh.');
+    }
+    const { data: done, error: updateError } = await this.raw
+      .from('crew_applications')
+      .update({ selection_status: input.approve ? 'HIRED' : 'REJECTED' })
+      .eq('id', input.applicationId)
+      .eq('selection_status', 'APPLIED')
+      .select('id');
+    if (updateError) fail(updateError);
+    if (!done || done.length === 0) return null;
+    return { userId: app.crew_user_id, eventTitle: events.get(app.shift.event_id) ?? '', label: app.shift.role_title };
   }
 }

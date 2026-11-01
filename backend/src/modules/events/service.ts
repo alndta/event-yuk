@@ -1,5 +1,6 @@
 import { matchesQuery } from '../../shared/search';
 import { badRequest, conflict, forbidden, notFound } from '../../shared/errors';
+import type { EventBus } from '../../shared/events/bus';
 import type { IdentityApi } from '../identity';
 import type { EventDetail, EventRecord, EventRepository } from './ports';
 import type { CreateEventInput, CreatePortfolioInput } from './schemas';
@@ -40,7 +41,8 @@ const summarize = (e: EventRecord): EventSummary => ({
 export class EventsService {
   constructor(
     private readonly repo: EventRepository,
-    private readonly identity: IdentityApi
+    private readonly identity: IdentityApi,
+    private readonly bus?: EventBus
   ) {}
 
   /** Public shape: the organizer is shown by business name and verification only, never by contact details. */
@@ -202,6 +204,34 @@ export class EventsService {
     const application = await this.repo.applyToShift({ eventId, shiftId, crewId });
     if (!application) throw notFound('Shift tidak ditemukan di acara ini.');
     return application;
+  }
+
+  async applicants(organizerId: string) {
+    const { tenants, crew } = await this.repo.listApplicants(organizerId);
+    const view = (a: (typeof tenants)[number]) => ({
+      id: a.id,
+      user_id: a.userId,
+      name: a.name,
+      status: a.status,
+      event_id: a.eventId,
+      event_title: a.eventTitle,
+      label: a.label,
+      detail: a.detail,
+      created_at: a.createdAt,
+    });
+    return { tenants: tenants.map(view), crew: crew.map(view) };
+  }
+
+  async decideTenant(organizerId: string, registrationId: string, approve: boolean) {
+    const done = await this.repo.decideTenant({ organizerId, registrationId, approve });
+    if (!done) throw notFound('Pendaftaran tidak ditemukan atau sudah diputuskan.');
+    await this.bus?.emit('events.application_decided', { userId: done.userId, kind: 'booth', approved: approve, eventTitle: done.eventTitle, label: done.label });
+  }
+
+  async decideCrew(organizerId: string, applicationId: string, approve: boolean) {
+    const done = await this.repo.decideCrew({ organizerId, applicationId, approve });
+    if (!done) throw notFound('Pendaftaran tidak ditemukan atau sudah diputuskan.');
+    await this.bus?.emit('events.application_decided', { userId: done.userId, kind: 'shift', approved: approve, eventTitle: done.eventTitle, label: done.label });
   }
 
   // ---------------------------------------------------------------- for other modules

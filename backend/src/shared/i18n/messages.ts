@@ -61,6 +61,8 @@ export const EN: Record<string, string> = {
   'Acara ini tidak membuka rekrutmen kru.': 'This event is not recruiting crew.',
   'Shift tidak ditemukan di acara ini.': 'Shift not found in this event.',
   'Kamu sudah melamar shift ini.': 'You already applied for this shift.',
+  'Pendaftaran tidak ditemukan atau sudah diputuskan.': 'Application not found or already decided.',
+  'Kuota shift ini sudah penuh.': 'This shift is already full.',
   // proposals
   'Kamu bukan pihak dalam pengajuan ini.': 'You are not a party to this proposal.',
   'Saat ini giliran pihak lain untuk menanggapi. Kamu bisa menunggu atau membatalkan pengajuan.': 'It is the other party\'s turn to respond. You can wait or withdraw the proposal.',

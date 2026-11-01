@@ -102,4 +102,32 @@ export interface EventRepository {
   listByOrganizer(organizerId: string): Promise<EventDetail[]>;
   listTenantRegistrations(tenantId: string): Promise<unknown[]>;
   listCrewApplications(crewId: string): Promise<unknown[]>;
+  /** Pending and decided applicants for every event the organizer owns. */
+  listApplicants(organizerId: string): Promise<{ tenants: ApplicantRecord[]; crew: ApplicantRecord[] }>;
+  /**
+   * Decides a tenant's booth registration that is still pending and belongs to one of the organizer's events.
+   * A rejection frees the booth. Returns the applicant, or null when there is nothing to decide.
+   */
+  decideTenant(input: { organizerId: string; registrationId: string; approve: boolean }): Promise<DecidedApplicant | null>;
+  /** Same for crew. Hiring stops once the shift's headcount is full (throws a 409 AppError). */
+  decideCrew(input: { organizerId: string; applicationId: string; approve: boolean }): Promise<DecidedApplicant | null>;
+}
+
+export interface ApplicantRecord {
+  id: string;
+  userId: string;
+  name: string;
+  status: string;
+  eventId: string;
+  eventTitle: string;
+  /** Booth code or shift role. */
+  label: string;
+  detail: string | null;
+  createdAt: string | null;
+}
+
+export interface DecidedApplicant {
+  userId: string;
+  eventTitle: string;
+  label: string;
 }

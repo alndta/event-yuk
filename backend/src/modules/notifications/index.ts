@@ -51,6 +51,19 @@ export function createNotificationsModule({ bus, identity, mailer, env }: Deps) 
       action === 'ACCEPT' ? `"${title}" disetujui. Kontrak PKS sudah terbit dan DP bisa dibayarkan.` : `"${title}" ditolak oleh pihak lain.`
     )
   );
+  bus.on('events.application_decided', ({ userId, kind, approved, eventTitle, label }) =>
+    notify(
+      userId,
+      approved ? 'Pendaftaranmu diterima' : 'Pendaftaranmu belum diterima',
+      kind === 'booth'
+        ? approved
+          ? `Pendaftaran booth ${label} di "${eventTitle}" disetujui penyelenggara.`
+          : `Pendaftaran booth ${label} di "${eventTitle}" belum bisa diterima. Booth dikembalikan ke daftar tersedia.`
+        : approved
+          ? `Lamaranmu sebagai ${label} di "${eventTitle}" diterima.`
+          : `Lamaranmu sebagai ${label} di "${eventTitle}" belum bisa diterima.`
+    )
+  );
   bus.on('payments.escrow_held', async ({ payeeId, payerId, amount }) => {
     await notify(payeeId, 'DP sudah masuk escrow', `Dana ${rupiah(amount)} sudah ditahan di escrow. Kamu bisa mulai bekerja.`);
     await notify(payerId, 'Pembayaran DP diterima', `Pembayaran ${rupiah(amount)} berhasil dan ditahan di escrow sampai pekerjaan disetujui.`);

@@ -50,6 +50,9 @@ export const listEventsQuery = z.object({
   city: z.string().trim().max(100).optional(),
 });
 
+export const applicationParams = z.object({ id: z.uuid() });
+export const decisionSchema = z.object({ decision: z.enum(['APPROVE', 'REJECT']) });
+
 export const eventParams = z.object({ id: z.uuid() });
 export const boothParams = z.object({ id: z.uuid(), boothId: z.uuid() });
 export const shiftParams = z.object({ id: z.uuid(), shiftId: z.uuid() });
