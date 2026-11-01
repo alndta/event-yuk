@@ -32,6 +32,37 @@ function detectImage(b: Buffer): { mime: string; ext: string } | null {
   return null;
 }
 
+type Lang = 'id' | 'en';
+
+/** The email that carries a code, in the language the visitor was using. */
+function codeEmail(kind: 'register' | 'reset', lang: Lang, code: string) {
+  const text = {
+    id: {
+      register: { subject: 'Kode verifikasi Event Yuk', title: 'Kode verifikasi Event Yuk', intro: 'Masukkan kode ini untuk menyelesaikan pendaftaran:' },
+      reset: { subject: 'Kode atur ulang kata sandi Event Yuk', title: 'Atur ulang kata sandi', intro: 'Masukkan kode ini untuk membuat kata sandi baru. Abaikan email ini kalau bukan kamu yang meminta:' },
+      foot: 'Berlaku 10 menit. Jangan bagikan kode ini ke siapa pun.',
+      plain: (c: string) => `Kode Event Yuk kamu: ${c}. Berlaku 10 menit. Jangan bagikan kode ini ke siapa pun.`,
+    },
+    en: {
+      register: { subject: 'Your Event Yuk verification code', title: 'Event Yuk verification code', intro: 'Enter this code to finish creating your account:' },
+      reset: { subject: 'Your Event Yuk password reset code', title: 'Reset your password', intro: 'Enter this code to set a new password. Ignore this email if you did not ask for it:' },
+      foot: 'Valid for 10 minutes. Do not share this code with anyone.',
+      plain: (c: string) => `Your Event Yuk code: ${c}. Valid for 10 minutes. Do not share it with anyone.`,
+    },
+  }[lang];
+  const k = text[kind];
+  return {
+    subject: k.subject,
+    text: text.plain(code),
+    html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
+      <h2 style="color:#172D46">${k.title}</h2>
+      <p>${k.intro}</p>
+      <p style="font-size:32px;font-weight:700;letter-spacing:6px;color:#172D46">${escapeHtml(code)}</p>
+      <p style="color:#64748b;font-size:13px">${text.foot}</p>
+    </div>`,
+  };
+}
+
 const OTP_TTL_MS = 10 * 60 * 1000;
 const OTP_WINDOW_MS = 10 * 60 * 1000;
 const OTP_MAX_REQUESTS = 3;
@@ -128,32 +159,26 @@ export class IdentityService {
 
   // ---------------------------------------------------------------- OTP
 
-  async requestOtp(emailInput: string): Promise<{ preview?: string }> {
-    const email = emailInput.toLowerCase();
-    const recent = await this.d.otps.countSince(email, new Date(Date.now() - OTP_WINDOW_MS));
+  async requestOtp(emailInput: string, lang: Lang = 'id'): Promise<{ preview?: string }> {
+    return this.issueCode(emailInput.toLowerCase(), 'register', lang);
+  }
+
+  /** Same code mechanism as sign-up, under its own identifier so the two cannot be mixed up. */
+  private async issueCode(identifier: string, kind: 'register' | 'reset', lang: Lang, mailTo = identifier): Promise<{ preview?: string }> {
+    const recent = await this.d.otps.countSince(identifier, new Date(Date.now() - OTP_WINDOW_MS));
     if (recent >= OTP_MAX_REQUESTS) {
       throw tooManyRequests('Terlalu sering meminta kode. Tunggu beberapa menit lalu coba lagi.');
     }
 
     const code = generateOtp();
     await this.d.otps.create({
-      identifier: email,
-      codeHash: hashOtp(email, code, this.otpKey),
+      identifier,
+      codeHash: hashOtp(identifier, code, this.otpKey),
       expiresAt: new Date(Date.now() + OTP_TTL_MS),
     });
 
     try {
-      await this.d.mailer.send({
-        to: email,
-        subject: 'Kode verifikasi Event Yuk',
-        text: `Kode verifikasi Event Yuk kamu: ${code}. Berlaku 10 menit. Jangan bagikan kode ini ke siapa pun.`,
-        html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
-          <h2 style="color:#172D46">Kode verifikasi Event Yuk</h2>
-          <p>Masukkan kode ini untuk menyelesaikan pendaftaran:</p>
-          <p style="font-size:32px;font-weight:700;letter-spacing:6px;color:#172D46">${escapeHtml(code)}</p>
-          <p style="color:#64748b;font-size:13px">Berlaku 10 menit. Jangan bagikan kode ini ke siapa pun.</p>
-        </div>`,
-      });
+      await this.d.mailer.send({ to: mailTo, ...codeEmail(kind, lang, code) });
     } catch (err) {
       logger.error('otp email failed', { error: err instanceof Error ? err.message : String(err) });
       if (this.d.env.isProduction) throw badGateway('Email belum bisa dikirim. Coba lagi sebentar lagi.');
@@ -162,12 +187,30 @@ export class IdentityService {
     return this.d.env.exposeOtpPreview ? { preview: code } : {};
   }
 
-  private async consumeOtp(emailInput: string, code: string): Promise<void> {
+  /**
+   * Asks for a reset code. The answer is the same whether or not the email has an account,
+   * so this cannot be used to find out who is registered.
+   */
+  async requestPasswordReset(emailInput: string, lang: Lang = 'id'): Promise<{ preview?: string }> {
     const email = emailInput.toLowerCase();
-    const record = await this.d.otps.findActive(email, new Date());
+    if (!(await this.d.users.findByEmail(email))) return {};
+    return this.issueCode(`reset:${email}`, 'reset', lang, email);
+  }
+
+  async resetPassword(emailInput: string, code: string, newPassword: string): Promise<void> {
+    const email = emailInput.toLowerCase();
+    await this.consumeOtp(`reset:${email}`, code);
+    const user = await this.d.users.findByEmail(email);
+    if (!user) throw badRequest('Kode OTP tidak valid atau sudah kedaluwarsa. Minta kode baru.');
+    await this.d.users.update(user.id, { passwordHash: await hashPassword(newPassword) });
+  }
+
+  private async consumeOtp(identifierInput: string, code: string): Promise<void> {
+    const identifier = identifierInput.toLowerCase();
+    const record = await this.d.otps.findActive(identifier, new Date());
     const invalid = badRequest('Kode OTP tidak valid atau sudah kedaluwarsa. Minta kode baru.');
     if (!record || record.attempts >= OTP_MAX_ATTEMPTS) throw invalid;
-    if (!safeEqualHex(record.codeHash, hashOtp(email, code, this.otpKey))) {
+    if (!safeEqualHex(record.codeHash, hashOtp(identifier, code, this.otpKey))) {
       await this.d.otps.incrementAttempts(record.id);
       throw invalid;
     }
@@ -177,7 +220,7 @@ export class IdentityService {
   // ---------------------------------------------------------------- sign up / sign in
 
   async register(input: RegisterInput): Promise<Session> {
-    await this.consumeOtp(input.email, input.otp_code);
+    await this.consumeOtp(input.email.toLowerCase(), input.otp_code);
     if (await this.d.users.findByEmail(input.email)) throw conflict('Email ini sudah terdaftar. Silakan masuk.');
 
     const user = await this.d.users.create({

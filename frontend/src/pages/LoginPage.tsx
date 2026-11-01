@@ -127,6 +127,12 @@ export default function LoginPage() {
             {t('login.sub')}
           </p>
 
+          {(location.state as { notice?: string } | null)?.notice && !errorMessage && (
+            <p role="status" className="mt-6 rounded-lg bg-brand-forest-light px-4 py-3 text-sm font-semibold text-brand-forest-dark">
+              {(location.state as { notice?: string }).notice}
+            </p>
+          )}
+
           {errorMessage && (
             <div
               role="alert"
@@ -162,13 +168,12 @@ export default function LoginPage() {
                 <label htmlFor="login-password" className="text-sm font-semibold text-slate-800">
                   {t('login.password')}
                 </label>
-                <button
-                  type="button"
-                  onClick={() => alert(t('login.forgotMsg'))}
-                  className="min-h-11 text-sm font-semibold text-brand-navy underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
+                <Link
+                  to="/forgot-password"
+                  className="inline-flex min-h-11 items-center text-sm font-semibold text-brand-navy underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
                 >
                   {t('login.forgot')}
-                </button>
+                </Link>
               </div>
               <div className="relative">
                 <Lock aria-hidden="true" className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-500" />

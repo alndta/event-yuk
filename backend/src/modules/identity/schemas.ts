@@ -30,6 +30,9 @@ export const registerSchema = z.object({
   otp_code: z.string().regex(/^\d{6}$/, 'Kode OTP terdiri dari 6 angka.'),
 });
 
+export const forgotPasswordSchema = z.object({ email });
+export const resetPasswordSchema = z.object({ email, otp_code: z.string().regex(/^\d{6}$/, 'Kode OTP terdiri dari 6 angka.'), new_password: password });
+
 export const loginSchema = z.object({ email, password: z.string().min(1, 'Kata sandi wajib diisi.').max(128) });
 
 export const googleSyncSchema = z.object({ access_token: z.string().min(20).max(4096) });

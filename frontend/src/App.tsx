@@ -38,6 +38,7 @@ const PartnerDetailPage = lazy(() => import('./pages/PartnerDetailPage'));
 const SponsorHubPage = lazy(() => import('./pages/SponsorHubPage'));
 const ContractsPage = lazy(() => import('./pages/ContractsPage'));
 const AdminKycPage = lazy(() => import('./pages/AdminKycPage'));
+const ForgotPasswordPage = lazy(() => import('./pages/ForgotPasswordPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
@@ -80,7 +81,7 @@ function AppContent() {
   // Workspace pages (signed-in tools) have no footer; it stays on public pages.
   const WORKSPACE_PATHS = ['/dashboard', '/profile', '/contracts', '/admin/kyc'];
   const isWorkspacePage = WORKSPACE_PATHS.some((p) => location.pathname === p || location.pathname.startsWith(p + '/'));
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/onboarding-role';
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register' || location.pathname === '/forgot-password' || location.pathname === '/onboarding-role';
 
   const {
     user,
@@ -357,6 +358,7 @@ function AppContent() {
               </ProtectedRoute>
             }
           />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route
             path="/admin/kyc"
             element={

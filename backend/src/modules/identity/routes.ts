@@ -1,9 +1,12 @@
 import express, { Router, type RequestHandler } from 'express';
+import { langOf } from '../../shared/i18n/messages';
 import { asyncHandler } from '../../shared/http/asyncHandler';
 import { currentAuth, type AuthGuards } from '../../shared/http/auth';
 import { validate } from '../../shared/http/validate';
 import {
   adminKycSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
   kycDocumentQuery,
   googleSyncSchema,
   loginSchema,
@@ -32,7 +35,7 @@ export function createIdentityRouter(service: IdentityService, guards: AuthGuard
     validate({ body: requestOtpSchema }),
     asyncHandler(async (req, res) => {
       const email = (req.body.email ?? req.body.identifier) as string;
-      const { preview } = await service.requestOtp(email);
+      const { preview } = await service.requestOtp(email, langOf(req));
       res.json({
         success: true,
         message: 'Kode verifikasi dikirim ke email kamu.',
@@ -48,6 +51,32 @@ export function createIdentityRouter(service: IdentityService, guards: AuthGuard
     asyncHandler(async (req, res) => {
       const session = await service.register(req.body);
       res.status(201).json({ success: true, message: 'Pendaftaran berhasil.', ...session });
+    })
+  );
+
+  router.post(
+    '/auth/forgot-password',
+    ...limits.auth,
+    ...limits.otp,
+    validate({ body: forgotPasswordSchema }),
+    asyncHandler(async (req, res) => {
+      const { preview } = await service.requestPasswordReset(req.body.email, langOf(req));
+      res.json({
+        success: true,
+        message: 'Kalau email itu terdaftar, kode atur ulang sudah dikirim.',
+        ...(exposePreview && preview ? { otp_preview: preview } : {}),
+      });
+    })
+  );
+
+  router.post(
+    '/auth/reset-password',
+    ...limits.auth,
+    ...limits.login,
+    validate({ body: resetPasswordSchema }),
+    asyncHandler(async (req, res) => {
+      await service.resetPassword(req.body.email, req.body.otp_code, req.body.new_password);
+      res.json({ success: true, message: 'Kata sandi diperbarui. Silakan masuk.' });
     })
   );
 
