@@ -17,7 +17,7 @@ if (!env.midtrans.serverKey) logger.warn('MIDTRANS_SERVER_KEY belum diisi: pemba
 if (!env.smtp.host && env.isProduction) logger.warn('SMTP belum dikonfigurasi: email OTP tidak akan terkirim.');
 
 const server = app.listen(env.port, () => {
-  logger.info('api listening', { port: env.port, env: env.nodeEnv });
+  logger.info('Event Yuk API ready', { url: `http://localhost:${env.port}`, docs: env.isProduction ? undefined : `http://localhost:${env.port}/api-docs`, env: env.nodeEnv });
 });
 
 const shutdown = (signal: string) => {

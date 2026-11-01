@@ -5,6 +5,7 @@ import { TokenService } from './shared/crypto/jwt';
 import { EventBus } from './shared/events/bus';
 import { createAuthGuards } from './shared/http/auth';
 import { errorHandler, notFoundHandler } from './shared/http/errorHandler';
+import { requestLog } from './shared/http/requestLog';
 import { authLimiter, corsPolicy, docsSecurityHeaders, generalLimiter, perEmailLimiter, securityHeaders } from './shared/http/security';
 import type { Mailer } from './shared/mail/mailer';
 import { createCatalogModule, type CatalogRepository } from './modules/catalog';
@@ -66,6 +67,7 @@ export function createApp(deps: AppDeps): Express {
   app.disable('x-powered-by');
   app.set('trust proxy', parseTrustProxy(env.trustProxy));
 
+  app.use(requestLog);
   app.use('/api-docs', docsSecurityHeaders());
   app.use(securityHeaders());
   app.use(corsPolicy(env));
