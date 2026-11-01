@@ -30,7 +30,7 @@ export default function HomeHero({ featuredEvent, onOpenCreateEvent }: Props) {
 
         <h1
           id="home-title"
-          className="absolute left-5 top-10 z-30 flex flex-col font-display text-[clamp(3.75rem,9.5vw,9rem)] font-black leading-[0.84] tracking-[-0.075em] text-white sm:left-8 sm:top-14 lg:left-12 2xl:left-16"
+          className="absolute left-5 top-10 z-30 flex flex-col font-display text-[clamp(3.25rem,8.5vw,8rem)] font-extrabold leading-[0.92] tracking-[-0.035em] text-white sm:left-8 sm:top-14 lg:left-12 2xl:left-16"
         >
           <span>{t('hero.title')}</span>
           <span className="mt-2 text-brand-lime lg:mt-3">{t('hero.titleHighlight')}</span>

@@ -122,12 +122,16 @@ export default function EventCardLive({ event, onSelectAction }: Props) {
                 {completion}% {t('eventCard.filled')}
               </span>
             </div>
-            <progress
-              value={completion}
-              max={100}
+            <div
+              role="progressbar"
+              aria-valuenow={completion}
+              aria-valuemin={0}
+              aria-valuemax={100}
               aria-label={t('eventCard.progressLabel') + ': ' + completion + '%'}
-              className="mt-3 block h-1.5 w-full accent-brand-navy"
-            />
+              className="mt-3 h-2 w-full overflow-hidden rounded-full bg-brand-sand"
+            >
+              <div className="h-full rounded-full bg-brand-navy" style={{ width: completion + '%' }} />
+            </div>
             <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-600">
               <span>{t('eventCard.boothCount')}: <strong className="font-semibold text-slate-950">{event.progress.boothFilled}</strong></span>
               <span>{t('eventCard.crewCount')}: <strong className="font-semibold text-slate-950">{event.progress.crewNeeded}</strong></span>
