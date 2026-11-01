@@ -13,6 +13,8 @@ export interface UserSession {
   cityRegion?: string;
   phoneWa?: string;
   avatarUrl?: string;
+  /** Listed in the server's ADMIN_EMAILS; shows the e-KYC review page. */
+  isAdmin?: boolean;
 }
 
 interface AuthContextType {
@@ -88,6 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     cityRegion: u.city_region || undefined,
     phoneWa: u.phone_wa || undefined,
     avatarUrl: avatar || '/assets/crew-production.jpg',
+    isAdmin: Boolean(u.is_admin),
   });
 
   const clearSession = () => {

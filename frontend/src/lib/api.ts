@@ -62,3 +62,18 @@ export const query = (params: Record<string, string | undefined | null>) => {
   const s = q.toString();
   return s ? `?${s}` : '';
 };
+
+/** Sends one image as the raw request body (the backend checks the real file type and size). */
+export async function uploadImage(path: string, file: File): Promise<void> {
+  let res: Response;
+  try {
+    res = await fetch(BASE + path, { method: 'POST', headers: { 'Content-Type': file.type, ...authHeaders() }, body: file });
+  } catch {
+    throw new ApiError(0, 'Tidak bisa terhubung ke server. Periksa koneksimu lalu coba lagi.');
+  }
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    if (res.status === 401 && getToken()) window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
+    throw new ApiError(res.status, data?.error || `Unggahan gagal (${res.status}).`, data?.code);
+  }
+}

@@ -37,6 +37,7 @@ const SearchVendorsPage = lazy(() => import('./pages/SearchVendorsPage'));
 const PartnerDetailPage = lazy(() => import('./pages/PartnerDetailPage'));
 const SponsorHubPage = lazy(() => import('./pages/SponsorHubPage'));
 const ContractsPage = lazy(() => import('./pages/ContractsPage'));
+const AdminKycPage = lazy(() => import('./pages/AdminKycPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
@@ -350,6 +351,14 @@ function AppContent() {
             element={
               <ProtectedRoute requiresRole={true}>
                 <ProfilePage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/kyc"
+            element={
+              <ProtectedRoute requiresRole={false}>
+                <AdminKycPage onShowToast={showToast} />
               </ProtectedRoute>
             }
           />

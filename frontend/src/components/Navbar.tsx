@@ -181,6 +181,7 @@ export default function Navbar({ onOpenCreateEvent, onOpenUploadPortfolio }: Pro
     { to: '/events', label: t('nav.events'), tone: 'bg-brand-lime text-brand-navy' },
     { to: '/contracts', label: t('nav.contracts'), tone: 'bg-brand-cream text-brand-navy' },
     { to: '/panduan-role', label: t('nav.guide'), tone: 'bg-brand-lime text-brand-navy' },
+    ...(user?.isAdmin ? [{ to: '/admin/kyc', label: t('nav.kycReview'), tone: 'bg-brand-cream text-brand-navy' }] : []),
   ];
   const partners = [
     { to: '/vendors', label: t('nav.vendors') },

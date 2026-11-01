@@ -6,16 +6,18 @@ import {
   CreditCard,
   CheckCircle2,
   AlertCircle,
-  ArrowRight,
   Wallet,
   Clock,
+  UploadCloud,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { SEOHead } from '../components/SEOHead';
-import { api, ApiError } from '../lib/api';
+import { api, ApiError, uploadImage } from '../lib/api';
+import { useLanguage } from '../context/LanguageContext';
 
 export default function ProfilePage() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'profile' | 'kyc' | 'wallet'>('profile');
   const pageRef = useRef<HTMLDivElement>(null);
   useEnter(pageRef, activeTab);
@@ -35,6 +37,9 @@ export default function ProfilePage() {
     accountHolder: user?.fullName || '',
   });
   const [kycRejectReason, setKycRejectReason] = useState<string | null>(null);
+  const [docs, setDocs] = useState({ ktp: false, selfie: false });
+  const [uploadingKind, setUploadingKind] = useState<'KTP' | 'SELFIE' | null>(null);
+  const [previews, setPreviews] = useState<{ ktp?: string; selfie?: string }>({});
 
   const [wallet, setWallet] = useState({ escrowLocked: 0, availableBal: 0, currency: 'IDR' });
 
@@ -61,7 +66,10 @@ export default function ProfilePage() {
       .catch(() => {});
 
     api('/users/kyc')
-      .then((data) => setKycRejectReason(data.kyc?.reject_reason || null))
+      .then((data) => {
+        setKycRejectReason(data.kyc?.reject_reason || null);
+        setDocs({ ktp: Boolean(data.kyc?.documents?.ktp), selfie: Boolean(data.kyc?.documents?.selfie) });
+      })
       .catch(() => {});
 
     api('/payments/wallet')
@@ -88,18 +96,40 @@ export default function ProfilePage() {
           city_region: profileData.cityRegion || undefined,
         },
       });
-      setSuccessToast('Profil berhasil disimpan.');
+      setSuccessToast(t('prof.savedOk'));
     } catch (err) {
-      setSuccessToast(err instanceof ApiError ? err.message : 'Profil belum tersimpan.');
+      setSuccessToast(err instanceof ApiError ? err.message : t('prof.savedFail'));
     } finally {
       setLoading(false);
       setTimeout(() => setSuccessToast(null), 3500);
     }
   };
 
+  // The photo goes to private storage; the page keeps only a local preview, never a public link.
+  const handlePhoto = async (kind: 'KTP' | 'SELFIE', file: File | undefined) => {
+    if (!file) return;
+    setUploadingKind(kind);
+    try {
+      await uploadImage(`/users/kyc/documents?kind=${kind}`, file);
+      const key = kind === 'KTP' ? 'ktp' : 'selfie';
+      setDocs((d) => ({ ...d, [key]: true }));
+      setPreviews((p) => ({ ...p, [key]: URL.createObjectURL(file) }));
+    } catch (err) {
+      setSuccessToast(err instanceof ApiError ? err.message : t('kyc.uploadFail'));
+      setTimeout(() => setSuccessToast(null), 4500);
+    } finally {
+      setUploadingKind(null);
+    }
+  };
+
   // Submitting only asks for review. An administrator makes the decision; the account cannot verify itself.
   const handleSaveKyc = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!docs.ktp || !docs.selfie) {
+      setSuccessToast(t('kyc.needPhotos'));
+      setTimeout(() => setSuccessToast(null), 4000);
+      return;
+    }
     setLoading(true);
     try {
       await api('/users/kyc', {
@@ -111,9 +141,9 @@ export default function ProfilePage() {
       });
       setFormData({ ...profileData, idCardNumber: '', kycStatus: 'PENDING' });
       setKycRejectReason(null);
-      setSuccessToast('Pengajuan terkirim. Tim kami akan memeriksanya.');
+      setSuccessToast(t('kyc.sent'));
     } catch (err) {
-      setSuccessToast(err instanceof ApiError ? err.message : 'Pengajuan belum terkirim.');
+      setSuccessToast(err instanceof ApiError ? err.message : t('kyc.sentFail'));
     } finally {
       setLoading(false);
       setTimeout(() => setSuccessToast(null), 4500);
@@ -123,8 +153,8 @@ export default function ProfilePage() {
   return (
     <div ref={pageRef} className="max-w-5xl mx-auto space-y-6 sm:space-y-8 font-sans">
       <SEOHead
-        title="Pengaturan Profil Akun & e-KYC | Event Yuk"
-        description="Kelola profil akun, verifikasi e-KYC identitas hukum, dan rekening bank penarikan saldo."
+        title={t('prof.seoTitle')}
+        description={t('prof.seoDesc')}
         noIndex={true}
       />
       {/* Toast Alert */}
@@ -139,10 +169,10 @@ export default function ProfilePage() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
           <h1 className="font-display text-3xl sm:text-5xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink">
-            Profil akun dan verifikasi e-KYC
+            {t('prof.title')}
           </h1>
           <p className="text-lg leading-8 text-slate-700 mt-3">
-            Atur data identitasmu dan rekening untuk penarikan saldo, lalu pantau posisi dompet Escrow.
+            {t('prof.lead')}
           </p>
         </div>
 
@@ -150,19 +180,19 @@ export default function ProfilePage() {
           {profileData.kycStatus === 'VERIFIED' ? (
             <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-forest-light text-brand-forest-dark rounded-full text-sm font-semibold">
               <ShieldCheck aria-hidden="true" className="w-4 h-4" />
-              <span>Akun e-KYC terverifikasi</span>
+              <span>{t('prof.badgeOk')}</span>
             </span>
           ) : (
             <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 text-amber-900 rounded-full text-sm font-semibold">
               <AlertCircle aria-hidden="true" className="w-4 h-4" />
-              <span>{profileData.kycStatus === 'PENDING' ? 'Sedang diperiksa' : 'Belum terverifikasi'}</span>
+              <span>{profileData.kycStatus === 'PENDING' ? t('prof.badgePending') : t('prof.badgeNone')}</span>
             </span>
           )}
         </div>
       </div>
 
       {/* Profile Navigation Tabs */}
-      <div role="group" aria-label="Bagian profil" className="flex items-center gap-2 border-b border-slate-200 pb-4 mb-8 overflow-x-auto text-sm font-semibold">
+      <div role="group" aria-label={t('prof.tabsLabel')} className="flex items-center gap-2 border-b border-slate-200 pb-4 mb-8 overflow-x-auto text-sm font-semibold">
         <button
           onClick={() => setActiveTab('profile')}
           aria-pressed={activeTab === 'profile'}
@@ -173,7 +203,7 @@ export default function ProfilePage() {
           }`}
         >
           <User className="w-4 h-4" />
-          <span>Informasi profil</span>
+          <span>{t('prof.tabProfile')}</span>
         </button>
 
         <button
@@ -186,7 +216,7 @@ export default function ProfilePage() {
           }`}
         >
           <ShieldCheck className="w-4 h-4" />
-          <span>Verifikasi e-KYC dan rekening bank</span>
+          <span>{t('prof.tabKyc')}</span>
         </button>
 
         <button
@@ -199,19 +229,19 @@ export default function ProfilePage() {
           }`}
         >
           <Wallet className="w-4 h-4" />
-          <span>Dompet Escrow dan penarikan</span>
+          <span>{t('prof.tabWallet')}</span>
         </button>
       </div>
 
       {/* TAB 1: INFORMASI PROFIL */}
       {activeTab === 'profile' && (
         <div data-enter className="bg-white rounded-lg p-6 sm:p-8 max-w-3xl">
-          <h3 className="font-display text-2xl font-extrabold tracking-[-0.03em] text-brand-ink mb-1">Data identitas akun</h3>
-          <p className="text-base text-slate-600 mb-6">Informasi kontak yang tampil pada kontrak PKS digital dan profil resmi.</p>
+          <h3 className="font-display text-2xl font-extrabold tracking-[-0.03em] text-brand-ink mb-1">{t('prof.idTitle')}</h3>
+          <p className="text-base text-slate-600 mb-6">{t('prof.idLead')}</p>
 
           <form onSubmit={handleSaveProfile} className="space-y-4 text-sm">
             <div>
-              <label className="block text-sm font-semibold text-slate-800 mb-2">Nama lengkap penanggung jawab</label>
+              <label className="block text-sm font-semibold text-slate-800 mb-2">{t('prof.fullName')}</label>
               <input
                 type="text"
                 value={profileData.fullName}
@@ -222,7 +252,7 @@ export default function ProfilePage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-semibold text-slate-800 mb-2">Email resmi (terkunci)</label>
+                <label className="block text-sm font-semibold text-slate-800 mb-2">{t('prof.email')}</label>
                 <input
                   type="email"
                   disabled
@@ -231,7 +261,7 @@ export default function ProfilePage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-slate-800 mb-2">Nomor WhatsApp</label>
+                <label className="block text-sm font-semibold text-slate-800 mb-2">{t('prof.phone')}</label>
                 <input
                   type="tel"
                   value={profileData.phoneWa}
@@ -242,7 +272,7 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-800 mb-2">Nama entitas bisnis atau komite</label>
+              <label className="block text-sm font-semibold text-slate-800 mb-2">{t('prof.business')}</label>
               <input
                 type="text"
                 value={profileData.businessName}
@@ -252,7 +282,7 @@ export default function ProfilePage() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-slate-800 mb-2">Kota dan domisili operasional</label>
+              <label className="block text-sm font-semibold text-slate-800 mb-2">{t('prof.city')}</label>
               <input
                 type="text"
                 value={profileData.cityRegion}
@@ -267,7 +297,7 @@ export default function ProfilePage() {
                 disabled={loading}
                 className="min-h-12 px-7 rounded-full bg-brand-navy hover:bg-brand-navy-dark text-white font-semibold transition-colors"
               >
-                {loading ? 'Menyimpan...' : 'Simpan Perubahan Profil'}
+                {loading ? t('prof.saving') : t('prof.saveProfile')}
               </button>
             </div>
           </form>
@@ -279,32 +309,32 @@ export default function ProfilePage() {
         <div data-enter className="bg-white rounded-lg p-6 sm:p-8 max-w-3xl">
           <div className="flex items-center gap-2 mb-1">
             <ShieldCheck aria-hidden="true" className="w-5 h-5 text-brand-forest" />
-            <h3 className="font-extrabold text-slate-900 text-lg">Verifikasi e-KYC dan rekening penarikan</h3>
+            <h3 className="font-extrabold text-slate-900 text-lg">{t('kyc.title')}</h3>
           </div>
           <p className="text-sm text-slate-500 mb-6">
-            Identitas dan rekening bank harus terverifikasi sebelum kamu bisa menerima dana dari Escrow.
+            {t('kyc.lead')}
           </p>
 
           {profileData.kycStatus === 'VERIFIED' && (
-            <p role="status" className="rounded-lg bg-brand-forest-light px-4 py-3 text-sm font-semibold text-brand-forest-dark">Identitas dan rekeningmu sudah terverifikasi.</p>
+            <p role="status" className="rounded-lg bg-brand-forest-light px-4 py-3 text-sm font-semibold text-brand-forest-dark">{t('kyc.verified')}</p>
           )}
           {profileData.kycStatus === 'PENDING' && (
-            <p role="status" className="rounded-lg bg-amber-100 px-4 py-3 text-sm font-semibold text-amber-900">Pengajuanmu sedang diperiksa. Biasanya selesai dalam beberapa hari kerja.</p>
+            <p role="status" className="rounded-lg bg-amber-100 px-4 py-3 text-sm font-semibold text-amber-900">{t('kyc.pending')}</p>
           )}
           {kycRejectReason && profileData.kycStatus === 'UNVERIFIED' && (
-            <p role="alert" className="rounded-lg bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-800">Pengajuan sebelumnya ditolak: {kycRejectReason}. Perbaiki lalu kirim lagi.</p>
+            <p role="alert" className="rounded-lg bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-800">{t('kyc.rejected')} {kycRejectReason}. {t('kyc.fixAndResend')}</p>
           )}
 
           {profileData.kycStatus === 'UNVERIFIED' && (
           <form onSubmit={handleSaveKyc} className="space-y-4 text-sm">
             <div>
-              <label className="block text-sm font-semibold text-slate-800 mb-2">Nomor Induk Kependudukan (NIK atau KTP)</label>
+              <label className="block text-sm font-semibold text-slate-800 mb-2">{t('kyc.nik')}</label>
               <input
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]{16}"
                 maxLength={16}
-                title="NIK terdiri dari 16 angka"
+                title={t('kyc.nikHint')}
                 required
                 value={profileData.idCardNumber}
                 onChange={(e) => setFormData({ ...profileData, idCardNumber: e.target.value })}
@@ -313,18 +343,53 @@ export default function ProfilePage() {
             </div>
 
             <p className="rounded-lg bg-brand-sand px-4 py-3 text-sm text-slate-700">
-              NIK kamu hanya dipakai untuk pemeriksaan dan tidak disimpan dalam bentuk aslinya. Unggah foto KTP akan ditambahkan di tahap berikutnya.
+              {t('kyc.privacy')}
             </p>
+
+
+            <div className="pt-2 border-t border-slate-100">
+              <h4 className="font-bold text-slate-900 text-sm mb-3 flex items-center gap-1.5">
+                <ShieldCheck aria-hidden="true" className="w-4 h-4 text-brand-navy" />
+                <span>{t('kyc.photos')}</span>
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {([
+                  { kind: 'KTP', key: 'ktp', label: t('kyc.ktp'), hint: t('kyc.ktpHint') },
+                  { kind: 'SELFIE', key: 'selfie', label: t('kyc.selfie'), hint: t('kyc.selfieHint') },
+                ] as const).map(({ kind, key, label, hint }) => (
+                  <label key={kind} className="flex cursor-pointer flex-col gap-2 rounded-lg border-2 border-dashed border-slate-300 p-4 text-center hover:border-brand-navy focus-within:border-brand-navy">
+                    <span className="text-sm font-semibold text-slate-800">{label}</span>
+                    {previews[key] ? (
+                      <img src={previews[key]} alt="" className="mx-auto h-28 w-full rounded-md object-cover" />
+                    ) : (
+                      <UploadCloud aria-hidden="true" className="mx-auto h-8 w-8 text-slate-400" />
+                    )}
+                    <span className="text-xs text-slate-500">{hint}</span>
+                    <span className={`text-sm font-semibold ${docs[key] ? 'text-brand-forest' : 'text-brand-navy'}`}>
+                      {uploadingKind === kind ? t('kyc.uploading') : docs[key] ? t('kyc.uploaded') + ' · ' + t('kyc.replace') : t('kyc.choose')}
+                    </span>
+                    <span className="text-xs text-slate-500">{t('kyc.formats')}</span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png"
+                      className="sr-only"
+                      disabled={uploadingKind !== null}
+                      onChange={(e) => { void handlePhoto(kind, e.target.files?.[0]); e.target.value = ''; }}
+                    />
+                  </label>
+                ))}
+              </div>
+            </div>
 
             <div className="pt-2 border-t border-slate-100">
               <h4 className="font-bold text-slate-900 text-sm mb-3 flex items-center gap-1.5">
                 <CreditCard className="w-4 h-4 text-[#172D46]" />
-                <span>Rekening bank untuk penarikan saldo</span>
+                <span>{t('kyc.bankTitle')}</span>
               </h4>
 
               <div className="grid grid-cols-2 gap-3 mb-3">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-800 mb-2">Nama bank</label>
+                  <label className="block text-sm font-semibold text-slate-800 mb-2">{t('kyc.bank')}</label>
                   <select
                     value={profileData.bankName}
                     onChange={(e) => setFormData({ ...profileData, bankName: e.target.value })}
@@ -338,7 +403,7 @@ export default function ProfilePage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-slate-800 mb-2">Nomor rekening</label>
+                  <label className="block text-sm font-semibold text-slate-800 mb-2">{t('kyc.account')}</label>
                   <input
                     type="text"
                     required
@@ -350,7 +415,7 @@ export default function ProfilePage() {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-slate-800 mb-2">Nama pemilik rekening (sesuai buku tabungan)</label>
+                <label className="block text-sm font-semibold text-slate-800 mb-2">{t('kyc.holder')}</label>
                 <input
                   type="text"
                   required
@@ -368,7 +433,7 @@ export default function ProfilePage() {
                 className="min-h-12 px-7 rounded-full bg-brand-navy hover:bg-brand-navy-dark text-white font-semibold transition-colors flex items-center gap-2"
               >
                 <CheckCircle2 className="w-4 h-4" />
-                <span>Kirim untuk diperiksa</span>
+                <span>{t('kyc.submit')}</span>
               </button>
             </div>
           </form>
@@ -384,16 +449,16 @@ export default function ProfilePage() {
             <div className="bg-brand-navy text-white p-6 sm:p-8 rounded-lg">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-sm font-semibold px-3 py-1 bg-white/10 text-white rounded-full flex items-center gap-1.5">
-                  <Clock aria-hidden="true" className="w-4 h-4 text-brand-lime" /> Dana tertahan
+                  <Clock aria-hidden="true" className="w-4 h-4 text-brand-lime" /> {t('wal.held')}
                 </span>
-                <span className="text-sm text-slate-300">Kontrak berjalan</span>
+                <span className="text-sm text-slate-300">{t('wal.heldTag')}</span>
               </div>
 
               <div className="font-display text-4xl font-extrabold tabular-nums tracking-[-0.03em] text-white mb-2">
                 Rp {wallet.escrowLocked.toLocaleString('id-ID')}
               </div>
               <p className="text-base text-slate-200 leading-7">
-                Dana yang sedang ditahan dalam kontrak aktif vendor panggung & gaji kru. Akan cair otomatis saat BAST disetujui atau presensi kru tervalidasi.
+                {t('wal.heldBody')}
               </p>
             </div>
 
@@ -401,22 +466,26 @@ export default function ProfilePage() {
             <div className="bg-brand-navy text-white p-6 sm:p-8 rounded-lg">
               <div className="flex items-center justify-between mb-4">
                 <span className="text-sm font-semibold px-3 py-1 bg-brand-lime text-brand-navy rounded-full flex items-center gap-1.5">
-                  <CheckCircle2 aria-hidden="true" className="w-4 h-4" /> Saldo siap tarik
+                  <CheckCircle2 aria-hidden="true" className="w-4 h-4" /> {t('wal.available')}
                 </span>
-                <span className="text-sm text-slate-300">Bisa ditarik instan</span>
+                <span className="text-sm text-slate-300">{t('wal.availableTag')}</span>
               </div>
 
               <div className="font-display text-4xl font-extrabold tabular-nums tracking-[-0.03em] text-white mb-2">
                 Rp {wallet.availableBal.toLocaleString('id-ID')}
               </div>
               <p className="text-base text-slate-200 leading-7 mb-5">
-                Dana bersih hasil sewa booth tenant dan pelunasan termin yang siap ditransfer instan ke rekening bank kamu.
+                {t('wal.availableBody')}
               </p>
 
-              <button className="min-h-12 px-6 bg-brand-lime hover:bg-brand-lime-hover rounded-full text-brand-navy font-semibold text-base transition-colors inline-flex items-center gap-2">
-                <span>Tarik dana ke bank sekarang</span>
-                <ArrowRight aria-hidden="true" className="w-4 h-4" />
+              <button
+                type="button"
+                disabled
+                className="min-h-12 px-6 bg-brand-lime/70 rounded-full text-brand-navy font-semibold text-base inline-flex items-center gap-2 cursor-not-allowed"
+              >
+                <span>{t('wal.withdraw')}</span>
               </button>
+              <p className="mt-3 text-sm text-slate-300">{t('wal.withdrawNote')}</p>
             </div>
           </div>
         </div>
