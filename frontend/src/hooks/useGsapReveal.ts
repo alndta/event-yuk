@@ -14,7 +14,11 @@ interface ElementRef {
  * Nothing runs for visitors who prefer reduced motion, and content is never
  * left hidden: anything already above the viewport is simply shown.
  */
-export default function useGsapReveal(rootRef: ElementRef, selector = '[data-gsap-reveal]') {
+export default function useGsapReveal(
+  rootRef: ElementRef,
+  selector = '[data-gsap-reveal]',
+  deps: unknown[] = []
+) {
   useLayoutEffect(() => {
     const root = rootRef.current;
     if (!root) return;
@@ -87,5 +91,6 @@ export default function useGsapReveal(rootRef: ElementRef, selector = '[data-gsa
     });
 
     return () => mm.revert();
-  }, [rootRef, selector]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rootRef, selector, ...deps]);
 }

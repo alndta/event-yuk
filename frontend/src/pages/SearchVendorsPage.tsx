@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import useGsapReveal from '../hooks/useGsapReveal';
 import { Link } from 'react-router-dom';
 import {
   Search,
@@ -26,6 +27,8 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
     mockPartners.filter((p) => p.type === 'VENDOR')
   );
   const [loading, setLoading] = useState<boolean>(false);
+  const pageRef = useRef<HTMLDivElement>(null);
+  useGsapReveal(pageRef, '[data-gsap-reveal]', [loading]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedCity, setSelectedCity] = useState<string>('ALL');
@@ -59,7 +62,7 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
   });
 
   return (
-    <div className="space-y-6 sm:space-y-8 font-sans">
+    <div ref={pageRef} className="space-y-6 sm:space-y-8 font-sans">
       <SEOHead
         title="Vendor Sound System, Lighting, LED & Rigging Panggung | Event Yuk"
         description="Katalog vendor perlengkapan konser dan panggung terverifikasi di Indonesia. Sewa sound system line array, panggung rigging aluminium, lighting bergerak, videotron LED screen, dan genset silent bergaransi BAST."
@@ -73,7 +76,7 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
           <Sliders aria-hidden="true" className="h-4 w-4" />
           Katalog vendor produksi dan peralatan konser
         </p>
-        <h1 className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
+        <h1 data-split-title className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
           Cari vendor panggung dan alat produksi
         </h1>
         <p className="mt-4 text-lg leading-8 text-slate-700">
@@ -146,6 +149,7 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
           {filtered.map((vendor) => (
           <div
             key={vendor.id}
+            data-gsap-reveal
             className="flex flex-col justify-between overflow-hidden rounded-lg bg-white"
           >
             <div className="p-6">

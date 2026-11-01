@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import useGsapReveal from '../hooks/useGsapReveal';
 import { useParams, Link } from 'react-router-dom';
 import {
   Sliders,
@@ -36,6 +37,8 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
   const fallbackPartner = mockPartners.find((p) => p.id === id) || mockPartners[0];
   const [partner, setPartner] = useState<any>(fallbackPartner);
   const [loading, setLoading] = useState<boolean>(false);
+  const pageRef = useRef<HTMLDivElement>(null);
+  useGsapReveal(pageRef, '[data-gsap-reveal]', [id, loading]);
 
   useEffect(() => {
     if (!id) return;
@@ -110,7 +113,7 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
   const contactEmail: string | undefined = partner.contactEmail;
 
   const Card = ({ children }: { children: React.ReactNode }) => (
-    <div className="space-y-5 rounded-lg bg-white p-6 sm:p-8">{children}</div>
+    <div data-gsap-reveal className="space-y-5 rounded-lg bg-white p-6 sm:p-8">{children}</div>
   );
   const CardTitle = ({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) => (
     <h2 className="flex items-center gap-2.5 font-display text-2xl font-extrabold tracking-[-0.03em] text-brand-ink">
@@ -126,7 +129,7 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
   );
 
   return (
-    <div className="space-y-8 font-sans sm:space-y-10">
+    <div ref={pageRef} className="space-y-8 font-sans sm:space-y-10">
       <SEOHead
         title={`${partner.name} — Spesifikasi, Rate Card & Sewa | Event Yuk`}
         description={
@@ -154,7 +157,7 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
         </span>
       </div>
 
-      <header className="rounded-lg bg-brand-navy p-6 text-white sm:p-10">
+      <header data-gsap-reveal className="rounded-lg bg-brand-navy p-6 text-white sm:p-10">
         <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
             <Avatar
@@ -290,7 +293,7 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
                 )}
               </Card>
 
-              <div className="space-y-3 rounded-lg bg-brand-navy p-6 text-white sm:p-8">
+              <div data-gsap-reveal className="space-y-3 rounded-lg bg-brand-navy p-6 text-white sm:p-8">
                 <p className="flex items-center gap-2 font-display text-xl font-extrabold">
                   <ShieldCheck aria-hidden="true" className="h-5 w-5 text-brand-lime" />
                   Jaminan BAST digital dan pencairan DP yang aman
@@ -342,7 +345,7 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
                 </dl>
               </Card>
 
-              <div className="space-y-3 rounded-lg bg-brand-navy p-6 text-white sm:p-8">
+              <div data-gsap-reveal className="space-y-3 rounded-lg bg-brand-navy p-6 text-white sm:p-8">
                 <p className="flex items-center gap-2 font-display text-xl font-extrabold">
                   <ShieldCheck aria-hidden="true" className="h-5 w-5 text-brand-lime" />
                   PKS sah dan kebijakan anti-cancel sepihak
@@ -371,7 +374,7 @@ export default function PartnerDetailPage({ onProposePartner }: Props) {
         </div>
 
         <aside>
-          <div className="sticky top-24 space-y-6 rounded-lg bg-white p-6 sm:p-8">
+          <div data-gsap-reveal className="sticky top-24 space-y-6 rounded-lg bg-white p-6 sm:p-8">
             <div>
               <p className="text-sm text-slate-700">Perkiraan honor / tarif</p>
               <p className="mt-1 font-display text-3xl font-extrabold tracking-[-0.04em] text-brand-ink">

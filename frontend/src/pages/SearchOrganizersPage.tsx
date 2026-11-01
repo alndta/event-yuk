@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import useGsapReveal from '../hooks/useGsapReveal';
 import { Link } from 'react-router-dom';
 import {
   Search,
@@ -23,6 +24,8 @@ interface Props {
 export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrganizer }: Props) {
   const [organizers, setOrganizers] = useState<OrganizerItem[]>(mockOrganizers);
   const [loading, setLoading] = useState<boolean>(false);
+  const pageRef = useRef<HTMLDivElement>(null);
+  useGsapReveal(pageRef, '[data-gsap-reveal]', [loading]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL');
   const [selectedCity, setSelectedCity] = useState<string>('ALL');
@@ -69,7 +72,7 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
   });
 
   return (
-    <div className="space-y-6 sm:space-y-8 font-sans">
+    <div ref={pageRef} className="space-y-6 sm:space-y-8 font-sans">
       <SEOHead
         title="Direktori Event Organizer & Promotor Terverifikasi | Event Yuk"
         description="Daftar promotor dan event organizer berlisensi resmi di Indonesia dengan rekam jejak terverifikasi e-KYC. Akses pagu anggaran acara, peluang kemitraan vendor, audisi musisi, dan rekrutmen kru."
@@ -83,7 +86,7 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
           <Calendar aria-hidden="true" className="h-4 w-4" />
           Direktori promotor dan event organizer
         </p>
-        <h1 className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
+        <h1 data-split-title className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
           Cari event organizer yang cocok
         </h1>
         <p className="mt-4 text-lg leading-8 text-slate-700">
@@ -156,6 +159,7 @@ export default function SearchOrganizersPage({ onInviteOrganizer: _onInviteOrgan
         {filtered.map((eo) => (
           <div
             key={eo.id}
+            data-gsap-reveal
             className="flex flex-col overflow-hidden rounded-lg bg-white"
           >
             {/* Banner Top */}

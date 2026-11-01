@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import useGsapReveal from '../hooks/useGsapReveal';
 import { Link } from 'react-router-dom';
 import {
   Search,
@@ -26,6 +27,8 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
     mockPartners.filter((p) => p.type === 'TALENT')
   );
   const [loading, setLoading] = useState<boolean>(false);
+  const pageRef = useRef<HTMLDivElement>(null);
+  useGsapReveal(pageRef, '[data-gsap-reveal]', [loading]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGenre, setSelectedGenre] = useState<string>('ALL');
   const [selectedCity, setSelectedCity] = useState<string>('ALL');
@@ -58,7 +61,7 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
   });
 
   return (
-    <div className="space-y-6 sm:space-y-8 font-sans">
+    <div ref={pageRef} className="space-y-6 sm:space-y-8 font-sans">
       <SEOHead
         title="Direktori Band, Musisi Panggung & Manajemen Artis | Event Yuk"
         description="Booking band indie, pop, jazz, dan musisi tamu profesional untuk konser dan pensi sekolah. Transparansi rate card honor manggung, kepastian riders teknis & konsumsi, bergaransi rekening bersama Escrow."
@@ -72,7 +75,7 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
           <Music aria-hidden="true" className="h-4 w-4" />
           Direktori band, artis, dan musisi festival
         </p>
-        <h1 className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
+        <h1 data-split-title className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
           Cari band dan musisi tamu
         </h1>
         <p className="mt-4 text-lg leading-8 text-slate-700">
@@ -145,6 +148,7 @@ export default function SearchBandsPage({ onProposeTalent: _onProposeTalent }: P
         {filtered.map((band) => (
           <div
             key={band.id}
+            data-gsap-reveal
             className="flex flex-col justify-between overflow-hidden rounded-lg bg-white"
           >
             <div className="p-6">

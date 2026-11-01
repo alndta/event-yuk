@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
+import useGsapReveal from '../hooks/useGsapReveal';
 import { Link } from 'react-router-dom';
 import {
   Calendar,
@@ -380,6 +381,8 @@ export const ROLES_GUIDE_DATA: Record<UserRole, RoleGuideDetail> = {
 
 export default function RolesGuidePage() {
   const [selectedRole, setSelectedRole] = useState<UserRole>('EO');
+  const pageRef = useRef<HTMLDivElement>(null);
+  useGsapReveal(pageRef);
   const activeGuide = ROLES_GUIDE_DATA[selectedRole];
 
   const roleOptions: { id: UserRole; label: string; icon: any; image: string; alt: string }[] = [
@@ -392,7 +395,7 @@ export default function RolesGuidePage() {
   ];
 
   return (
-    <div className="guide-page -mx-5 -mt-6 -mb-[6.5rem] sm:-mx-8 sm:-mt-8 sm:-mb-28 lg:-mx-12 2xl:-mx-16 font-sans">
+    <div ref={pageRef} className="guide-page -mx-5 -mt-6 -mb-[6.5rem] sm:-mx-8 sm:-mt-8 sm:-mb-28 lg:-mx-12 2xl:-mx-16 font-sans">
       <SEOHead
         title="Panduan Peran di Ekosistem Acara | Event Yuk"
         description="Kenali enam peran di Event Yuk, lihat cara kerja tiap mitra, dan ikuti tiga langkah pendaftaran akun."
@@ -403,14 +406,14 @@ export default function RolesGuidePage() {
       <section className="guide-chapter guide-hero">
         <div className="guide-shell guide-hero__layout">
           <div className="guide-hero__copy">
-            <h1><span>Pilih peranmu</span><span>di dunia acara</span></h1>
+            <h1 data-split-title><span>Pilih peranmu</span><span>di dunia acara</span></h1>
             <p>Kenali enam peran, lihat alurnya, lalu daftar dengan langkah yang jelas.</p>
             <a className="guide-action guide-action--lime" href="#peran">
               Lihat peran <ArrowRight aria-hidden="true" />
             </a>
           </div>
 
-          <div className="guide-hero__scene" aria-label="Pratinjau alur pendaftaran Event Yuk">
+          <div data-gsap-reveal className="guide-hero__scene" aria-label="Pratinjau alur pendaftaran Event Yuk">
             <img
               className="guide-hero__photo"
               src="/assets/crew-production.jpg"
@@ -438,11 +441,11 @@ export default function RolesGuidePage() {
       <section id="peran" className="guide-chapter guide-roles">
         <div className="guide-shell">
           <div className="guide-section-heading">
-            <h2>Peranmu dalam acara</h2>
+            <h2 data-split-title>Peranmu dalam acara</h2>
             <p>Pilih satu peran untuk melihat tanggung jawab, fitur, dan alur kerjanya.</p>
           </div>
 
-          <div className="guide-role-grid" role="group" aria-label="Pilih peran">
+          <div data-gsap-reveal className="guide-role-grid" role="group" aria-label="Pilih peran">
             {roleOptions.map((option) => {
               const Icon = option.icon;
               const isSelected = selectedRole === option.id;
@@ -482,12 +485,12 @@ export default function RolesGuidePage() {
       <section className="guide-chapter guide-features">
         <div className="guide-shell">
           <div className="guide-section-heading">
-            <h2>Yang bisa kamu kerjakan</h2>
+            <h2 data-split-title>Yang bisa kamu kerjakan</h2>
             <p>Fitur untuk {activeGuide.badge.toLowerCase()}.</p>
           </div>
           <ul className="guide-feature-list">
             {activeGuide.features.map((feature) => (
-              <li key={feature.title}>
+              <li key={feature.title} data-gsap-reveal>
                 <CheckCircle2 aria-hidden="true" />
                 <div>
                   <h3>{feature.title}</h3>
@@ -502,12 +505,12 @@ export default function RolesGuidePage() {
       <section className="guide-chapter guide-workflow">
         <div className="guide-shell">
           <div className="guide-section-heading">
-            <h2>Alur kerja di lapangan</h2>
+            <h2 data-split-title>Alur kerja di lapangan</h2>
             <p>Dari persiapan sampai acara selesai, setiap peran punya urutan kerja yang berbeda.</p>
           </div>
           <ol className="guide-workflow-list">
             {activeGuide.workflow.map((item, index) => (
-              <li key={item.title}>
+              <li key={item.title} data-gsap-reveal>
                 <span className="guide-workflow-list__number">{index + 1}</span>
                 <h3>{item.title}</h3>
                 <p>{item.desc}</p>
@@ -521,11 +524,11 @@ export default function RolesGuidePage() {
         <div className="guide-shell guide-agreements__layout">
           <div>
             <ShieldCheck aria-hidden="true" className="guide-agreements__icon" />
-            <h2>Pastikan kesepakatan jelas</h2>
+            <h2 data-split-title>Pastikan kesepakatan jelas</h2>
             <p className="guide-agreements__intro">
               Cek isi kontrak, termin pembayaran, dan tanggung jawab masing-masing sebelum menyetujui kerja sama.
             </p>
-            <ul className="guide-agreement-list">
+            <ul data-gsap-reveal className="guide-agreement-list">
               {activeGuide.legalAndEscrow.map((item) => (
                 <li key={item}>{item}</li>
               ))}
@@ -533,9 +536,9 @@ export default function RolesGuidePage() {
           </div>
 
           <div className="guide-faq">
-            <h2>Pertanyaan umum</h2>
+            <h2 data-split-title>Pertanyaan umum</h2>
             {activeGuide.faqs.map((faq, index) => (
-              <details key={faq.q} open={index === 0}>
+              <details key={faq.q} data-gsap-reveal open={index === 0}>
                 <summary>{faq.q}</summary>
                 <p>{faq.a}</p>
               </details>
@@ -546,7 +549,7 @@ export default function RolesGuidePage() {
 
       <section className="guide-chapter guide-cta">
         <div className="guide-shell guide-cta__layout">
-          <h2>Mulai dari peranmu</h2>
+          <h2 data-split-title>Mulai dari peranmu</h2>
           <p>Pilih peran, isi data akun, lalu verifikasi email untuk masuk.</p>
           <Link to="/register" className="guide-action guide-action--navy">
             Daftar akun <ArrowRight aria-hidden="true" />

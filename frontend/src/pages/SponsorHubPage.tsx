@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import useGsapReveal from '../hooks/useGsapReveal';
 import {
   Building2,
   CheckCircle2,
@@ -23,6 +24,8 @@ export default function SponsorHubPage({ events, onApplySponsorship }: Props) {
   const [customBrandName, setCustomBrandName] = useState('');
   const [customBudget, setCustomBudget] = useState('');
   const [proposalSubmitted, setProposalSubmitted] = useState(false);
+  const pageRef = useRef<HTMLDivElement>(null);
+  useGsapReveal(pageRef);
 
   useEffect(() => {
     if (availableEvents.length > 0) {
@@ -129,7 +132,7 @@ export default function SponsorHubPage({ events, onApplySponsorship }: Props) {
         aria-label={label}
         className="h-2.5 w-full overflow-hidden rounded-full bg-brand-sand"
       >
-        <div className="h-full rounded-full bg-brand-navy" style={{ width: pct + '%' }} />
+        <div data-gsap-bar className="h-full rounded-full bg-brand-navy" style={{ width: pct + '%' }} />
       </div>
     </div>
   );
@@ -138,7 +141,7 @@ export default function SponsorHubPage({ events, onApplySponsorship }: Props) {
     'min-h-12 w-full rounded-lg border border-slate-300 bg-white px-4 text-base text-slate-900 placeholder:text-slate-500 focus:border-brand-navy focus:outline-none focus:ring-2 focus:ring-brand-navy/30';
 
   return (
-    <div className="space-y-16 font-sans sm:space-y-20">
+    <div ref={pageRef} className="space-y-16 font-sans sm:space-y-20">
       <SEOHead
         title="Sponsor Hub — Peluang Aktivasi Brand & Kemitraan Festival | Event Yuk"
         description="Hubungkan brand FMCG, fintech, dan korporasi dengan ratusan festival musik, pensi sekolah, dan bazaar di Indonesia. Akses demografi audiens riil, paket Title/Platinum/Gold/Silver, dan laporan ROI aktivasi transparan."
@@ -151,7 +154,7 @@ export default function SponsorHubPage({ events, onApplySponsorship }: Props) {
           <Building2 aria-hidden="true" className="h-4 w-4" />
           Portal kemitraan sponsor brand
         </p>
-        <h1 className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
+        <h1 data-split-title className="font-display text-4xl font-extrabold leading-[1.02] tracking-[-0.04em] text-brand-ink sm:text-6xl">
           Sponsor Hub
         </h1>
         <p className="mt-4 text-lg leading-8 text-slate-700">
@@ -165,7 +168,7 @@ export default function SponsorHubPage({ events, onApplySponsorship }: Props) {
           { label: 'Target usia dominan', value: '18-32 tahun', note: 'Gen-Z dan milenial produktif (SES A dan B 72%)' },
           { label: 'Total estimasi media impressions', value: '12,8 juta', note: 'Jangkauan media sosial dan aktivasi on-ground' },
         ].map((m) => (
-          <div key={m.label} className="rounded-lg bg-white p-6">
+          <div key={m.label} data-gsap-reveal className="rounded-lg bg-white p-6">
             <p className="text-sm font-medium text-slate-700">{m.label}</p>
             <p className="mt-3 font-display text-4xl font-extrabold tracking-[-0.04em] text-brand-ink">{m.value}</p>
             <p className="mt-2 text-sm leading-6 text-slate-600">{m.note}</p>
@@ -174,7 +177,7 @@ export default function SponsorHubPage({ events, onApplySponsorship }: Props) {
       </section>
 
       <section className="grid grid-cols-1 gap-5 lg:grid-cols-3">
-        <div className="rounded-lg bg-white p-6 sm:p-8 lg:col-span-2">
+        <div data-gsap-reveal className="rounded-lg bg-white p-6 sm:p-8 lg:col-span-2">
           <div className="flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <h2 className="font-display text-2xl font-extrabold tracking-[-0.03em] text-brand-ink">
@@ -230,7 +233,7 @@ export default function SponsorHubPage({ events, onApplySponsorship }: Props) {
           </div>
         </div>
 
-        <div className="flex flex-col justify-between rounded-lg bg-white p-6 sm:p-8">
+        <div data-gsap-reveal className="flex flex-col justify-between rounded-lg bg-white p-6 sm:p-8">
           <div>
             <h2 className="font-display text-2xl font-extrabold tracking-[-0.03em] text-brand-ink">
               Pilih acara untuk disponsori
@@ -289,6 +292,7 @@ export default function SponsorHubPage({ events, onApplySponsorship }: Props) {
         <div className="mx-auto max-w-3xl text-center">
           <h2
             id="sponsor-tiers-title"
+            data-split-title
             className="font-display text-4xl font-extrabold leading-[1.05] tracking-[-0.04em] text-brand-ink sm:text-5xl"
           >
             Pilih paket sponsorship
@@ -304,6 +308,7 @@ export default function SponsorHubPage({ events, onApplySponsorship }: Props) {
             return (
               <div
                 key={tier.id}
+                data-gsap-reveal
                 role="button"
                 tabIndex={0}
                 aria-pressed={selected}
@@ -357,7 +362,7 @@ export default function SponsorHubPage({ events, onApplySponsorship }: Props) {
         </div>
       </section>
 
-      <section aria-labelledby="sponsor-form-title" className="rounded-lg bg-white p-6 sm:p-10">
+      <section aria-labelledby="sponsor-form-title" data-gsap-reveal className="rounded-lg bg-white p-6 sm:p-10">
         <div className="max-w-2xl">
           <p className="mb-2 inline-flex items-center gap-2 text-sm font-semibold text-brand-lime-strong">
             <Send aria-hidden="true" className="h-4 w-4" />
