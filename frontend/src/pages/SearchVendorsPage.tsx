@@ -15,6 +15,7 @@ import {
 import { PartnerItem } from '../types/models';
 import { PartnerCardsSkeletonList } from '../components/skeletons/PartnerCardSkeleton';
 import { SEOHead } from '../components/SEOHead';
+import EmptyState from '../components/EmptyState';
 import { useLanguage } from '../context/LanguageContext';
 import { api, query } from '../lib/api';
 import useDebounced from '../hooks/useDebounced';
@@ -27,7 +28,7 @@ interface Props {
 export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }: Props) {
   const { t, language } = useLanguage();
   const [vendors, setVendors] = useState<PartnerItem[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const pageRef = useRef<HTMLDivElement>(null);
   useGsapReveal(pageRef, '[data-gsap-reveal]', [loading]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -46,7 +47,10 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
       .catch((err) => {
         if (err?.name !== 'AbortError') setVendors([]);
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        // A superseded request must not end the loading state of the one that replaced it.
+        if (!controller.signal.aborted) setLoading(false);
+      });
     return () => controller.abort();
   }, [debouncedSearch, cityFilter]);
 
@@ -143,8 +147,15 @@ export default function SearchVendorsPage({ onProposeVendor: _onProposeVendor }:
       {/* Vendors Grid */}
       {loading ? (
         <PartnerCardsSkeletonList count={4} />
+      ) : filtered.length === 0 ? (
+        <EmptyState
+          title={t('common.noResults')}
+          body={t('common.noResultsBody')}
+          actionLabel={t('common.reset')}
+          onAction={() => { setSearchTerm(''); setSelectedCity('ALL'); setSelectedCategory('ALL'); }}
+        />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 ey-stagger">
           {filtered.map((vendor) => (
           <div
             key={vendor.id}

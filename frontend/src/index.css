@@ -48,25 +48,60 @@
   background: #94a3b8;
 }
 
-/* Elegant Shimmer Skeleton Effect (Non-flickering, Stripe/Linear style) */
-@keyframes shimmerWave {
-  0% {
-    background-position: -200% 0;
-  }
-  100% {
-    background-position: 200% 0;
-  }
+/* Skeleton: a soft light band glides across a calm base. The band moves with transform
+   (GPU, no repaints), and skeleton blocks fade in so a page never "pops" into view. */
+:root {
+  --sk-base: #e8edf2;
+  --sk-band: rgba(255, 255, 255, 0.75);
 }
-
+.dark {
+  --sk-base: #1f3044;
+  --sk-band: rgba(255, 255, 255, 0.09);
+}
+@keyframes skSweep {
+  to { transform: translateX(100%); }
+}
+@keyframes eyFadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes eySpin {
+  to { transform: rotate(360deg); }
+}
 .skeleton-shimmer {
-  background: linear-gradient(
-    90deg,
-    rgba(241, 245, 249, 0.9) 0%,
-    rgba(226, 232, 240, 0.95) 35%,
-    rgba(241, 245, 249, 0.9) 70%
-  );
-  background-size: 200% 100%;
-  animation: shimmerWave 1.8s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+  background-color: var(--sk-base);
+}
+.skeleton-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(100deg, transparent 20%, var(--sk-band) 50%, transparent 80%);
+  animation: skSweep 1.7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.ey-fade-in {
+  animation: eyFadeIn 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+/* Cards inside a fresh list arrive one after another. */
+.ey-stagger > * {
+  animation: eyFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.ey-stagger > *:nth-child(2) { animation-delay: 60ms; }
+.ey-stagger > *:nth-child(3) { animation-delay: 120ms; }
+.ey-stagger > *:nth-child(4) { animation-delay: 180ms; }
+.ey-stagger > *:nth-child(5) { animation-delay: 240ms; }
+.ey-stagger > *:nth-child(n + 6) { animation-delay: 300ms; }
+.ey-spinner {
+  border-radius: 9999px;
+  border: 3px solid currentColor;
+  border-right-color: transparent;
+  animation: eySpin 0.75s cubic-bezier(0.5, 0.2, 0.5, 0.8) infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer::after { animation: none; }
+  .ey-fade-in, .ey-stagger > * { animation: none; }
 }
 
 /* Headline lines that rise out of a mask: give descenders room inside the clip. */

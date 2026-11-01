@@ -15,6 +15,9 @@ import {
 } from 'lucide-react';
 import ContractModal from '../components/ContractModal';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
+import EmptyState from '../components/EmptyState';
+import LoadingState from '../components/Spinner';
 import { api, ApiError } from '../lib/api';
 import { SEOHead } from '../components/SEOHead';
 
@@ -47,6 +50,7 @@ interface Props {
 
 export default function ContractsPage({ onShowToast }: Props) {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [proposals, setProposals] = useState<ContractProposalItem[]>([]);
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
@@ -62,6 +66,7 @@ export default function ContractsPage({ onShowToast }: Props) {
   const [counterNotes, setCounterNotes] = useState<string>('');
 
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [loadingList, setLoadingList] = useState(true);
 
   const fetchLiveProposals = () => {
     api('/proposals')
@@ -95,7 +100,8 @@ export default function ContractsPage({ onShowToast }: Props) {
       .catch((err) => {
         setProposals([]);
         setLoadError(err instanceof ApiError ? err.message : 'Daftar kontrak belum bisa dimuat.');
-      });
+      })
+      .finally(() => setLoadingList(false));
   };
 
   useEffect(() => {
@@ -271,12 +277,14 @@ export default function ContractsPage({ onShowToast }: Props) {
 
       {/* Proposals List */}
       <div className="space-y-4">
-        {filtered.length === 0 ? (
-          <div className="p-12 text-center bg-white rounded-lg border border-slate-200">
-            <FileText className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-            <div className="font-extrabold text-slate-800 text-sm">Tidak ada proposal yang sesuai filter</div>
-            <p className="text-sm text-slate-400 mt-1">Coba sesuaikan kata kunci pencarian atau ubah tab status filter.</p>
-          </div>
+        {loadingList ? (
+          <LoadingState />
+        ) : filtered.length === 0 ? (
+          proposals.length === 0 ? (
+            <EmptyState title={t('contracts.emptyTitle')} body={t('contracts.emptyBody')} icon={<FileText aria-hidden="true" className="h-7 w-7" />} />
+          ) : (
+            <EmptyState title={t('contracts.noMatch')} body={t('contracts.noMatchBody')} />
+          )
         ) : (
           filtered.map((item) => {
             const hasCounter = item.status === 'COUNTER_OFFER' && item.counterAmount;

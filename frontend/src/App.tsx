@@ -8,7 +8,8 @@ import { PartnerItem } from './types/models';
 
 // Auth Context & Protected Route
 import { AuthProvider, useAuth } from './context/AuthContext';
-import { LanguageProvider } from './context/LanguageContext';
+import { LanguageProvider, useLanguage } from './context/LanguageContext';
+import LoadingState from './components/Spinner';
 import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import useSmoothScroll from './hooks/useSmoothScroll';
@@ -44,6 +45,7 @@ const DashboardPage = lazy(() => import('./pages/DashboardPage'));
 const RoleOnboardingPage = lazy(() => import('./pages/RoleOnboardingPage'));
 
 function AppContent() {
+  const { t } = useLanguage();
   const navigate = useNavigate();
   const location = useLocation();
   const mainRef = useRef<HTMLElement>(null);
@@ -194,9 +196,7 @@ function AppContent() {
       <main ref={mainRef} className={isAuthPage ? 'flex-1 w-full' : 'flex-1 w-full px-5 sm:px-8 lg:px-12 2xl:px-16 py-6 sm:py-8'}>
         <Suspense
           fallback={
-            <div role="status" aria-live="polite" className="flex min-h-[40vh] items-center justify-center text-base text-slate-600">
-              Memuat halaman
-            </div>
+            <LoadingState label={t('common.loadingPage')} />
           }
         >
         <Routes>

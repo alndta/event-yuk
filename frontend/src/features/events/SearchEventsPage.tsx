@@ -9,6 +9,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { api, query } from '../../lib/api';
 import useDebounced from '../../hooks/useDebounced';
 import { mapBackendEvent } from '../../utils/mapEvent';
+import EmptyState from '../../components/EmptyState';
 import useGsapReveal from '../../hooks/useGsapReveal';
 
 interface Props {
@@ -29,7 +30,7 @@ export default function SearchEventsPage({
   const { t } = useLanguage();
   const pageRef = useRef<HTMLDivElement>(null);
   const [eventsList, setEventsList] = useState<EventItem[]>(propEvents || []);
-  const [loading, setLoading] = useState<boolean>(!propEvents || propEvents.length === 0);
+  const [loading, setLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<(typeof categoryIds)[number]>('ALL');
   const [selectedStatus, setSelectedStatus] = useState<StatusFilter>('ALL');
@@ -56,7 +57,10 @@ export default function SearchEventsPage({
         if (err?.name === 'AbortError') return;
         setEventsList([]);
       })
-      .finally(() => setLoading(false));
+      .finally(() => {
+        // A superseded request must not end the loading state of the one that replaced it.
+        if (!controller.signal.aborted) setLoading(false);
+      });
     return () => controller.abort();
   }, [debouncedSearch, selectedCategory, selectedStatus, propEvents]);
 
@@ -225,7 +229,7 @@ export default function SearchEventsPage({
           <EventCardsSkeletonList count={6} />
         </div>
       ) : filteredEvents.length > 0 ? (
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3 ey-stagger">
           {filteredEvents.map((event) =>
             event.isPortfolio ? (
               <EventCardPortfolio key={event.id} event={event} onViewDetails={onViewDetails} />
@@ -235,23 +239,12 @@ export default function SearchEventsPage({
           )}
         </div>
       ) : (
-        <div className="mx-auto max-w-xl bg-white px-6 py-12 text-center">
-          <CalendarDays aria-hidden="true" className="mx-auto h-8 w-8 text-brand-navy" />
-          <h2 className="mt-4 font-display text-2xl font-semibold text-slate-950">
-            {t('eventSearch.noResultsTitle')}
-          </h2>
-          <p className="mx-auto mt-2 max-w-sm text-base leading-7 text-slate-600">
-            {t('eventSearch.noResultsDescription')}
-          </p>
-          <button
-            type="button"
-            onClick={clearFilters}
-            className="mt-5 inline-flex min-h-11 items-center gap-2 bg-brand-navy px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-navy-dark focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-navy"
-          >
-            <RotateCcw aria-hidden="true" className="h-4 w-4" />
-            {t('eventSearch.reset')}
-          </button>
-        </div>
+        <EmptyState
+          title={t('eventSearch.noResultsTitle')}
+          body={t('eventSearch.noResultsDescription')}
+          actionLabel={t('eventSearch.reset')}
+          onAction={clearFilters}
+        />
       )}
       </div>
     </>
