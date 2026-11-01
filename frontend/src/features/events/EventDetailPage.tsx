@@ -333,7 +333,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                 activeTab === 'booths' ? 'bg-brand-navy text-white shadow-sm' : 'text-slate-600 hover:bg-white hover:text-slate-900'
               }`}
             >
-              Denah kaveling booth ({displayBooths.length} Unit)
+              Denah kaveling booth ({displayBooths.length} unit)
             </button>
             <button
               onClick={() => setActiveTab('crew')}
@@ -342,7 +342,7 @@ export default function EventDetailPage({ events: propEvents, onOpenProposal }: 
                 activeTab === 'crew' ? 'bg-brand-navy text-white shadow-sm' : 'text-slate-600 hover:bg-white hover:text-slate-900'
               }`}
             >
-              Lowongan kru shift ({displayShifts.length} Posisi)
+              Lowongan kru shift ({displayShifts.length} posisi)
             </button>
             <button
               onClick={() => setActiveTab('sponsorship')}
